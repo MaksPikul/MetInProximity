@@ -1,4 +1,4 @@
-﻿using MetInProximityBack.ServiceInterfaces;
+﻿using MetInProximityBack.Interfaces;
 
 namespace MetInProximityBack.Services
 {

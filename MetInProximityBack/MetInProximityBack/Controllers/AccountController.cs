@@ -1,8 +1,12 @@
-﻿using MetInProximityBack.Models;
-using MetInProximityBack.ServiceInterfaces;
+﻿using Azure;
+using MetInProximityBack.Factories;
+using MetInProximityBack.Interfaces;
+using MetInProximityBack.Models;
 using MetInProximityBack.Services;
+using MetInProximityBack.Types;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Data.Common;
 
 namespace MetInProximityBack.Controllers
 {
@@ -11,72 +15,64 @@ namespace MetInProximityBack.Controllers
     public class AccountController : Controller
     {
         private readonly SignInManager<AppUser> _signInManager;
-
+        private readonly UserManager<AppUser> _userManager;
+        private readonly OAuthProviderFactory _providerFactory;
         private readonly ITokenService _tokenService;
         private readonly IOAuthService _OAuthService;
+
         public AccountController(
             SignInManager<AppUser> signInManager,
+            UserManager<AppUser> userManager,
+            OAuthProviderFactory providerFactory,
             ITokenService tokenService,
             IOAuthService OAuthService
+
         ) { 
             _signInManager = signInManager;
+            _userManager = userManager;
+            _providerFactory = providerFactory;
             _tokenService = tokenService;
             _OAuthService = OAuthService;
         }
 
-        [HttpPost("googleLogin")]
-        public async Task<IActionResult> googleOAuthLogin([FromQuery(Name = "code")] string code)
-        {
-
-            if (string.IsNullOrWhiteSpace(code))
+        [HttpPost("oauth/{provider}")]
+        public async Task<IActionResult> Authenticate(
+            [FromQuery(Name = "code")] string code, 
+            [FromRoute] string provider
+        ) {
+            try
             {
-                return BadRequest("Authorization code is required.");
-            }
+                IOAuthProvider OAuthProvider = _providerFactory.GetProvider(provider);
 
-            var tokens = await _OAuthService.GetGoogleOAuthTokens(code);
-            if (tokens == null)
+                OAuthTokenResponse tokens = await _OAuthService.GetOAuthTokens(OAuthProvider.TokenUrl, OAuthProvider.GetReqValues(code));
+
+                HttpResponseMessage response = await _OAuthService.GetUserAsResponse(OAuthProvider.UserUrl, tokens.access_token);
+
+                OAuthUserDto user = await OAuthProvider.MapResponseToUser(response);
+
+                if (user.IsEmailVerified != true)
+                {
+                    return BadRequest("Email not verified.");
+                }
+
+                //check for null after creation below here
+                //factory this
+                AppUser appUser = await _userManager.FindByEmailAsync(user.UserEmail); //?? await CreateAppUser(user.UserName, user.UserEmail);
+
+                await _signInManager.SignInAsync(appUser, isPersistent: true);
+
+                return Redirect("https://localhost:5173/home");
+
+            }
+            catch (ArgumentException ex)
             {
-                return BadRequest("Invalid Google tokens.");
+                return BadRequest(ex.Message);
+
             }
-
-            var googleUserClaims = _tokenService.DecodeToken(tokens.id_token);
-            if (googleUserClaims == null)
-            {
-                return BadRequest("Failed to decode Google user token.");
-            }
-
-            var isEmailVerified = googleUserClaims.FirstOrDefault(c => c.Type == "email_verified")?.Value;
-            if (isEmailVerified != "true")
-            {
-                return BadRequest("Email not verified.");
-            }
-
-            //factory this
-            //var appUser = await _userManager.FindByEmailAsync(userEmail) ?? await CreateAppUser(userName, userEmail, userPicture);
-
-            await _signInManager.SignInAsync(appUser, isPersistent: true);
-
-            return Redirect("https://localhost:5173/home");
-        }
-
-
-        [HttpPost("microsoftLogin")]
-        public IActionResult microsoftOAuthLogin([FromQuery(Name = "code")] string code)
-        {
-            if (string.IsNullOrWhiteSpace(code)) return BadRequest("Authorization code is required.");
-
-
-
-
-
-
-
-
-            return View();
         }
 
         [HttpPost("logout")]
-        public async Task logout()
+        public async Task Logout()
         {
             await _signInManager.SignOutAsync();
             Response.Redirect("https://localhost:5173/");
@@ -84,7 +80,7 @@ namespace MetInProximityBack.Controllers
         }
 
         [HttpPost("ping")]
-        public IActionResult ping()
+        public IActionResult Ping()
         {
             return View();
         }

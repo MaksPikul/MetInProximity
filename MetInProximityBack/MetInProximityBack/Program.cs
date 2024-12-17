@@ -1,7 +1,9 @@
 using MetInProximityBack.Data;
+using MetInProximityBack.Factories;
+using MetInProximityBack.Interfaces;
 using MetInProximityBack.Models;
-using MetInProximityBack.ServiceInterfaces;
 using MetInProximityBack.Services;
+using MetInProximityBack.Providers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -34,22 +36,29 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
     options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+/ ";
     options.User.RequireUniqueEmail = true;
     
-    /*
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequireNonAlphanumeric = true;
-    options.Password.RequiredLength = 6;
-    */
-
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
     options.Lockout.AllowedForNewUsers = true;
     options.Lockout.MaxFailedAccessAttempts = 3;
 })
 .AddEntityFrameworkStores<DBContext>();
 
+/* dependency injections*/
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IOAuthService, OAuthService>();
+
+builder.Services.AddTransient<IOAuthProvider, GoogleOAuthProvider>();
+builder.Services.AddTransient<IOAuthProvider, MicrosoftOAuthProvider>();
+builder.Services.AddSingleton<OAuthProviderFactory>();
+
+
+
+
+/*
+ following
+https://learn.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests
+ */
+builder.Services.AddHttpClient<IOAuthService, OAuthService>(); 
+
 
 app.UseHttpsRedirection();
 
