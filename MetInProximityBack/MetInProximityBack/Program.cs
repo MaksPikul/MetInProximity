@@ -17,19 +17,13 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 
 builder.Services.AddDbContext<DBContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
 
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
@@ -57,7 +51,16 @@ builder.Services.AddSingleton<OAuthProviderFactory>();
  following
 https://learn.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests
  */
-builder.Services.AddHttpClient<IOAuthService, OAuthService>(); 
+builder.Services.AddHttpClient<IOAuthService, OAuthService>();
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 
 app.UseHttpsRedirection();

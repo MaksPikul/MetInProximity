@@ -4,8 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
 using System;
 using MetInProximityBack.Services;
-using MetInProximityBack.ServiceInterfaces;
 using Azure.Core;
+using System.Security.Claims;
+using MetInProximityBack.NewFolder;
 
 namespace MetInProximityBack.Providers
 {
@@ -38,15 +39,17 @@ namespace MetInProximityBack.Providers
             return body;
         }
 
-        public async Task<OAuthUserDto> MapResponseToUser(HttpResponseMessage res)
+        public async Task<OAuthUserDto> MapResponseToUser(IEnumerable<Claim> res)
         {
-            GoogleOAuthUserResponse user = await res.Content.ReadFromJsonAsync<GoogleOAuthUserResponse>();
+            var userEmail = res.GetClaimValue("email");
+            var userName = res.GetClaimValue("name");
+            var userVerified = res.GetClaimValue("email_verified"); 
 
             return new OAuthUserDto
             {
-                UserName = user.name,
-                UserEmail = user.email,
-                IsEmailVerified = user.email_verified,
+                UserName = userName,
+                UserEmail = userEmail,
+                IsEmailVerified = userVerified == "true" ? true : false,
             };
 
         }

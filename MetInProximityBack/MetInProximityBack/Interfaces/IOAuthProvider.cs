@@ -1,5 +1,6 @@
 ﻿using MetInProximityBack.Types;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace MetInProximityBack.Interfaces
 {
@@ -9,6 +10,6 @@ namespace MetInProximityBack.Interfaces
         string TokenUrl { get; }
         string UserUrl { get; }
         Dictionary<string, string> GetReqValues(string code);
-        Task<OAuthUserDto> MapResponseToUser(HttpResponseMessage res);
+        Task<OAuthUserDto> MapResponseToUser(IEnumerable<Claim> res);
     }
 }

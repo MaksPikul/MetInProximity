@@ -1,8 +1,10 @@
 ﻿using MetInProximityBack.Interfaces;
-using MetInProximityBack.ServiceInterfaces;
+using MetInProximityBack.NewFolder;
 using MetInProximityBack.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using System.Security.Claims;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace MetInProximityBack.Providers
 {
@@ -10,7 +12,7 @@ namespace MetInProximityBack.Providers
     {
         private readonly IConfiguration _configuration;
         public string ProviderName => "microsoft";
-        public string TokenUrl => "https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token";
+        public string TokenUrl => "https://login.microsoftonline.com/common/oauth2/v2.0/token";
         public string UserUrl => "https://graph.microsoft.com/v1.0/me";
 
         public MicrosoftOAuthProvider(
@@ -28,6 +30,7 @@ namespace MetInProximityBack.Providers
                 { "client_secret", _configuration["Auth:Microsoft:ClientSecret"] },
                 { "grant_type", "authorization_code" },
                 { "code", code },
+                { "response_mode", "query" },
                 { "redirect_uri", _configuration["Auth:Microsoft:RedirectUri"] },
                 { "scope", "openid profile email" }
             };
@@ -35,15 +38,16 @@ namespace MetInProximityBack.Providers
             return req;
         }
 
-        public async Task<OAuthUserDto> MapResponseToUser(HttpResponseMessage res)
+        public async Task<OAuthUserDto> MapResponseToUser(IEnumerable<Claim> res)
         {
-            MicrosoftOAuthUserResponse user = await res.Content.ReadFromJsonAsync<MicrosoftOAuthUserResponse>();
+            var userEmail = res.GetClaimValue("email");
+            var userName = res.GetClaimValue("name");
 
             return new OAuthUserDto
             {
-                UserName = user.displayName,
-                UserEmail = user.mail,
-                IsEmailVerified = user.mail == null ? false : true,
+                UserName = userName,
+                UserEmail = userEmail,
+                IsEmailVerified = userEmail == null ? false : true,
             };
 
         }

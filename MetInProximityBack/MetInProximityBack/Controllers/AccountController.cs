@@ -7,6 +7,7 @@ using MetInProximityBack.Types;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.Common;
+using System.Security.Claims;
 
 namespace MetInProximityBack.Controllers
 {
@@ -46,29 +47,32 @@ namespace MetInProximityBack.Controllers
 
                 OAuthTokenResponse tokens = await _OAuthService.GetOAuthTokens(OAuthProvider.TokenUrl, OAuthProvider.GetReqValues(code));
 
-                HttpResponseMessage response = await _OAuthService.GetUserAsResponse(OAuthProvider.UserUrl, tokens.access_token);
+                IEnumerable<Claim> claims = _tokenService.DecodeToken(tokens.id_token);
 
-                OAuthUserDto user = await OAuthProvider.MapResponseToUser(response);
-
+                OAuthUserDto user = await OAuthProvider.MapResponseToUser(claims);
+                
                 if (user.IsEmailVerified != true)
                 {
                     return BadRequest("Email not verified.");
                 }
-
+                
                 //check for null after creation below here
                 //factory this
-                AppUser appUser = await _userManager.FindByEmailAsync(user.UserEmail); //?? await CreateAppUser(user.UserName, user.UserEmail);
+
+                AppUser appUser = await _userManager.FindByEmailAsync(user.UserEmail) ?? await CreateAppUser(user.UserName, user.UserEmail);
 
                 await _signInManager.SignInAsync(appUser, isPersistent: true);
 
-                return Redirect("https://localhost:5173/home");
+                return Ok(user.UserEmail + " " + user.UserName);
 
+                // change when android front end done 
+                //return Redirect("https://localhost:5173/home");
             }
             catch (ArgumentException ex)
             {
                 return BadRequest(ex.Message);
-
             }
+            
         }
 
         [HttpPost("logout")]
@@ -83,6 +87,19 @@ namespace MetInProximityBack.Controllers
         public IActionResult Ping()
         {
             return View();
+        }
+
+
+
+
+
+        //CLASS METHOD FOR NOW, WILL MOVE LATER, IF NECESSARY
+        async Task<AppUser> CreateAppUser(string UserName,string Email)
+        {
+            AppUser appUser = new AppUser {UserName = UserName, Email = Email };
+            await _userManager.CreateAsync(appUser);
+            //await _userManager.AddToRoleAsync(appUser, "User");
+            return appUser;
         }
     }
 }
