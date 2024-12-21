@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "com.example.metinproximityfront"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.metinproximityfront"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -40,6 +40,13 @@ android {
 }
 
 dependencies {
+
+    implementation(libs.androidx.browser)
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    val nav_version = "2.8.5"
+    implementation("androidx.navigation:navigation-compose:$nav_version")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
