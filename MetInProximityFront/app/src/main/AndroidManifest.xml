@@ -2,8 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -15,23 +13,36 @@
         android:theme="@style/Theme.MetInProximityFront"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".app.HomeActivity"
+            android:exported="false"
+            android:label="@string/title_activity_home"
+            android:theme="@style/Theme.MetInProximityFront" />
+        <activity
+            android:name=".app.LoginActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.MetInProximityFront">
-            <!-- Launcher intent: Defines the main entry point of the app -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <!-- Deep link intent: Handles the redirect URI from the browser -->
+        </activity>
+
+        <activity
+            android:name="net.openid.appauth.RedirectUriReceiverActivity"
+            android:exported="true"
+            tools:node="replace" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="maks.example.scheme" android:host="callback" />
+
+                <data android:scheme="com.example.metinproximityfront" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>

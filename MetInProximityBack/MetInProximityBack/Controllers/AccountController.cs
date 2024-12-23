@@ -41,6 +41,8 @@ namespace MetInProximityBack.Controllers
             [FromQuery(Name = "code")] string code, 
             [FromRoute] string provider
         ) {
+            Console.WriteLine("Goes here");
+
             try
             {
                 IOAuthProvider OAuthProvider = _providerFactory.GetProvider(provider);
@@ -55,24 +57,19 @@ namespace MetInProximityBack.Controllers
                 {
                     return BadRequest("Email not verified.");
                 }
-                
-                //check for null after creation below here
-                //factory this
 
                 AppUser appUser = await _userManager.FindByEmailAsync(user.UserEmail) ?? await CreateAppUser(user.UserName, user.UserEmail);
 
                 await _signInManager.SignInAsync(appUser, isPersistent: true);
 
-                return Ok(user.UserEmail + " " + user.UserName);
-
-                // change when android front end done 
-                //return Redirect("https://localhost:5173/home");
+                var token = "encode a token later";
+                 
+                return Redirect($"com.metinproximity.app://callback?status=success&token={token}");
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);
+                return Redirect($"com.metinproximity.app://callback?status=error&message={ex.Message}");
             }
-            
         }
 
         [HttpPost("logout")]
@@ -80,7 +77,6 @@ namespace MetInProximityBack.Controllers
         {
             await _signInManager.SignOutAsync();
             Response.Redirect("https://localhost:5173/");
-
         }
 
         [HttpPost("ping")]

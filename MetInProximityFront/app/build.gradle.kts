@@ -39,14 +39,24 @@ android {
     }
 }
 
+object VERSION {
+    const val NAVIGATION = "2.8.0"
+    const val APPAUTH = "0.11.1"
+    const val BROWSER = "1.8.0"
+    const val OKHTTP = "4.12.0"
+    const val GSON = "2.11.0"
+}
+
 dependencies {
 
-    implementation(libs.androidx.browser)
-    implementation("androidx.security:security-crypto:1.1.0-alpha06")
-    val nav_version = "2.8.5"
-    implementation("androidx.navigation:navigation-compose:$nav_version")
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation ("net.openid:appauth:${VERSION.APPAUTH}")
+
+    // Chrome Custom tabs for the login window
+    implementation ("androidx.browser:browser:${VERSION.BROWSER}")
+
+    // API requests and JSON
+    implementation ("com.squareup.okhttp3:okhttp:${VERSION.OKHTTP}")
+    implementation ("com.google.code.gson:gson:${VERSION.GSON}")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -56,6 +66,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
