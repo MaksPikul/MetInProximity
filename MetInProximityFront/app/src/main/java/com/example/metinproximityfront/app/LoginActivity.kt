@@ -48,7 +48,7 @@ class LoginActivity : ComponentActivity() {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Button(onClick = {googleAuth()}) { }
+                    Button(onClick = {goToHome()/*googleAuth()*/}) { }
                 }
 
             }
@@ -60,10 +60,16 @@ class LoginActivity : ComponentActivity() {
             //val ex = AuthorizationException.fromIntent(it.data!!)
             //val result = AuthorizationResponse.fromIntent(it.data!!)
 
-            val intent = Intent(this, HomeActivity::class.java)
-            startActivity(intent)
-            finish()
+            // get token, call my backend, receive jwt, save Jwt + user info?
+
+                goToHome()
         }
+    }
+
+    private fun goToHome(){
+        val intent = Intent(this, HomeActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
 

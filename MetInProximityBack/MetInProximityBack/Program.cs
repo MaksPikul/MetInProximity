@@ -44,9 +44,6 @@ builder.Services.AddTransient<IOAuthProvider, GoogleOAuthProvider>();
 builder.Services.AddTransient<IOAuthProvider, MicrosoftOAuthProvider>();
 builder.Services.AddSingleton<OAuthProviderFactory>();
 
-
-
-
 /*
  following
 https://learn.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests
