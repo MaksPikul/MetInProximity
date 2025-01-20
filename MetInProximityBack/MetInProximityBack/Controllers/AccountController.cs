@@ -2,10 +2,11 @@
 using MetInProximityBack.Factories;
 using MetInProximityBack.Interfaces;
 using MetInProximityBack.Models;
-using MetInProximityBack.Services;
+using MetInProximityBack.Builders;
 using MetInProximityBack.Types;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using System.Data.Common;
 using System.Security.Claims;
 
@@ -41,7 +42,6 @@ namespace MetInProximityBack.Controllers
             [FromQuery(Name = "code")] string code, 
             [FromRoute] string provider
         ) {
-            Console.WriteLine("Goes here");
 
             try
             {
@@ -62,13 +62,20 @@ namespace MetInProximityBack.Controllers
 
                 await _signInManager.SignInAsync(appUser, isPersistent: true);
 
-                var token = "encode a token later";
-                 
-                return Redirect($"com.metinproximity.app://callback?status=success&token={token}");
+                List<Claim> userClaims = new ClaimsBuilder()
+                    .AddClaim("UserId", User.FindFirstValue(ClaimTypes.NameIdentifier))
+                    .AddClaim("UserName", User.Identity.Name)
+                    .AddClaim("Email", User.FindFirstValue(ClaimTypes.Email))
+                    .AddClaim("IsAuthed", "true")
+                    .Build();
+
+                var token = _tokenService.CreateToken(userClaims);
+
+                return Ok(token);
             }
             catch (ArgumentException ex)
             {
-                return Redirect($"com.metinproximity.app://callback?status=error&message={ex.Message}");
+                return BadRequest(ex.Message);
             }
         }
 
@@ -76,7 +83,6 @@ namespace MetInProximityBack.Controllers
         public async Task Logout()
         {
             await _signInManager.SignOutAsync();
-            Response.Redirect("https://localhost:5173/");
         }
 
         [HttpPost("ping")]
