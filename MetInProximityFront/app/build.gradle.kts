@@ -55,6 +55,7 @@ dependencies {
     implementation ("androidx.browser:browser:${VERSION.BROWSER}")
 
     // API requests and JSON
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.okhttp3:okhttp:${VERSION.OKHTTP}")
     implementation ("com.google.code.gson:gson:${VERSION.GSON}")
 

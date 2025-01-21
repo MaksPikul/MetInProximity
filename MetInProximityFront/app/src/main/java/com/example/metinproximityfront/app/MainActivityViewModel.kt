@@ -3,46 +3,55 @@ package com.example.metinproximityfront.app
 import android.app.Application
 import android.content.Intent
 import androidx.lifecycle.AndroidViewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.metinproximityfront.api.AccountRepo
+import com.example.metinproximityfront.clients.HttpClient
 import com.example.metinproximityfront.config.OAuth.GoogleOAuthConfig
 import com.example.metinproximityfront.config.OAuth.OAuthConfig
 import com.example.metinproximityfront.services.auth.AuthService
 import com.example.metinproximityfront.services.auth.IAuthService
 import com.example.metinproximityfront.services.preference.IPrefStoreService
 import com.example.metinproximityfront.services.preference.PrefStoreService
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import retrofit2.HttpException
 
-class MainActivityViewModel(private val app: Application) : AndroidViewModel(app) {
+class MainActivityViewModel(
+    private val app: Application
+) : AndroidViewModel(app) {
 
-    val authenticator : IAuthService
+
+    val authService : IAuthService
     val prefStore : IPrefStoreService
+
     val OAuthProviders : MutableList<OAuthConfig>
 
-    init{
-        this.authenticator = AuthService(this.app.applicationContext)
+    private val accountRepo: AccountRepo
 
-        this.prefStore = PrefStoreService()
+    init{
+
+        this.prefStore = PrefStoreService(this.app.applicationContext)
+
+        this.accountRepo = AccountRepo(HttpClient.apiClient)
+
+        this.authService = AuthService(
+            this.app.applicationContext,
+            this.prefStore,
+            this.accountRepo
+        )
 
         this.OAuthProviders = InitOAuthProviders()
+
+
+
     }
 
-
-    fun StartLogin(
-        provider:OAuthConfig,
-        launchAction: (i: Intent) -> Unit,
-    ){
-        this.authenticator.StartLogin(provider, launchAction)
+    fun GetOAuthProviders (): List<OAuthConfig>{
+        return this.OAuthProviders
     }
-
-    fun FinishLogin(responseIntent: Intent){
-        this.authenticator.FinishLogin(responseIntent)
-
-        // TODO: save auth code into shared preferences
-
-        // TODO: redirect
-    }
-
-
-
-
 
     private fun InitOAuthProviders() : MutableList<OAuthConfig>{
         val list = mutableListOf<OAuthConfig>()
@@ -53,15 +62,5 @@ class MainActivityViewModel(private val app: Application) : AndroidViewModel(app
 
         return list
     }
-
-    fun GetOAuthProviders (): List<OAuthConfig>{
-        return this.OAuthProviders
-    }
-
-
-
-
-
-
 
 }

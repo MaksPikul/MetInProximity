@@ -9,5 +9,12 @@ interface IAuthService{
         launchAction: (i: Intent) -> Unit
     )
 
-    fun FinishLogin(responseIntent: Intent)
+    fun FinishLogin(
+        responseIntent: Intent,
+        successRedirect : ()-> Unit
+    )
+
+    fun Logout()
+
+    fun IsLoggedIn (): Boolean
 }

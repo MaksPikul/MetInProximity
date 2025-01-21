@@ -32,6 +32,7 @@ fun LoginView(
         i: Intent
     ) -> Unit
 ){
+
     Column (
         modifier = Modifier
             .fillMaxSize()
@@ -54,10 +55,3 @@ fun LoginView(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MetInProximityFrontTheme {
-        //LoginView()
-    }
-}
