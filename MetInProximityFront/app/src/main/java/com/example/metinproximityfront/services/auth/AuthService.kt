@@ -2,10 +2,9 @@ package com.example.metinproximityfront.services.auth
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.util.Base64
-import com.example.metinproximityfront.api.AccountRepo
-import com.example.metinproximityfront.api.entities.AuthResponse
+import com.example.metinproximityfront.data.repositories.AccountRepository
+import com.example.metinproximityfront.data.entities.account.AuthResult
 import com.example.metinproximityfront.config.OAuth.OAuthConfig
 import com.example.metinproximityfront.services.preference.IPrefStoreService
 import kotlinx.coroutines.CoroutineScope
@@ -27,7 +26,7 @@ import java.security.SecureRandom
 class AuthService(
     private val appContext: Context,
     private val prefStore : IPrefStoreService,
-    private val accountRepo: AccountRepo
+    private val accountRepo: AccountRepository
 ) : IAuthService
 {
     private var loginAuthService : AuthorizationService? = null
@@ -66,7 +65,7 @@ class AuthService(
         val error = AuthorizationException.fromIntent(responseIntent)
 
         if (error != null){
-            // TODO : THROW OR HANDLE ERRO
+            // TODO : THROW OR HANDLE ERROR
         }
         if (authResponse == null){
             return
@@ -79,14 +78,14 @@ class AuthService(
         this.loginAuthService = null
 
         CoroutineScope(Dispatchers.IO).launch {
-            val loginResult  = accountRepo.Authenticate(provider, authResponse.authorizationCode)
+            val authResult : AuthResult = accountRepo.Authenticate(provider, authResponse.authorizationCode.toString())
 
             withContext(Dispatchers.Main) {
-                if (loginResult.isSuccessful && loginResult.body() != null) {
+                if (authResult.isSuccessful) {
 
                     storeTokens(
-                        loginResult.body()!!.access_token,
-                        loginResult.body()!!.refresh_token
+                        authResult.accessToken.toString(),
+                        authResult.refreshToken.toString()
                     )
                     successRedirect()
                 } else {
@@ -96,13 +95,39 @@ class AuthService(
         }
     }
 
-    override fun Logout() {
-        (TODO("NOT IMPLEMENTED YET"))
+    override fun Logout(
+        successRedirect: () -> Unit
+    ) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                // Todo : accountRepo.logout()
+                removeTokens()
+                withContext(Dispatchers.Main) {
+                    successRedirect()
+                }
+            } catch (e: Exception) {
+                // Handle logout error
+            }
+        }
     }
 
+
+
+    /*
+        this is fine even if the token is expired, because refresh token would revalidate access
+        client will make api request with expired token,
+        client revalidates with refresh,
+        client still logged in,
+        we could check here if the refresh token is expired, to save on resources, a design decision for later :D
+    */
+
     override fun IsLoggedIn (): Boolean {
-        return this.prefStore.getFromPref("auth_token") != ""
+
+        return this.prefStore.getFromPref("Access_Token") != ""
     }
+
+
+    // Helper Functions
 
     private fun createVerifierAndChallenge (): Pair<String, String> {
         val secureRandom = SecureRandom()
@@ -141,6 +166,9 @@ class AuthService(
         this.prefStore.saveIntoPref("Refresh_Token", refreshToken)
     }
 
-
+    private fun removeTokens() {
+        this.prefStore.removeFromPref("Access_Token")
+        this.prefStore.removeFromPref("Refresh_Token")
+    }
 
 }

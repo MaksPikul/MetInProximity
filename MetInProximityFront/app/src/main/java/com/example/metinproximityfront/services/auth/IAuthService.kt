@@ -14,7 +14,9 @@ interface IAuthService{
         successRedirect : ()-> Unit
     )
 
-    fun Logout()
+    fun Logout(
+        successRedirect: () -> Unit
+    )
 
     fun IsLoggedIn (): Boolean
 }

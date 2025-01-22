@@ -1,7 +1,6 @@
 package com.example.metinproximityfront.app
 
 import android.app.Application
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -38,7 +37,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //TODO: (this.application as Application).setMainActivity(this)
+        // (this.application as Application).setMainActivity(this)
 
         val model: MainActivityViewModel by viewModels()
         this.model = model
@@ -54,31 +53,40 @@ class MainActivity : ComponentActivity() {
     private fun createViews(){
         setContent {
             MetInProximityFrontTheme {
-                navHostController = rememberNavController()
+                val nhc = rememberNavController()
+                this.navHostController = nhc
 
                 NavHost(
-                    navController = navHostController,
-                    startDestination = if (this.model.authService.IsLoggedIn()) "home" else "login"
+                    navController = nhc,
+                    startDestination = "Home"/*if (this.model.authService.IsLoggedIn()) "home" else "login"*/
                 ) {
                     // TODO: Blank Composable? for when loading
                     composable("Login") {
+
                         LoginView(
                             providers = model.GetOAuthProviders(),
-                            StartLogin = { launcher, provider -> model.authService.StartLogin(provider, launcher) },
-                            LoginLauncher ={ intent -> LoginLauncher.launch(intent) }
-
+                            // This looks hella complicated, but its very nice
+                            // pass 1 parameter here, pass a second parameter in login view
+                            StartLogin = { provider ->
+                                model.authService.StartLogin(
+                                    provider,
+                                    {LoginLauncher.launch(intent)}
+                                ) },
                         )
+
+
                     }
 
                     composable("Home") { HomeView(/* this.model.authenticator.logout(this.navHostController.navigate("login")) */) }
+
+
+
                 }
             }
         }
     }
 
-
-
-
 }
+
 
 

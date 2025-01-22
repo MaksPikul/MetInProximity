@@ -59,6 +59,8 @@ dependencies {
     implementation ("com.squareup.okhttp3:okhttp:${VERSION.OKHTTP}")
     implementation ("com.google.code.gson:gson:${VERSION.GSON}")
 
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
     implementation("androidx.security:security-crypto:1.0.0")
 
 

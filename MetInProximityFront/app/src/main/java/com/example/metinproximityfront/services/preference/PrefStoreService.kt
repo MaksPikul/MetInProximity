@@ -33,4 +33,8 @@ class PrefStoreService(
     override fun getFromPref (key: String) : String? {
         return sharedPreferences.getString(key, "");
     }
+
+    override fun removeFromPref(key: String) {
+        sharedPreferences.edit().remove(key).apply()
+    }
 }
