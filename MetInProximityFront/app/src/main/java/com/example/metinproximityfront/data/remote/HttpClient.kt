@@ -1,6 +1,7 @@
 package com.example.metinproximityfront.data.remote
 
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 object HttpClient {
 
@@ -9,7 +10,7 @@ object HttpClient {
     val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
-            //.addConverterFactory(GsonConverterFactory.create())  // Used to convert JSON response to Kotlin objects
+            .addConverterFactory(GsonConverterFactory.create())  // Used to convert JSON response to Kotlin objects
             .build()
     }
 

@@ -6,9 +6,9 @@ using MetInProximityBack.Builders;
 using MetInProximityBack.Types;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Data;
-using System.Data.Common;
 using System.Security.Claims;
+using MetInProximityBack.NewFolder;
+using Azure.Core;
 
 namespace MetInProximityBack.Controllers
 {
@@ -58,20 +58,17 @@ namespace MetInProximityBack.Controllers
                     return BadRequest("Email not verified.");
                 }
 
-                AppUser appUser = await _userManager.FindByEmailAsync(user.UserEmail) ?? await CreateAppUser(user.UserName, user.UserEmail);
+                AppUser appUser = await _userManager.FindByEmailAsync(user.UserEmail) ?? await this.CreateAppUser(user.UserName, user.UserEmail);
 
                 await _signInManager.SignInAsync(appUser, isPersistent: true);
+                
+                var accessToken = this.CreateAccessToken(); 
+                var refreshToken = this.CreateRefreshToken(); 
 
-                List<Claim> userClaims = new ClaimsBuilder()
-                    .AddClaim("UserId", User.FindFirstValue(ClaimTypes.NameIdentifier))
-                    .AddClaim("UserName", User.Identity.Name)
-                    .AddClaim("Email", User.FindFirstValue(ClaimTypes.Email))
-                    .AddClaim("IsAuthed", "true")
-                    .Build();
+                // OPTIONAL, PROBABLY WILL INCLUDE, STORE refreshToken into DB to REVOKE access by admin
 
-                var token = _tokenService.CreateToken(userClaims);
 
-                return Ok(token);
+                return Ok(new {accessToken, refreshToken});
             }
             catch (ArgumentException ex)
             {
@@ -82,6 +79,7 @@ namespace MetInProximityBack.Controllers
         [HttpPost("logout")]
         public async Task Logout()
         {
+            // Clear refresh token from DB
             await _signInManager.SignOutAsync();
         }
 
@@ -91,17 +89,72 @@ namespace MetInProximityBack.Controllers
             return View();
         }
 
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh(
+            [FromBody] string refreshToken
+        ) {
+
+            IEnumerable<Claim> decodedToken = _tokenService.DecodeToken(refreshToken);
+
+            var tokenId = decodedToken.GetClaimValue("TokenId");
+            var expiration = decodedToken.GetClaimValue("expiration");
+            var userId = decodedToken.GetClaimValue("UserId");
+
+            AppUser user = await _userManager.FindByIdAsync(userId);
+
+            // User doesn't exist or token expired
+            if (user == null || DateTime.Parse(expiration) > DateTime.UtcNow) {
+                return BadRequest("Go back to login");
+            }
+
+            // Find token in DB
+
+            var accessToken = this.CreateAccessToken();
+
+            // Optional : create new refresh token and send that back too
+
+            return Ok(new { accessToken });
+        }
+
 
 
 
 
         //CLASS METHOD FOR NOW, WILL MOVE LATER, IF NECESSARY
-        async Task<AppUser> CreateAppUser(string UserName,string Email)
+        private async Task<AppUser> CreateAppUser(string UserName,string Email)
         {
             AppUser appUser = new AppUser {UserName = UserName, Email = Email };
             await _userManager.CreateAsync(appUser);
             //await _userManager.AddToRoleAsync(appUser, "User");
             return appUser;
+        }
+
+
+        // I think this is the only place that this method will be used, hence a private controller class
+        private string CreateAccessToken()
+        {
+            List<Claim> accessTokenClaims = new ClaimsBuilder()
+                    .AddClaim("UserId", User.FindFirstValue(ClaimTypes.NameIdentifier))
+                    .AddClaim("UserName", User.Identity.Name)
+                    .AddClaim("Email", User.FindFirstValue(ClaimTypes.Email))
+            .Build();
+
+            string accessToken = _tokenService.CreateToken(accessTokenClaims, mins: 60); // Hour
+
+            return accessToken;
+        }
+
+        private string CreateRefreshToken()
+        {
+            string refreshTokenId = Guid.NewGuid().ToString();
+            List<Claim> refreshTokenClaims = new ClaimsBuilder()
+                .AddClaim("UserId", User.FindFirstValue(ClaimTypes.NameIdentifier))
+                .AddClaim("TokenId", refreshTokenId) // used to store in DB, and Revoke user access
+                .Build();
+
+            var refreshToken = _tokenService.CreateToken(refreshTokenClaims, mins: 60 * 24 * 30); // Month
+
+            return refreshToken;
         }
     }
 }

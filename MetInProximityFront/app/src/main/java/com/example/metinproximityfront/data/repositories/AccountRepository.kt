@@ -4,6 +4,7 @@ import com.example.metinproximityfront.data.api.AccountApi
 import com.example.metinproximityfront.data.entities.account.AuthResponse
 import com.example.metinproximityfront.data.entities.account.AuthResult
 import com.example.metinproximityfront.data.remote.ApiServiceFactory
+import com.example.metinproximityfront.data.remote.HttpClient.retrofit
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -14,17 +15,11 @@ class AccountRepository {
 
     val BASE_URL = "https://10.0.2.2:7238/api"
 
-    private val retrofit: Retrofit by lazy {
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())  // Used to convert JSON response to Kotlin objects
-            .build()
-    }
 
     // AccountApi instance, lazily initialized
     private val accountApi: AccountApi by lazy {
         ApiServiceFactory(retrofit)
-        }
+    }
 
 
 
@@ -59,19 +54,19 @@ class AccountRepository {
         val response : Response<AuthResponse> = accountApi.RefreshAccessToken(refreshToken)
     }
 
-    suspend fun Logout() {
-        try {
-            // todo : apiClient.logout()
-        } catch (e: Exception) {
-            throw e
-        }
-    }
+
 
     fun Ping(){
 
     }
      */
-
+    suspend fun Logout() {
+        try {
+            accountApi.Logout()
+        } catch (e: Exception) {
+            throw e
+        }
+    }
 
 
     // TODO: private fun Co-Routine Wrapper?

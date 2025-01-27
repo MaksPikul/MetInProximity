@@ -3,6 +3,7 @@ package com.example.metinproximityfront.services.auth
 import android.content.Context
 import android.content.Intent
 import android.util.Base64
+import android.widget.Toast
 import com.example.metinproximityfront.data.repositories.AccountRepository
 import com.example.metinproximityfront.data.entities.account.AuthResult
 import com.example.metinproximityfront.config.OAuth.OAuthConfig
@@ -65,12 +66,11 @@ class AuthService(
         val error = AuthorizationException.fromIntent(responseIntent)
 
         if (error != null){
-            // TODO : THROW OR HANDLE ERROR
+            Toast.makeText(appContext, error.errorDescription, Toast.LENGTH_SHORT).show()
         }
         if (authResponse == null){
-            return
+            Toast.makeText(appContext, "Authentication Result is Missing", Toast.LENGTH_SHORT).show()
         }
-        // TODO : Validate code verifier
 
         val provider : String = responseIntent.getStringExtra("provider").toString()
 
@@ -78,7 +78,7 @@ class AuthService(
         this.loginAuthService = null
 
         CoroutineScope(Dispatchers.IO).launch {
-            val authResult : AuthResult = accountRepo.Authenticate(provider, authResponse.authorizationCode.toString())
+            val authResult : AuthResult = accountRepo.Authenticate(provider, authResponse?.authorizationCode.toString())
 
             withContext(Dispatchers.Main) {
                 if (authResult.isSuccessful) {
@@ -90,17 +90,17 @@ class AuthService(
                     successRedirect()
                 } else {
                     // Handle error (e.g., show a toast or update UI state)
+                    Toast.makeText(appContext, authResult.error, Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
-
     override fun Logout(
         successRedirect: () -> Unit
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                // Todo : accountRepo.logout()
+                accountRepo.Logout()
                 removeTokens()
                 withContext(Dispatchers.Main) {
                     successRedirect()
@@ -110,9 +110,6 @@ class AuthService(
             }
         }
     }
-
-
-
     /*
         this is fine even if the token is expired, because refresh token would revalidate access
         client will make api request with expired token,
@@ -120,14 +117,15 @@ class AuthService(
         client still logged in,
         we could check here if the refresh token is expired, to save on resources, a design decision for later :D
     */
-
     override fun IsLoggedIn (): Boolean {
 
         return this.prefStore.getFromPref("Access_Token") != ""
     }
 
 
-    // Helper Functions
+    /*
+        Helper Functions
+    */
 
     private fun createVerifierAndChallenge (): Pair<String, String> {
         val secureRandom = SecureRandom()

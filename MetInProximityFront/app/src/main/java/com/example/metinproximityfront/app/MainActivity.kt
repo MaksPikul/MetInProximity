@@ -1,6 +1,5 @@
 package com.example.metinproximityfront.app
 
-import android.app.Application
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,7 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.metinproximityfront.ui.theme.MetInProximityFrontTheme
 import com.example.metinproximityfront.views.Home.HomeView
-import com.example.metinproximityfront.views.Home.LoginView
+import com.example.metinproximityfront.views.Login.LoginView
 
 
 class MainActivity : ComponentActivity() {
@@ -28,12 +27,10 @@ class MainActivity : ComponentActivity() {
             val successRedirect = {
                 this.navHostController.navigate("Home")
             }
+            // This should return errors if any and update UI in Login page, custom toast that lasts long and is large??
             this.model.authService.FinishLogin(result.data!!, successRedirect)
         }
     }
-
-    //TODO: LogoutLauncher, probably not necessary
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +44,6 @@ class MainActivity : ComponentActivity() {
         //TODO: this.model.initialize(this::onLoaded)
 
         enableEdgeToEdge()
-
     }
 
     private fun createViews(){
@@ -58,13 +54,13 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = nhc,
-                    startDestination = "Home"/*if (this.model.authService.IsLoggedIn()) "home" else "login"*/
+                    startDestination = if (this.model.authService.IsLoggedIn()) "Login" else "Home"
                 ) {
                     // TODO: Blank Composable? for when loading
                     composable("Login") {
 
                         LoginView(
-                            providers = model.GetOAuthProviders(),
+                            providers = model.oAuthProviderFactory.getProviders(),
                             // This looks hella complicated, but its very nice
                             // pass 1 parameter here, pass a second parameter in login view
                             StartLogin = { provider ->
@@ -73,14 +69,11 @@ class MainActivity : ComponentActivity() {
                                     {LoginLauncher.launch(intent)}
                                 ) },
                         )
-
-
                     }
 
-                    composable("Home") { HomeView(/* this.model.authenticator.logout(this.navHostController.navigate("login")) */) }
-
-
-
+                    composable("Home") { HomeView(
+                        {model.authService.Logout({navHostController.navigate("Login")})}
+                    ) }
                 }
             }
         }

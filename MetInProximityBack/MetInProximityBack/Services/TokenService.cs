@@ -19,7 +19,7 @@ namespace MetInProximityBack.Services
             _tokenHandler = new JwtSecurityTokenHandler();
         }
 
-        public string CreateToken(List<Claim> claims)
+        public string CreateToken(List<Claim> claims, int mins)
         {
 
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
@@ -27,7 +27,7 @@ namespace MetInProximityBack.Services
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                //Expires = DateTime.Now.AddDays(7),      // Keep, or set manually with claims builder?
+                Expires = DateTime.Now.AddMinutes(mins),      // Keep, or set manually with claims builder?
                 SigningCredentials = creds,
                 Issuer = _config["JWT:Issuer"],
                 Audience = _config["JWT:Audience"]

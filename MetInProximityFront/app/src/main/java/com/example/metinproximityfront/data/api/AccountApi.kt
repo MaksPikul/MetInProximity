@@ -20,4 +20,7 @@ interface AccountApi {
         @Body() refreshToken: String
     ) : Response<AuthResponse>
 
+    @POST("account/logout")
+    suspend fun Logout()
+
 }
