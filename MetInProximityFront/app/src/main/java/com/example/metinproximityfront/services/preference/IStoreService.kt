@@ -1,6 +1,6 @@
 package com.example.metinproximityfront.services.preference
 
-interface IPrefStoreService {
+interface IStoreService {
     fun saveIntoPref(key: String, value: String)
 
     fun getFromPref(key: String) : String?

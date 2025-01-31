@@ -7,7 +7,7 @@ import android.widget.Toast
 import com.example.metinproximityfront.data.repositories.AccountRepository
 import com.example.metinproximityfront.data.entities.account.AuthResult
 import com.example.metinproximityfront.config.OAuth.OAuthConfig
-import com.example.metinproximityfront.services.preference.IPrefStoreService
+import com.example.metinproximityfront.services.preference.IStoreService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -26,7 +26,7 @@ import java.security.SecureRandom
 
 class AuthService(
     private val appContext: Context,
-    private val prefStore : IPrefStoreService,
+    private val prefStore : IStoreService,
     private val accountRepo: AccountRepository
 ) : IAuthService
 {
@@ -36,13 +36,20 @@ class AuthService(
         provider: OAuthConfig,
         launchAction: (i: Intent) -> Unit
     ){
+        // Creating client which handles OAuth (AppAuth Dependency)
         val authService = initLoginAuthService()
         this.loginAuthService = authService
 
+        // Using provider class to configure service with Authentication server URL and
+        // Resource Server URL which holds User ID tokens
+        // tokenUri configured here, but not used, called in server backend
         val config = AuthorizationServiceConfiguration(provider.oauthUrl,provider.tokenUri)
 
+        // Create a pair class which holds Verifier and Challenge for extra security
+        // Following PKCE OAuth Flow)
         val codePair = createVerifierAndChallenge()
 
+        // Request intent is built
         val request = AuthorizationRequest
             .Builder(config, provider.clientId, ResponseTypeValues.CODE, provider.redirectUri)
             .setScopes("profile email")
@@ -52,9 +59,12 @@ class AuthService(
                 "S256")
             .build()
 
+        // Provider added to intent
+        // helps handle the correct third party auth provider when finishing login
         val authIntent = authService.getAuthorizationRequestIntent(request)
         authIntent.putExtra("provider", provider.name)
 
+        // Intent is launched which opens up chrome
         launchAction(authIntent)
     }
 
@@ -62,9 +72,12 @@ class AuthService(
         responseIntent: Intent,
         successRedirect : ()-> Unit
     ){
+        // After redirect back to Mobile App login screen,
+        // Response Object and Code extracted
         val authResponse : AuthorizationResponse? = AuthorizationResponse.fromIntent(responseIntent)
         val error = AuthorizationException.fromIntent(responseIntent)
 
+        // Checking for errors or missing response object
         if (error != null){
             Toast.makeText(appContext, error.errorDescription, Toast.LENGTH_SHORT).show()
         }
@@ -72,24 +85,30 @@ class AuthService(
             Toast.makeText(appContext, "Authentication Result is Missing", Toast.LENGTH_SHORT).show()
         }
 
+        // Getting provider from intent
         val provider : String = responseIntent.getStringExtra("provider").toString()
 
+        // Class created for OAuth disposed because it's not required after login
         this.loginAuthService?.dispose()
         this.loginAuthService = null
 
+        // Wraps the API request in a Co-routine for async actions
         CoroutineScope(Dispatchers.IO).launch {
+            // Account repo calls API, and returns an AuthResult Object
             val authResult : AuthResult = accountRepo.Authenticate(provider, authResponse?.authorizationCode.toString())
 
             withContext(Dispatchers.Main) {
                 if (authResult.isSuccessful) {
 
+                    // Saving tokens into Encrypted Shared Preferences
                     storeTokens(
                         authResult.accessToken.toString(),
                         authResult.refreshToken.toString()
                     )
+                    // Function passed from MainActivity which redirects user to home view
                     successRedirect()
                 } else {
-                    // Handle error (e.g., show a toast or update UI state)
+                    // Shows error on Login View
                     Toast.makeText(appContext, authResult.error, Toast.LENGTH_SHORT).show()
                 }
             }

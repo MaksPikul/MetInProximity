@@ -15,14 +15,10 @@ class AccountRepository {
 
     val BASE_URL = "https://10.0.2.2:7238/api"
 
-
     // AccountApi instance, lazily initialized
     private val accountApi: AccountApi by lazy {
         ApiServiceFactory(retrofit)
     }
-
-
-
 
     suspend fun Authenticate(
         provider: String,
@@ -47,6 +43,14 @@ class AccountRepository {
         }
     }
 
+    suspend fun Logout() {
+        try {
+            accountApi.Logout()
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
     /*
     suspend fun RefreshAccessToken(
         refreshToken : String
@@ -60,13 +64,7 @@ class AccountRepository {
 
     }
      */
-    suspend fun Logout() {
-        try {
-            accountApi.Logout()
-        } catch (e: Exception) {
-            throw e
-        }
-    }
+
 
 
     // TODO: private fun Co-Routine Wrapper?

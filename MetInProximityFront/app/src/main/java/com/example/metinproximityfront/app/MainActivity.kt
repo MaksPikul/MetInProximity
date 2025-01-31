@@ -1,23 +1,30 @@
 package com.example.metinproximityfront.app
 
+import android.Manifest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.metinproximityfront.ui.theme.MetInProximityFrontTheme
 import com.example.metinproximityfront.views.Home.HomeView
+import com.example.metinproximityfront.views.Home.HomeViewModel
 import com.example.metinproximityfront.views.Login.LoginView
 
 
 class MainActivity : ComponentActivity() {
     private lateinit var navHostController: NavHostController
-    private lateinit var model: MainActivityViewModel
+
+    private lateinit var mainVM: MainActivityViewModel
+    private lateinit var homeVM : HomeViewModel
+
 
     private val LoginLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()){
@@ -28,7 +35,7 @@ class MainActivity : ComponentActivity() {
                 this.navHostController.navigate("Home")
             }
             // This should return errors if any and update UI in Login page, custom toast that lasts long and is large??
-            this.model.authService.FinishLogin(result.data!!, successRedirect)
+            this.mainVM.authService.FinishLogin(result.data!!, successRedirect)
         }
     }
 
@@ -36,10 +43,17 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         // (this.application as Application).setMainActivity(this)
 
-        val model: MainActivityViewModel by viewModels()
-        this.model = model
+
+
+
+        val mainModel: MainActivityViewModel by viewModels()
+        this.mainVM = mainModel
+
+        val homeModel: HomeViewModel by viewModels()
+        this.homeVM = homeModel
 
         this.createViews()
+
 
         //TODO: this.model.initialize(this::onLoaded)
 
@@ -54,17 +68,17 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = nhc,
-                    startDestination = if (this.model.authService.IsLoggedIn()) "Login" else "Home"
+                    startDestination = if (this.mainVM.authService.IsLoggedIn()) "Login" else "Home"
                 ) {
                     // TODO: Blank Composable? for when loading
                     composable("Login") {
 
                         LoginView(
-                            providers = model.oAuthProviderFactory.getProviders(),
+                            providers = mainVM.oAuthProviderFactory.getProviders(),
                             // This looks hella complicated, but its very nice
                             // pass 1 parameter here, pass a second parameter in login view
                             StartLogin = { provider ->
-                                model.authService.StartLogin(
+                                mainVM.authService.StartLogin(
                                     provider,
                                     {LoginLauncher.launch(intent)}
                                 ) },
@@ -72,7 +86,8 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable("Home") { HomeView(
-                        {model.authService.Logout({navHostController.navigate("Login")})}
+                        homeVM,
+                        {mainVM.authService.Logout({navHostController.navigate("Login")})}
                     ) }
                 }
             }

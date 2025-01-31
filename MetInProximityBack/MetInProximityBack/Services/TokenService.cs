@@ -40,9 +40,8 @@ namespace MetInProximityBack.Services
 
         public IEnumerable<Claim> DecodeToken(string token)
         {
-            var handler = new JwtSecurityTokenHandler();
 
-            var jwt = handler.ReadJwtToken(token);
+            var jwt = _tokenHandler.ReadJwtToken(token);
 
             var claims = jwt.Claims;
 

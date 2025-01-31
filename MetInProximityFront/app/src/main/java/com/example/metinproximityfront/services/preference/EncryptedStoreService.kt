@@ -5,9 +5,9 @@ import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 
-class PrefStoreService(
+class EncryptedStoreService(
     appContext: Context
-): IPrefStoreService {
+): IStoreService {
 
     private var sharedPreferences: SharedPreferences
 
