@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Azure.Cosmos.Spatial;
+using Newtonsoft.Json;
 
 namespace MetInProximityBack.Types.Location
 {
@@ -14,10 +15,13 @@ namespace MetInProximityBack.Types.Location
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
 
         [JsonProperty("location")]
-        public GeoJsonPoint Location { get; set; }
+        public Point Location { get; set; }
 
         [JsonProperty("geohash")]
         public string Geohash { get; set; }
+
+        [JsonProperty("open_to_messages")]
+        public bool openToMessages { get; set; } = false;
 
 
     }

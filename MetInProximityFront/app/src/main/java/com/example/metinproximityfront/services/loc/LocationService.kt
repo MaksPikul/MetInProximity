@@ -80,6 +80,15 @@ class LocationService(
 
     }
 
+    /*
+    fun GetCurrentLocation() {
+        fusedLocationClient.getCurrentLocation()
+    }
+     */
+
+
+
+
     private fun CreateNotification(): Notification {
         //https://stackoverflow.com/questions/20857120/what-is-the-proper-way-to-stop-a-service-running-as-foreground
 

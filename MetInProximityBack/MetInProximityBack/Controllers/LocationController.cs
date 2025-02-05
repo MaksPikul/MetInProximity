@@ -1,4 +1,5 @@
 ﻿using MetInProximityBack.Data;
+using MetInProximityBack.Enums;
 using MetInProximityBack.Extensions;
 using MetInProximityBack.Interfaces;
 using MetInProximityBack.Models;
@@ -12,10 +13,10 @@ namespace MetInProximityBack.Controllers
     [Route("api/location")]
     [ApiController]
     public class LocationController(
-        UserManager<AppUser> userManager ,
+        UserManager<AppUser> userManager,
         INoSqlDb cosmosDb
 
-    ) : Controller 
+    ) : Controller
     {
 
         private readonly UserManager<AppUser> _userManager = userManager;
@@ -26,14 +27,17 @@ namespace MetInProximityBack.Controllers
         [Authorize]
         public async Task<IActionResult> PutUserLocation(
             [FromQuery(Name = "long")] double longitude,
-            [FromQuery(Name = "lat")] double latitude
+            [FromQuery(Name = "lat")] double latitude,
+            [FromQuery(Name = "open")] bool open
         ) {
-
             try
             {
+                // Validate Long and Lat parameters
+
                 AppUser user = await _userManager.FindByEmailAsync(User.GetEmail());
 
-                LocationObject locObj = LocObjFactory.CreateLocObj(user.Id, longitude, latitude);
+                LocationObject locObj = LocationFactory
+                    .CreateLocObj(user.Id, longitude, latitude, open);
 
                 _cosmosDb.AddLocation(locObj);
 
@@ -45,7 +49,16 @@ namespace MetInProximityBack.Controllers
             }
         }
 
-        
+
+        // If a user wants to receive private messages, they should
+        [HttpPost]
+        public IActionResult MakeAvailableForPrivateMessages()
+        {
+
+            return View();
+        }
+
+
 
 
 

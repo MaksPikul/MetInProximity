@@ -96,12 +96,6 @@ namespace MetInProximityBack.Controllers
             await _signInManager.SignOutAsync();
         }
 
-        [HttpPost("ping")]
-        public IActionResult Ping()
-        {
-            return View();
-        }
-
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh(
             [FromBody] string refreshToken
