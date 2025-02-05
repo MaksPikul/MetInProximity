@@ -1,4 +1,4 @@
-﻿using MetInProximityBack.Types;
+﻿using MetInProximityBack.Types.OAuth;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 

@@ -19,7 +19,7 @@ import com.example.metinproximityfront.app.ui.theme.MetInProximityFrontTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeView(
-    homeVm : HomeViewModel,
+    //homeVm : HomeViewModel,
     logout : ()-> Unit
 ) {
 

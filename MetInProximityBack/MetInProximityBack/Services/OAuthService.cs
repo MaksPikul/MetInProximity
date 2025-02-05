@@ -1,7 +1,7 @@
-﻿using MetInProximityBack.Types;
-using MetInProximityBack.Interfaces;
+﻿using MetInProximityBack.Interfaces;
 using System;
 using Azure.Core;
+using MetInProximityBack.Types.OAuth;
 
 namespace MetInProximityBack.Services
 {

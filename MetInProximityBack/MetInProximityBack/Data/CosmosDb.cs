@@ -1,8 +1,10 @@
 ﻿using Microsoft.Azure.Cosmos;
+using MetInProximityBack.Interfaces;
+using MetInProximityBack.Types.Location;
 
 namespace MetInProximityBack.Data
 {
-    public class CosmosDb
+    public class CosmosDb : INoSqlDb
     {
 
         private readonly Container _container;
@@ -15,6 +17,13 @@ namespace MetInProximityBack.Data
             _container = cosmosClient.GetContainer(databaseName, containerName);
         }
 
+
+        public async Task AddLocation (LocationObject locObj)
+        {
+
+            await _container.UpsertItemAsync(locObj, new PartitionKey(locObj.Geohash));
+
+        }
 
 
 

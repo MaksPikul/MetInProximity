@@ -1,4 +1,4 @@
-package com.example.metinproximityfront.config.OAuth
+package com.example.metinproximityfront.config.oauth
 
 import android.net.Uri
 

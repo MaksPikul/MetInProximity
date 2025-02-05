@@ -3,12 +3,12 @@ using MetInProximityBack.Factories;
 using MetInProximityBack.Interfaces;
 using MetInProximityBack.Models;
 using MetInProximityBack.Builders;
-using MetInProximityBack.Types;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using MetInProximityBack.NewFolder;
 using Azure.Core;
+using MetInProximityBack.Types.OAuth;
 
 namespace MetInProximityBack.Controllers
 {
@@ -106,27 +106,34 @@ namespace MetInProximityBack.Controllers
         public async Task<IActionResult> Refresh(
             [FromBody] string refreshToken
         ) {
+            try {
 
-            IEnumerable<Claim> decodedToken = _tokenService.DecodeToken(refreshToken);
+                IEnumerable<Claim> decodedToken = _tokenService.DecodeToken(refreshToken);
 
-            var tokenId = decodedToken.GetClaimValue("TokenId");
-            var expiration = decodedToken.GetClaimValue("expiration");
-            var userId = decodedToken.GetClaimValue("UserId");
+                var tokenId = decodedToken.GetClaimValue("TokenId");
+                var expiration = decodedToken.GetClaimValue("expiration");
+                var userId = decodedToken.GetClaimValue("UserId");
 
-            AppUser user = await _userManager.FindByIdAsync(userId);
+                AppUser user = await _userManager.FindByIdAsync(userId);
 
-            // User doesn't exist or token expired
-            if (user == null || DateTime.Parse(expiration) > DateTime.UtcNow) {
-                return BadRequest("Go back to login");
+                // User doesn't exist or token expired
+                if (user == null || DateTime.Parse(expiration) > DateTime.UtcNow)
+                {
+                    return BadRequest("Go back to login");
+                }
+
+                // Find token in DB
+
+                var accessToken = this.CreateAccessToken();
+
+                // Optional : create new refresh token and send that back too
+
+                return Ok(new { accessToken });
             }
+            catch (Exception ex) {
 
-            // Find token in DB
-
-            var accessToken = this.CreateAccessToken();
-
-            // Optional : create new refresh token and send that back too
-
-            return Ok(new { accessToken });
+                return StatusCode(500, "Failed to refresh");
+            }
         }
 
 

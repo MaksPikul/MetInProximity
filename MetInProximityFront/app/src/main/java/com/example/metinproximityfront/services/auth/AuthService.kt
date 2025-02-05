@@ -3,10 +3,12 @@ package com.example.metinproximityfront.services.auth
 import android.content.Context
 import android.content.Intent
 import android.util.Base64
+import android.util.Log
 import android.widget.Toast
+import com.example.metinproximityfront.config.Constants
 import com.example.metinproximityfront.data.repositories.AccountRepository
 import com.example.metinproximityfront.data.entities.account.AuthResult
-import com.example.metinproximityfront.config.OAuth.OAuthConfig
+import com.example.metinproximityfront.config.oauth.OAuthConfig
 import com.example.metinproximityfront.services.preference.IStoreService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -70,7 +72,7 @@ class AuthService(
 
     override fun FinishLogin(
         responseIntent: Intent,
-        successRedirect : ()-> Unit
+        onSuccessfulLogin : ()-> Unit
     ){
         // After redirect back to Mobile App login screen,
         // Response Object and Code extracted
@@ -79,10 +81,12 @@ class AuthService(
 
         // Checking for errors or missing response object
         if (error != null){
-            Toast.makeText(appContext, error.errorDescription, Toast.LENGTH_SHORT).show()
+            Toast.makeText(appContext, error.errorDescription, Toast.LENGTH_LONG).show()
+            error.errorDescription?.let { Log.e("OAuth Error", it) }
         }
         if (authResponse == null){
-            Toast.makeText(appContext, "Authentication Result is Missing", Toast.LENGTH_SHORT).show()
+            Toast.makeText(appContext, "Authentication Result is Missing", Toast.LENGTH_LONG).show()
+            Log.e("OAuth Error","Missing Result")
         }
 
         // Getting provider from intent
@@ -93,9 +97,12 @@ class AuthService(
         this.loginAuthService = null
 
         // Wraps the API request in a Co-routine for async actions
+
         CoroutineScope(Dispatchers.IO).launch {
             // Account repo calls API, and returns an AuthResult Object
-            val authResult : AuthResult = accountRepo.Authenticate(provider, authResponse?.authorizationCode.toString())
+
+            val authResult: AuthResult =
+                accountRepo.Authenticate(provider, authResponse?.authorizationCode.toString())
 
             withContext(Dispatchers.Main) {
                 if (authResult.isSuccessful) {
@@ -106,10 +113,11 @@ class AuthService(
                         authResult.refreshToken.toString()
                     )
                     // Function passed from MainActivity which redirects user to home view
-                    successRedirect()
+                    onSuccessfulLogin()
                 } else {
                     // Shows error on Login View
-                    Toast.makeText(appContext, authResult.error, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(appContext, authResult.error, Toast.LENGTH_LONG).show()
+                    authResult.error?.let { Log.e("OAuth Error", it) }
                 }
             }
         }
@@ -129,6 +137,16 @@ class AuthService(
             }
         }
     }
+
+    override suspend fun RefreshAndReturnToken() : String {
+        val refreshToken : String? = prefStore.getFromPref(Constants.REFRESH_TOKEN_KEY)
+
+        if (!refreshToken.isNullOrBlank()) {
+            return accountRepo.RefreshAccessToken(refreshToken)
+        }
+        return ""
+    }
+
     /*
         this is fine even if the token is expired, because refresh token would revalidate access
         client will make api request with expired token,
@@ -138,7 +156,7 @@ class AuthService(
     */
     override fun IsLoggedIn (): Boolean {
 
-        return this.prefStore.getFromPref("Access_Token") != ""
+        return this.prefStore.getFromPref(Constants.ACCESS_TOKEN_KEY) != ""
     }
 
 
@@ -179,13 +197,13 @@ class AuthService(
         accessToken : String,
         refreshToken : String
     ){
-        this.prefStore.saveIntoPref("Access_Token", accessToken)
-        this.prefStore.saveIntoPref("Refresh_Token", refreshToken)
+        this.prefStore.saveIntoPref(Constants.ACCESS_TOKEN_KEY, accessToken)
+        this.prefStore.saveIntoPref(Constants.REFRESH_TOKEN_KEY, refreshToken)
     }
 
     private fun removeTokens() {
-        this.prefStore.removeFromPref("Access_Token")
-        this.prefStore.removeFromPref("Refresh_Token")
+        this.prefStore.removeFromPref(Constants.ACCESS_TOKEN_KEY)
+        this.prefStore.removeFromPref(Constants.REFRESH_TOKEN_KEY)
     }
 
 }

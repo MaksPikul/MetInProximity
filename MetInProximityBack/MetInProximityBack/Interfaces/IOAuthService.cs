@@ -1,4 +1,4 @@
-﻿using MetInProximityBack.Types;
+﻿using MetInProximityBack.Types.OAuth;
 
 namespace MetInProximityBack.Interfaces
 {

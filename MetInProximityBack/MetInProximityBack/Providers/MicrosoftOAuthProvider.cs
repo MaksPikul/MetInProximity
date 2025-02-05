@@ -1,6 +1,6 @@
 ﻿using MetInProximityBack.Interfaces;
 using MetInProximityBack.NewFolder;
-using MetInProximityBack.Types;
+using MetInProximityBack.Types.OAuth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System.Security.Claims;

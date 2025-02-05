@@ -4,20 +4,18 @@ import com.example.metinproximityfront.data.api.AccountApi
 import com.example.metinproximityfront.data.entities.account.AuthResponse
 import com.example.metinproximityfront.data.entities.account.AuthResult
 import com.example.metinproximityfront.data.remote.ApiServiceFactory
-import com.example.metinproximityfront.data.remote.HttpClient.retrofit
+import com.example.metinproximityfront.data.remote.PublicHttpClient.publicRetrofit
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class AccountRepository {
 
     // TODO : THIS NEEDS TO BE PUT SOMEWHERE, THERE ARE CURRENTLY INITIALISATIONE ERRORS
 
-    val BASE_URL = "https://10.0.2.2:7238/api"
+
 
     // AccountApi instance, lazily initialized
     private val accountApi: AccountApi by lazy {
-        ApiServiceFactory(retrofit)
+        ApiServiceFactory(publicRetrofit)
     }
 
     suspend fun Authenticate(
@@ -51,21 +49,28 @@ class AccountRepository {
         }
     }
 
-    /*
-    suspend fun RefreshAccessToken(
-        refreshToken : String
-    ) {
-        val response : Response<AuthResponse> = accountApi.RefreshAccessToken(refreshToken)
+
+    suspend fun RefreshAccessToken(refreshToken: String): String {
+        try {
+
+            val response = accountApi.RefreshAccessToken(refreshToken)
+
+            if (response.isSuccessful && response.body() != null) {
+                val tokenResponse = response.body()!!
+                return tokenResponse.access_token
+            } else {
+                throw Exception("Failed to refresh access token")
+            }
+        } catch (e: Exception) {
+            throw Exception("Error refreshing access token: ${e.message}")
+        }
     }
 
 
-
+    /*
     fun Ping(){
 
     }
      */
 
-
-
-    // TODO: private fun Co-Routine Wrapper?
 }

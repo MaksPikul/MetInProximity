@@ -1,4 +1,4 @@
-﻿namespace MetInProximityBack.Types
+﻿namespace MetInProximityBack.Types.OAuth
 {
     public class MicrosoftOAuthUserResponse
     {

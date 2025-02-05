@@ -1,8 +1,8 @@
 package com.example.metinproximityfront.factories
 
-import com.example.metinproximityfront.config.OAuth.GoogleOAuthConfig
-import com.example.metinproximityfront.config.OAuth.MicrosoftOAuthConfig
-import com.example.metinproximityfront.config.OAuth.OAuthConfig
+import com.example.metinproximityfront.config.oauth.GoogleOAuthConfig
+import com.example.metinproximityfront.config.oauth.MicrosoftOAuthConfig
+import com.example.metinproximityfront.config.oauth.OAuthConfig
 
 class OAuthProviderFactory {
 

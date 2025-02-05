@@ -35,16 +35,14 @@ builder.Services.AddSingleton<CosmosClient>(sp =>
         builder.Configuration["CosmosDb:AuthKey"]
     )
 );
-builder.Services.AddSingleton<CosmosDb>(sp =>
+builder.Services.AddSingleton<INoSqlDb, CosmosDb>(sp =>
 
     new CosmosDb(
         sp.GetRequiredService<CosmosClient>(),
-        builder.Configuration["CosmosDb:DatabaseName"], 
+        builder.Configuration["CosmosDb:DatabaseName"],
         builder.Configuration["CosmosDb:ContainerName"]
     )
-);
-
-
+); 
 
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
@@ -82,9 +80,6 @@ builder.Services.AddAuthentication(options =>
 
 
 
-
-
-
 /* dependency injections*/
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IOAuthService, OAuthService>();
@@ -107,6 +102,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 
 
 app.UseHttpsRedirection();

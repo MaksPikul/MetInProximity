@@ -1,5 +1,4 @@
 ﻿using MetInProximityBack.Interfaces;
-using MetInProximityBack.Types;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
 using System;
@@ -7,6 +6,7 @@ using MetInProximityBack.Services;
 using Azure.Core;
 using System.Security.Claims;
 using MetInProximityBack.NewFolder;
+using MetInProximityBack.Types.OAuth;
 
 namespace MetInProximityBack.Providers
 {
