@@ -1,5 +1,5 @@
-﻿using MetInProximityBack.Enums;
-using MetInProximityBack.Interfaces;
+﻿using MetInProximityBack.Interfaces;
+using MetInProximityBack.Enums;
 using MetInProximityBack.Models;
 using MetInProximityBack.Types.Location;
 using MetInProximityBack.Types.Message;
@@ -11,34 +11,71 @@ namespace MetInProximityBack.Controllers
     [Route("api/message")]
     [ApiController]
     public class MessageController(
-        INoSqlDb cosmosDb
-
+        INoSqlDb cosmosDb,
+        ICacheService cacheService
     ) : Controller
     {
 
         private readonly INoSqlDb _cosmosDb = cosmosDb;
+        private readonly ICacheService _cacheService = cacheService;
 
-        [HttpPost("{method}")]
+        [HttpPost]
         public async Task<IActionResult> ReceiveMessageAndNotify(
             [FromBody] MessageRequest msgReq
         ) {
 
-            // Private or Public
-            // If public 
-
-            List<LocationObject> nearbyUserIds = await _cosmosDb
+            HashSet<NearbyUser> nearbyUsers = await _cosmosDb
                 .GetNearbyLocations(
                     LocationFactory.CreatePoint( msgReq.Longitude, msgReq.Latitude )
                 );
 
-            // Get redis/signal r connected users which are on the list
-            // Check if they want messages
-            // send accordingly,
+            // UserId : ConnectionString (SignalR)
+            List<string> socketConnectedUsers = await _cacheService
+                .GetManyFromCache<string>(
+                    nearbyUsers.Select(user => user.UserId).ToList()
+                );
 
-            // Do the same for those not connected by signalR/Redis
-            // They will Need to be able to see the message once it loads
+            // Managed to make this process O(n) instead of O(n^2)
+            var tasks = new List<Task>();
 
-            return View();
+            foreach (var nearbyUser in nearbyUsers)
+            {
+                tasks.Add(Task.Run(async () =>
+                {
+                    try
+                    {
+                        if (socketConnectedUsers.Contains(nearbyUser.UserId) && nearbyUser.openToMessages)
+                        {
+                            // Signal R Send message Logic
+                        }
+                        else if (nearbyUser.openToMessages)
+                        {
+                            // Firebase Send Message Logic
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Failure to send message, Error :", ex);
+                    }
+                }));
+            }
+            await Task.WhenAll(tasks);
+
+            return Ok("Message sent");
         }
     }
 }
+
+
+
+
+
+
+/*  Unnecessary, leaving this to display time complexity saved
+             
+    List<string> offlineUsers = nearbyUsers
+        .Where(nuser => !socketConnectedUsers.Contains(nuser.UserId))
+        .Select(user => user.UserId)
+        .ToList();
+
+*/

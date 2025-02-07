@@ -10,8 +10,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Azure.StackExchangeRedis;
+using StackExchange.Redis;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using fightnight.Server.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,10 +25,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
 builder.Services.AddSingleton<CosmosClient>(sp =>
 
     new CosmosClient(
@@ -40,7 +45,19 @@ builder.Services.AddSingleton<INoSqlDb, CosmosDb>(sp =>
         builder.Configuration["CosmosDb:DatabaseName"],
         builder.Configuration["CosmosDb:ContainerName"]
     )
-); 
+);
+
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("RedisConnectionString");
+    options.InstanceName = "MetinInstance";
+});
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp => ConnectionMultiplexer.Connect("    TODO    "));
+
+
+
+
 
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
@@ -51,7 +68,7 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
     options.Lockout.AllowedForNewUsers = true;
     options.Lockout.MaxFailedAccessAttempts = 3;
 })
-.AddEntityFrameworkStores<MetInProximityBack.Data.AppDbContext>();
+.AddEntityFrameworkStores<AppDbContext>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -79,10 +96,11 @@ builder.Services.AddAuthentication(options =>
 /* dependency injections*/
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IOAuthService, OAuthService>();
+builder.Services.AddScoped<ICacheService, RedisCacheService>();
 
 builder.Services.AddTransient<IOAuthProvider, GoogleOAuthProvider>();
 builder.Services.AddTransient<IOAuthProvider, MicrosoftOAuthProvider>();
-builder.Services.AddSingleton<OAuthProviderFactory>();
+builder.Services.AddTransient<OAuthProviderFactory>();
 
 /*
  following

@@ -25,12 +25,17 @@ namespace MetInProximityBack.Data
             await _container.UpsertItemAsync(locObj, new PartitionKey(locObj.Geohash));
         }
 
-        public async Task<List<LocationObject>> GetNearbyLocations(Point contextPoint)
+        public async Task<HashSet<NearbyUser>> GetNearbyLocations(Point contextPoint)
         {
-            var NearbyLocations = new List<LocationObject>();
+            var NearbyLocations = new List<NearbyUser>();
 
             var query = _container.GetItemLinqQueryable<LocationObject>()
                 .Where(locObj => locObj.Location.Distance(contextPoint) < 2000)
+                .Select(locObj => new NearbyUser
+                {
+                    UserId = locObj.UserId,
+                    openToMessages = locObj.openToMessages
+                })
                 .Take(20)
                 .ToFeedIterator();
 
@@ -40,7 +45,7 @@ namespace MetInProximityBack.Data
                 NearbyLocations.AddRange(response);
             }
 
-            return NearbyLocations.ToList();
+            return NearbyLocations.ToHashSet();
         }
 
 
