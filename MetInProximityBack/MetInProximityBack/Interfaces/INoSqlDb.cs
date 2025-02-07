@@ -7,7 +7,7 @@ namespace MetInProximityBack.Interfaces
     {
         Task AddLocation(LocationObject locObj);
 
-        Task<HashSet<NearbyUser>> GetNearbyLocations(Point contextPoint);
+        Task<List<NearbyUser>> GetNearbyLocations(Point contextPoint);
 
 
     }

@@ -9,5 +9,11 @@ namespace MetInProximityBack.Extensions
             var emailClaim = user.Claims.SingleOrDefault(x => x.Type == ClaimTypes.Email);
             return emailClaim?.Value;
         }
+
+        public static string GetId(this ClaimsPrincipal user)
+        {
+            var idClaim = user.Claims.SingleOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+            return idClaim?.Value;
+        }
     }
 }

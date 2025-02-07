@@ -5,6 +5,14 @@ using MetInProximityBack.Types.Location;
 using MetInProximityBack.Types.Message;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using MetInProximityBack.Factories;
+using MetInProximityBack.Extensions;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
+using MetInProximityBack.Hubs;
+using System.Threading.Tasks;
+using Microsoft.Azure.Cosmos;
+using System.Collections.Generic;
 
 namespace MetInProximityBack.Controllers
 {
@@ -12,43 +20,112 @@ namespace MetInProximityBack.Controllers
     [ApiController]
     public class MessageController(
         INoSqlDb cosmosDb,
-        ICacheService cacheService
+        ICacheService cacheService,
+        IHubContext<ChatHub> hubContext
+
     ) : Controller
     {
 
         private readonly INoSqlDb _cosmosDb = cosmosDb;
         private readonly ICacheService _cacheService = cacheService;
+        private readonly IHubContext<ChatHub> _hubContext = hubContext;
 
         [HttpPost]
-        public async Task<IActionResult> ReceiveMessageAndNotify(
-            [FromBody] MessageRequest msgReq
+        [Authorize]
+        public async Task<IActionResult> PublicReceiveMessageAndNotify(
+                [FromBody] MessageRequest msgReq
         ) {
+            try { 
 
-            HashSet<NearbyUser> nearbyUsers = await _cosmosDb
-                .GetNearbyLocations(
-                    LocationFactory.CreatePoint( msgReq.Longitude, msgReq.Latitude )
+                List<NearbyUser> nearbyUsers = await _cosmosDb
+                    .GetNearbyLocations(
+                        LocationFactory.CreatePoint(msgReq.Longitude, msgReq.Latitude)
+                    );
+
+                // UserId : ConnectionString (SignalR)
+                // List of Connection Ids
+                List<string> connectionIds = await _cacheService
+                    .GetManyFromCacheAsync<string>(
+                        nearbyUsers.Select(user => $"chat/user:{user.UserId}").ToList()
+                    );
+
+                List<NearbyUserWithConnId> nuwConnId = MapUserToConnId(nearbyUsers, connectionIds);
+
+                MessageResponse msgRes = MessageFactory.CreateMessageResponse(msgReq, User.GetId());
+
+                List<Task> tasks = this.CreateMsgTasksForParallel(msgRes, nuwConnId);
+
+                await Task.WhenAll(tasks);
+
+                return Ok("Message Sent");
+            }
+            catch (Exception ex) {
+                return StatusCode(500, "Failed to refresh");
+            }
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> PrivateReceiveMessageAndNotify(
+            [FromBody] PrivateMessageRequest msgReq
+        )
+        {
+            try
+            {
+                string recipietnConnId = await _cacheService.GetFromCacheAsync(msgReq.MsgRecipientId);
+
+                MessageResponse msgRes = MessageFactory.CreateMessageResponse(msgReq, User.GetId());
+
+                if (recipietnConnId != null)
+                {
+                    await _hubContext.Clients.Client("connectionId").SendAsync("ReceiveMessage", msgRes, msgReq.MsgRecipientId);
+                }
+                else
+                {
+                    // firebase
+                }
+
+                return Ok("Message Sent");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Failed to refresh");
+            }
+        }
+
+
+        private List<NearbyUserWithConnId> MapUserToConnId(List<NearbyUser> nearbyUsers, List<string> connectionIds)
+        {
+            var result = new List<NearbyUserWithConnId>();
+
+            for (int i = 0; i < nearbyUsers.Count; i++)
+            {
+                result.Add(
+                    new NearbyUserWithConnId(nearbyUsers[i], connectionIds[i])
                 );
+            }
 
-            // UserId : ConnectionString (SignalR)
-            List<string> socketConnectedUsers = await _cacheService
-                .GetManyFromCache<string>(
-                    nearbyUsers.Select(user => user.UserId).ToList()
-                );
+            return result;
 
-            // Managed to make this process O(n) instead of O(n^2)
+        }
+
+        private List<Task> CreateMsgTasksForParallel(MessageResponse msgRes, List<NearbyUserWithConnId> users)
+        {
             var tasks = new List<Task>();
 
-            foreach (var nearbyUser in nearbyUsers)
+            // Managed to make this process O(n) instead of O(n^2)
+            // Wanted to use HashSets, but this was easier
+            foreach (var user in users)
             {
                 tasks.Add(Task.Run(async () =>
                 {
                     try
                     {
-                        if (socketConnectedUsers.Contains(nearbyUser.UserId) && nearbyUser.openToMessages)
+                        if (user.connId != null && user.openToMessages)
                         {
-                            // Signal R Send message Logic
+                            await _hubContext.Clients.Client("connectionId").SendAsync("ReceiveMessage", msgRes, "public");
                         }
-                        else if (nearbyUser.openToMessages)
+                        else if (user.openToMessages)
                         {
                             // Firebase Send Message Logic
                         }
@@ -58,18 +135,18 @@ namespace MetInProximityBack.Controllers
                         Console.WriteLine("Failure to send message, Error :", ex);
                     }
                 }));
-            }
-            await Task.WhenAll(tasks);
 
-            return Ok("Message sent");
+            }
+            return tasks;
         }
+
+
+
+
+
+
     }
 }
-
-
-
-
-
 
 /*  Unnecessary, leaving this to display time complexity saved
              

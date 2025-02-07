@@ -14,7 +14,7 @@ using Microsoft.Azure.StackExchangeRedis;
 using StackExchange.Redis;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using fightnight.Server.Interfaces;
+using MetInProximityBack.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -120,6 +120,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.MapHub<ChatHub>("/chathub");
 
 app.MapControllers();
 

@@ -25,7 +25,7 @@ namespace MetInProximityBack.Data
             await _container.UpsertItemAsync(locObj, new PartitionKey(locObj.Geohash));
         }
 
-        public async Task<HashSet<NearbyUser>> GetNearbyLocations(Point contextPoint)
+        public async Task<List<NearbyUser>> GetNearbyLocations(Point contextPoint)
         {
             var NearbyLocations = new List<NearbyUser>();
 
@@ -45,7 +45,7 @@ namespace MetInProximityBack.Data
                 NearbyLocations.AddRange(response);
             }
 
-            return NearbyLocations.ToHashSet();
+            return NearbyLocations.ToList();
         }
 
 

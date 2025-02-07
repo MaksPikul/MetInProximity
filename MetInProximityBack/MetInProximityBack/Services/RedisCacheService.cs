@@ -24,7 +24,7 @@ namespace MetInProximityBack.Services
             return await _dCache.GetStringAsync(key);
         }
         
-        public async Task<List<T>> GetManyFromCache<T>(List<string> keys)
+        public async Task<List<T>> GetManyFromCacheAsync<T>(List<string> keys)
         {
             RedisKey[] redisKeys = keys.ConvertAll(key => new RedisKey(key) ).ToArray();
 
@@ -32,7 +32,7 @@ namespace MetInProximityBack.Services
 
             List<T> deserializeValues = this.DeserializeRedisValues<T>(values);
 
-           return deserializeValues;
+            return deserializeValues;
         }
 
         public async Task RemoveFromCacheAsync(string key)
@@ -42,6 +42,10 @@ namespace MetInProximityBack.Services
 
         private T DeserializeRedisValue<T>(RedisValue value)
         {
+            if (value.IsNull)
+            {
+                return default;
+            }
             T obj = JsonSerializer.Deserialize<T>(value);
 
             return obj;
