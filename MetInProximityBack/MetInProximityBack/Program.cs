@@ -97,6 +97,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IOAuthService, OAuthService>();
 builder.Services.AddScoped<ICacheService, RedisCacheService>();
+builder.Services.AddScoped<INotificationService, FirebaseService>();
 
 builder.Services.AddTransient<IOAuthProvider, GoogleOAuthProvider>();
 builder.Services.AddTransient<IOAuthProvider, MicrosoftOAuthProvider>();

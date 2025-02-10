@@ -13,6 +13,7 @@ using MetInProximityBack.Hubs;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
 using System.Collections.Generic;
+using MetInProximityBack.Constants;
 
 namespace MetInProximityBack.Controllers
 {
@@ -21,7 +22,8 @@ namespace MetInProximityBack.Controllers
     public class MessageController(
         INoSqlDb cosmosDb,
         ICacheService cacheService,
-        IHubContext<ChatHub> hubContext
+        IHubContext<ChatHub> hubContext,
+        INotificationService notifService
 
     ) : Controller
     {
@@ -29,6 +31,7 @@ namespace MetInProximityBack.Controllers
         private readonly INoSqlDb _cosmosDb = cosmosDb;
         private readonly ICacheService _cacheService = cacheService;
         private readonly IHubContext<ChatHub> _hubContext = hubContext;
+        private readonly INotificationService _notifService = notifService;
 
         [HttpPost]
         [Authorize]
@@ -46,10 +49,12 @@ namespace MetInProximityBack.Controllers
                 // List of Connection Ids
                 List<string> connectionIds = await _cacheService
                     .GetManyFromCacheAsync<string>(
-                        nearbyUsers.Select(user => $"chat/user:{user.UserId}").ToList()
+                        nearbyUsers
+                        .Select(user => CacheKeys.ConnIdCacheKey(user.UserId) )
+                        .ToList()
                     );
 
-                List<NearbyUserWithConnId> nuwConnId = MapUserToConnId(nearbyUsers, connectionIds);
+                List<NearbyUserWithConnId> nuwConnId = this.MapUserToConnId(nearbyUsers, connectionIds);
 
                 MessageResponse msgRes = MessageFactory.CreateMessageResponse(msgReq, User.GetId());
 
@@ -60,7 +65,7 @@ namespace MetInProximityBack.Controllers
                 return Ok("Message Sent");
             }
             catch (Exception ex) {
-                return StatusCode(500, "Failed to refresh");
+                return StatusCode(500, "Failed to send message: " + ex.Message);
             }
         }
 
@@ -72,27 +77,27 @@ namespace MetInProximityBack.Controllers
         {
             try
             {
-                string recipietnConnId = await _cacheService.GetFromCacheAsync(msgReq.MsgRecipientId);
+                string recipientConnId = await _cacheService
+                    .GetFromCacheAsync( CacheKeys.ConnIdCacheKey(msgReq.MsgRecipientId) );
 
                 MessageResponse msgRes = MessageFactory.CreateMessageResponse(msgReq, User.GetId());
 
-                if (recipietnConnId != null)
+                if (recipientConnId != null)
                 {
-                    await _hubContext.Clients.Client("connectionId").SendAsync("ReceiveMessage", msgRes, msgReq.MsgRecipientId);
+                    await _hubContext.Clients.Client(recipientConnId).SendAsync("ReceivePrivateMessage", msgRes, msgReq.MsgRecipientId);
                 }
                 else
                 {
-                    // firebase
+                    _notifService.SendPushNotification(msgReq.MsgRecipientId, msgRes);
                 }
 
                 return Ok("Message Sent");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Failed to refresh");
+                return StatusCode(500, "Failed to send message: " + ex.Message);
             }
         }
-
 
         private List<NearbyUserWithConnId> MapUserToConnId(List<NearbyUser> nearbyUsers, List<string> connectionIds)
         {
@@ -106,7 +111,6 @@ namespace MetInProximityBack.Controllers
             }
 
             return result;
-
         }
 
         private List<Task> CreateMsgTasksForParallel(MessageResponse msgRes, List<NearbyUserWithConnId> users)
@@ -123,11 +127,11 @@ namespace MetInProximityBack.Controllers
                     {
                         if (user.connId != null && user.openToMessages)
                         {
-                            await _hubContext.Clients.Client("connectionId").SendAsync("ReceiveMessage", msgRes, "public");
+                            await _hubContext.Clients.Client(user.connId).SendAsync("ReceivePublicMessage", msgRes);
                         }
                         else if (user.openToMessages)
                         {
-                            // Firebase Send Message Logic
+                            _notifService.SendPushNotification(user.UserId, msgRes);
                         }
                     }
                     catch (Exception ex)
@@ -139,10 +143,6 @@ namespace MetInProximityBack.Controllers
             }
             return tasks;
         }
-
-
-
-
 
 
     }

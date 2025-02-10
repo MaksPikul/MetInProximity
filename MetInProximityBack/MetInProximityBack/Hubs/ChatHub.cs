@@ -1,4 +1,5 @@
-﻿using MetInProximityBack.Interfaces;
+﻿using MetInProximityBack.Constants;
+using MetInProximityBack.Interfaces;
 using Microsoft.AspNetCore.SignalR;
 
 namespace MetInProximityBack.Hubs
@@ -14,7 +15,7 @@ namespace MetInProximityBack.Hubs
             var httpContext = Context.GetHttpContext();
             var userId = httpContext.Request.Query["userId"];
 
-            string connectionKey = this.buildKey(userId);
+            string connectionKey = CacheKeys.ConnIdCacheKey(userId);
             _cacheService.AddToCacheAsync(connectionKey, Context.ConnectionId);
 
             base.OnConnectedAsync();
@@ -25,7 +26,7 @@ namespace MetInProximityBack.Hubs
             var httpContext = Context.GetHttpContext();
             var userId = httpContext.Request.Query["userId"];
 
-            string connectionKey = this.buildKey(userId);
+            string connectionKey = CacheKeys.ConnIdCacheKey(userId);
             string connectionId = await _cacheService.GetFromCacheAsync(connectionKey);
 
             _cacheService
@@ -40,10 +41,5 @@ namespace MetInProximityBack.Hubs
             base.OnDisconnectedAsync(exception);
         }
 
-        private string buildKey(string userId)
-        {
-            string connectionKey = $"chat/user:{userId}";
-            return connectionKey;
-        }
     }
 }

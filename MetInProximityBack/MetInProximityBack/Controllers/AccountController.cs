@@ -39,7 +39,8 @@ namespace MetInProximityBack.Controllers
 
         [HttpPost("oauth/{provider}")]
         public async Task<IActionResult> Authenticate(
-            [FromQuery(Name = "code")] string code, 
+            [FromQuery(Name = "code")] string code,
+            [FromQuery(Name = "fcm")] string fcmToken,
             [FromRoute] string provider
         ) {
 
@@ -70,10 +71,19 @@ namespace MetInProximityBack.Controllers
                 // This part simply checks if user has logged in with such credentials before, if not a new account is made,
                 // A user who logs in with google can also log in with same emailed microsoft account, 
                 // If a client would not like this feature,we can change code for accounts to hold a value in database to note what oauth provider was used for this account, and check if they match
-                AppUser appUser = await _userManager.FindByEmailAsync(user.UserEmail) ?? await this.CreateAppUser(user.UserName, user.UserEmail);
+                AppUser appUser = await _userManager.FindByEmailAsync(user.UserEmail); 
+
+                if (appUser == null) {
+                    appUser = await this.CreateAppUser(user.UserName, user.UserEmail, fcmToken);
+                }
+                else
+                {
+                    appUser.FcmToken = fcmToken;
+                    await _userManager.UpdateAsync(appUser);
+                }
 
                 await _signInManager.SignInAsync(appUser, isPersistent: true);
-                
+
                 // Token for accessing app resources 30 minutes duration
                 var accessToken = this.CreateAccessToken(); 
                 // Token for refreshing access token 1 month duration
@@ -135,11 +145,11 @@ namespace MetInProximityBack.Controllers
 
 
         //CLASS METHOD FOR NOW, WILL MOVE LATER, IF NECESSARY
-        private async Task<AppUser> CreateAppUser(string UserName,string Email)
+        private async Task<AppUser> CreateAppUser(string UserName, string Email, string fcmToken)
         {
-            AppUser appUser = new AppUser {UserName = UserName, Email = Email };
-            //await _userManager.CreateAsync(appUser);
-            //await _userManager.AddToRoleAsync(appUser, "User");
+            AppUser appUser = new AppUser {UserName = UserName, Email = Email, FcmToken = fcmToken };
+            await _userManager.CreateAsync(appUser);
+            await _userManager.AddToRoleAsync(appUser, "User");
             return appUser;
         }
 

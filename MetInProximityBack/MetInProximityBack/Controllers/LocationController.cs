@@ -50,17 +50,5 @@ namespace MetInProximityBack.Controllers
         }
 
 
-        // If a user wants to receive private messages, they should
-        [HttpPost]
-        public IActionResult MakeAvailableForPrivateMessages()
-        {
-
-            return View();
-        }
-
-
-
-
-
     }
 }
