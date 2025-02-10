@@ -14,47 +14,35 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
 using System.Collections.Generic;
 using MetInProximityBack.Constants;
+using MetInProximityBack.Services;
 
 namespace MetInProximityBack.Controllers
 {
     [Route("api/message")]
     [ApiController]
     public class MessageController(
-        INoSqlDb cosmosDb,
         ICacheService cacheService,
         IHubContext<ChatHub> hubContext,
-        INotificationService notifService
+        INotificationService notifService,
+        LocationService locService
 
     ) : Controller
     {
-
-        private readonly INoSqlDb _cosmosDb = cosmosDb;
         private readonly ICacheService _cacheService = cacheService;
         private readonly IHubContext<ChatHub> _hubContext = hubContext;
         private readonly INotificationService _notifService = notifService;
+        private readonly LocationService _locService = locService;
 
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> PublicReceiveMessageAndNotify(
-                [FromBody] MessageRequest msgReq
+            [FromBody] MessageRequest msgReq
         ) {
-            try { 
+            try {
 
-                List<NearbyUser> nearbyUsers = await _cosmosDb
-                    .GetNearbyLocations(
-                        LocationFactory.CreatePoint(msgReq.Longitude, msgReq.Latitude)
-                    );
+                List<NearbyUser> nearbyUsers = await _locService.GetNearbyUsersAsync(msgReq.Longitude, msgReq.Latitude);
 
-                // UserId : ConnectionString (SignalR)
-                // List of Connection Ids
-                List<string> connectionIds = await _cacheService
-                    .GetManyFromCacheAsync<string>(
-                        nearbyUsers
-                        .Select(user => CacheKeys.ConnIdCacheKey(user.UserId) )
-                        .ToList()
-                    );
-
-                List<NearbyUserWithConnId> nuwConnId = this.MapUserToConnId(nearbyUsers, connectionIds);
+                List<NearbyUserWithConnId> nuwConnId = await _locService.GetUserConnIdsAsync(nearbyUsers);
 
                 MessageResponse msgRes = MessageFactory.CreateMessageResponse(msgReq, User.GetId());
 
@@ -78,7 +66,7 @@ namespace MetInProximityBack.Controllers
             try
             {
                 string recipientConnId = await _cacheService
-                    .GetFromCacheAsync( CacheKeys.ConnIdCacheKey(msgReq.MsgRecipientId) );
+                    .GetFromCacheAsync( CacheKeys.ConnIdCacheKey( msgReq.MsgRecipientId) );
 
                 MessageResponse msgRes = MessageFactory.CreateMessageResponse(msgReq, User.GetId());
 
@@ -97,20 +85,6 @@ namespace MetInProximityBack.Controllers
             {
                 return StatusCode(500, "Failed to send message: " + ex.Message);
             }
-        }
-
-        private List<NearbyUserWithConnId> MapUserToConnId(List<NearbyUser> nearbyUsers, List<string> connectionIds)
-        {
-            var result = new List<NearbyUserWithConnId>();
-
-            for (int i = 0; i < nearbyUsers.Count; i++)
-            {
-                result.Add(
-                    new NearbyUserWithConnId(nearbyUsers[i], connectionIds[i])
-                );
-            }
-
-            return result;
         }
 
         private List<Task> CreateMsgTasksForParallel(MessageResponse msgRes, List<NearbyUserWithConnId> users)
