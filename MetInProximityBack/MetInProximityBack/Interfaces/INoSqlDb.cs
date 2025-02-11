@@ -9,6 +9,7 @@ namespace MetInProximityBack.Interfaces
 
         Task<List<NearbyUser>> GetNearbyLocations(Point contextPoint);
 
+        Task<LocationObject> GetLocationObjectByUserId(string userId);
 
     }
 }

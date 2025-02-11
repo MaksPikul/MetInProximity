@@ -9,5 +9,8 @@ namespace MetInProximityBack.Types.Location
 
         [JsonProperty("open_to_messages")]
         public bool openToMessages { get; set; } = false;
+
+        [JsonProperty("open_to_private")]
+        public bool openToPrivate { get; set; } = false;
     }
 }

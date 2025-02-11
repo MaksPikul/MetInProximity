@@ -15,5 +15,11 @@ namespace MetInProximityBack.Extensions
             var idClaim = user.Claims.SingleOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
             return idClaim?.Value;
         }
+
+        public static string GetOpenToPrivate(this ClaimsPrincipal user)
+        {
+            var idClaim = user.Claims.SingleOrDefault(x => x.Type == "OpenToPrivate");
+            return idClaim?.Value;
+        }
     }
 }

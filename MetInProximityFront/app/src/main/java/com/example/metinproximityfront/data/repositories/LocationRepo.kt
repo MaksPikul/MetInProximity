@@ -20,7 +20,6 @@ class LocationRepo (
     fun UpdateUserLocation(
         loc : Location
     ) {
-
         // This doesnt Update ui, Just sends data to server so that it can be used for requests
         CoroutineScope(Dispatchers.IO).launch {
             apiTokenWrapper.callApiWithToken { token: String ->

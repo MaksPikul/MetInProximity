@@ -9,7 +9,7 @@
             message = new FcmMessage
             {
                 token = fcmToken,
-                data = msgRes,  
+                data = msgRes,
                 android = new FcmAndroid
                 {
                     direct_boot_ok = true
@@ -20,7 +20,7 @@
         private class FcmMessage
         {
             public string token { get; set; }
-            public MessageResponse data { get; set; }  
+            public MessageResponse data { get; set; } 
             public FcmAndroid android { get; set; }
         }
 

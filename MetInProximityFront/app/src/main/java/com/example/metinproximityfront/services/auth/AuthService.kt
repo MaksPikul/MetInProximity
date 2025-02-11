@@ -72,7 +72,8 @@ class AuthService(
 
     override fun FinishLogin(
         responseIntent: Intent,
-        onSuccessfulLogin : ()-> Unit
+        onSuccessfulLogin : ()-> Unit,
+        fcmToken : String
     ){
         // After redirect back to Mobile App login screen,
         // Response Object and Code extracted
@@ -97,12 +98,15 @@ class AuthService(
         this.loginAuthService = null
 
         // Wraps the API request in a Co-routine for async actions
-
         CoroutineScope(Dispatchers.IO).launch {
             // Account repo calls API, and returns an AuthResult Object
 
             val authResult: AuthResult =
-                accountRepo.Authenticate(provider, authResponse?.authorizationCode.toString())
+                accountRepo.Authenticate(
+                    provider,
+                    authResponse?.authorizationCode.toString(),
+                    fcmToken
+                )
 
             withContext(Dispatchers.Main) {
                 if (authResult.isSuccessful) {
@@ -122,6 +126,7 @@ class AuthService(
             }
         }
     }
+
     override fun Logout(
         successRedirect: () -> Unit
     ) {

@@ -32,7 +32,7 @@ class ApiTokenWrapper<T> (
                 }
 
                 accessToken = try {
-                    authService.RefreshAndReturnToken()
+                    authService?.RefreshAndReturnToken()
                 } catch (refreshError: Throwable) {
                     throw Exception("Token refresh failed so redirect to login.", refreshError)
                 }

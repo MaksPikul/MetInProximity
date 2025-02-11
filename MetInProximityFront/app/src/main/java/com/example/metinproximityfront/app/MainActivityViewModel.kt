@@ -9,7 +9,7 @@ import com.example.metinproximityfront.data.repositories.LocationRepo
 import com.example.metinproximityfront.factories.OAuthProviderFactory
 import com.example.metinproximityfront.services.auth.AuthService
 import com.example.metinproximityfront.services.auth.IAuthService
-import com.example.metinproximityfront.services.loc.LocationService
+import com.example.metinproximityfront.services.locaction.LocationService
 import com.example.metinproximityfront.services.preference.EncryptedStoreService
 import com.example.metinproximityfront.services.preference.IStoreService
 

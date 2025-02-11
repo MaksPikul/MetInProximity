@@ -10,6 +10,7 @@ interface LocationApi{
 
     @PUT("location")
     suspend fun PutUserLocation(
+        // THIS NEEDS CHANGING TO A BODY
         @Query("long") long: Double,
         @Query("lat") lat: Double,
         @Header("Authorization") authHeader: String

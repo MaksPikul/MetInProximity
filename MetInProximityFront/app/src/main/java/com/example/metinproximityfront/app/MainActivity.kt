@@ -1,6 +1,7 @@
 package com.example.metinproximityfront.app
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -13,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.metinproximityfront.ui.theme.MetInProximityFrontTheme
 import com.example.metinproximityfront.views.Home.HomeView
 import com.example.metinproximityfront.views.Login.LoginView
+import com.google.firebase.messaging.FirebaseMessaging
 
 
 class MainActivity : ComponentActivity() {
@@ -20,7 +22,6 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var mainVM: MainActivityViewModel
     //private lateinit var homeVM : HomeViewModel
-
 
     private val loginLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()){
@@ -31,8 +32,17 @@ class MainActivity : ComponentActivity() {
                 this.mainVM.startLocationService()
                 this.navHostController.navigate("Home")
             }
-            // This should return errors if any and update UI in Login page, custom toast that lasts long and is large??
-            mainVM.authService.FinishLogin(result.data!!, onSuccessfulLogin)
+
+            FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Log.w("FCM", "Fetching FCM token failed :(", task.exception)
+                    return@addOnCompleteListener
+                }
+
+                val fcmToken = task.result
+                // This should return errors if any and update UI in Login page, custom toast that lasts long and is large??
+                mainVM.authService.FinishLogin(result.data!!, onSuccessfulLogin, fcmToken)
+            }
         }
     }
 

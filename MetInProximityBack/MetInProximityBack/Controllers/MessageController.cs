@@ -44,7 +44,7 @@ namespace MetInProximityBack.Controllers
 
                 List<NearbyUserWithConnId> nuwConnId = await _locService.GetUserConnIdsAsync(nearbyUsers);
 
-                MessageResponse msgRes = MessageFactory.CreateMessageResponse(msgReq, User.GetId());
+                MessageResponse msgRes = MessageFactory.CreateMessageResponse(msgReq, User.GetId(), true);
 
                 List<Task> tasks = this.CreateMsgTasksForParallel(msgRes, nuwConnId);
 
@@ -68,7 +68,7 @@ namespace MetInProximityBack.Controllers
                 string recipientConnId = await _cacheService
                     .GetFromCacheAsync( CacheKeys.ConnIdCacheKey( msgReq.MsgRecipientId) );
 
-                MessageResponse msgRes = MessageFactory.CreateMessageResponse(msgReq, User.GetId());
+                MessageResponse msgRes = MessageFactory.CreateMessageResponse(msgReq, User.GetId(), false);
 
                 if (recipientConnId != null)
                 {

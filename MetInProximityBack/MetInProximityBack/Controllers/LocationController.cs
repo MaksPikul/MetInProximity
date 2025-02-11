@@ -32,12 +32,10 @@ namespace MetInProximityBack.Controllers
         ) {
             try
             {
-                // Validate Long and Lat parameters
-
-                AppUser user = await _userManager.FindByEmailAsync(User.GetEmail());
+                // Validate Long and Lat parameters?
 
                 LocationObject locObj = LocationFactory
-                    .CreateLocObj(user.Id, longitude, latitude, open);
+                    .CreateLocObj( User.GetId(), longitude, latitude, open);
 
                 _cosmosDb.AddLocation(locObj);
 

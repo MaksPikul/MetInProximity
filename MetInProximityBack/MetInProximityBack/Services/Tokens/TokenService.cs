@@ -4,14 +4,14 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace MetInProximityBack.Services
+namespace MetInProximityBack.Services.Tokens
 {
     public class TokenService : ITokenService
 
     {
-        private readonly IConfiguration _config;
-        private readonly SymmetricSecurityKey _key;
-        private readonly JwtSecurityTokenHandler _tokenHandler;
+        protected readonly IConfiguration _config;
+        protected readonly SymmetricSecurityKey _key;
+        protected readonly JwtSecurityTokenHandler _tokenHandler;
         public TokenService(IConfiguration config)
         {
             _config = config;
@@ -19,7 +19,17 @@ namespace MetInProximityBack.Services
             _tokenHandler = new JwtSecurityTokenHandler();
         }
 
-        public string CreateToken(List<Claim> claims, int mins)
+        public IEnumerable<Claim> DecodeToken(string token)
+        {
+
+            var jwt = _tokenHandler.ReadJwtToken(token);
+
+            var claims = jwt.Claims;
+
+            return claims;
+        }
+
+        protected string CreateToken(List<Claim> claims, int mins)
         {
 
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
@@ -38,14 +48,6 @@ namespace MetInProximityBack.Services
             return _tokenHandler.WriteToken(token);
         }
 
-        public IEnumerable<Claim> DecodeToken(string token)
-        {
-
-            var jwt = _tokenHandler.ReadJwtToken(token);
-
-            var claims = jwt.Claims;
-
-            return claims;
-        }
+        
     }
 }

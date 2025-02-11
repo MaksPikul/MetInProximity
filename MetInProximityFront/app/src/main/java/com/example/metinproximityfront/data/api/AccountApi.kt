@@ -12,7 +12,8 @@ interface AccountApi  {
     @POST("account/oauth/{provider}")
     suspend fun Authenticate(
         @Path("provider") provider: String, // Whether to handle google, microsoft, etc
-        @Query("code") code: String // code provided by provider
+        @Query("code") code: String, // code provided by provider,
+        @Query("fcm") fcm: String // code provided by provider
     ): Response<AuthResponse>
 
     @POST("account/refresh")

@@ -12,7 +12,8 @@ interface IAuthService{
 
     fun FinishLogin(
         responseIntent: Intent,
-        successRedirect : ()-> Unit
+        onSuccessfulLogin : ()-> Unit,
+        fcmToken : String
     )
 
     fun Logout(

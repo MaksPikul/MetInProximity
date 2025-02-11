@@ -11,8 +11,6 @@ class AccountRepository {
 
     // TODO : THIS NEEDS TO BE PUT SOMEWHERE, THERE ARE CURRENTLY INITIALISATIONE ERRORS
 
-
-
     // AccountApi instance, lazily initialized
     private val accountApi: AccountApi by lazy {
         ApiServiceFactory(publicRetrofit)
@@ -20,10 +18,11 @@ class AccountRepository {
 
     suspend fun Authenticate(
         provider: String,
-        code : String
+        code : String,
+        fcmToken: String
     ): AuthResult {
         return try {
-            val response : Response<AuthResponse> = accountApi.Authenticate(provider, code)
+            val response : Response<AuthResponse> = accountApi.Authenticate(provider, code, fcmToken)
 
             if (response.isSuccessful) {
                 val tokens = response.body()

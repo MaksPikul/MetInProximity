@@ -1,8 +1,7 @@
-package com.example.metinproximityfront.services.loc
+package com.example.metinproximityfront.services.locaction
 
 
 import android.Manifest
-import android.R
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -17,7 +16,6 @@ import android.os.IBinder
 import android.os.Looper
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import com.example.metinproximityfront.app.MainActivity
 import com.example.metinproximityfront.data.repositories.LocationRepo
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -25,10 +23,6 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import org.json.JSONObject
 
 
 class LocationService(
@@ -80,11 +74,24 @@ class LocationService(
 
     }
 
-    /*
+
     fun GetCurrentLocation() {
-        fusedLocationClient.getCurrentLocation()
+        if (
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION, // TODO : CHECK for moar permissions?
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationClient.getLastLocation().addOnSuccessListener { location: Location? ->
+                if (location != null) {
+                    //Toast.makeText(this, "Lat: ${location.latitude}, Lng: ${location.longitude}", Toast.LENGTH_LONG).show()
+                } else {
+                    //Toast.makeText(this, "Location not available", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
-     */
+
 
 
 

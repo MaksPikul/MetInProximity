@@ -9,6 +9,7 @@ using System.Security.Claims;
 using MetInProximityBack.NewFolder;
 using Azure.Core;
 using MetInProximityBack.Types.OAuth;
+using MetInProximityBack.Services.Tokens;
 
 namespace MetInProximityBack.Controllers
 {
@@ -19,21 +20,21 @@ namespace MetInProximityBack.Controllers
         private readonly SignInManager<AppUser> _signInManager;
         private readonly UserManager<AppUser> _userManager;
         private readonly OAuthProviderFactory _providerFactory;
-        private readonly ITokenService _tokenService;
+        private readonly AuthTokenService _authTokenService;
         private readonly IOAuthService _OAuthService;
 
         public AccountController(
             SignInManager<AppUser> signInManager,
             UserManager<AppUser> userManager,
             OAuthProviderFactory providerFactory,
-            ITokenService tokenService,
+            AuthTokenService authTokenService,
             IOAuthService OAuthService
 
         ) { 
             _signInManager = signInManager;
             _userManager = userManager;
             _providerFactory = providerFactory;
-            _tokenService = tokenService;
+            _authTokenService = authTokenService;
             _OAuthService = OAuthService;
         }
 
@@ -56,7 +57,7 @@ namespace MetInProximityBack.Controllers
                 // Provider resource server returns a json of values, the Id token holding information about the user that we can use to authenticate them to our application
                 // the id_token is a JWT which can be simply decoded into a enumerable object of claims
                 // Claims are statements about a user, used by ASP.Net for authentication
-                IEnumerable<Claim> claims = _tokenService.DecodeToken(tokens.id_token);
+                IEnumerable<Claim> claims = _authTokenService.DecodeToken(tokens.id_token);
 
                 // Different providers id_tokens hold a differnt set of values, example, google has email key {email:"mail"} and microsoft as {mail : "mail"}
                 // using the Adapter Design pattern, we can unify the many interfaces to a common one that can be used by the server
@@ -85,9 +86,9 @@ namespace MetInProximityBack.Controllers
                 await _signInManager.SignInAsync(appUser, isPersistent: true);
 
                 // Token for accessing app resources 30 minutes duration
-                var accessToken = this.CreateAccessToken(); 
+                string accessToken = _authTokenService.CreateAccessToken(User); 
                 // Token for refreshing access token 1 month duration
-                var refreshToken = this.CreateRefreshToken();
+                string refreshToken = _authTokenService.CreateRefreshToken(User);
 
                 // OPTIONAL, PROBABLY WILL INCLUDE, STORE refreshToken into DB to REVOKE access by admin
 
@@ -112,7 +113,7 @@ namespace MetInProximityBack.Controllers
         ) {
             try {
 
-                IEnumerable<Claim> decodedToken = _tokenService.DecodeToken(refreshToken);
+                IEnumerable<Claim> decodedToken = _authTokenService.DecodeToken(refreshToken);
 
                 var tokenId = decodedToken.GetClaimValue("TokenId");
                 var expiration = decodedToken.GetClaimValue("expiration");
@@ -128,7 +129,7 @@ namespace MetInProximityBack.Controllers
 
                 // Find token in DB
 
-                var accessToken = this.CreateAccessToken();
+                var accessToken = _authTokenService.CreateAccessToken(User);
 
                 // Optional : create new refresh token and send that back too
 
@@ -139,9 +140,6 @@ namespace MetInProximityBack.Controllers
                 return StatusCode(500, "Failed to refresh");
             }
         }
-
-
-
 
 
         //CLASS METHOD FOR NOW, WILL MOVE LATER, IF NECESSARY
@@ -155,30 +153,6 @@ namespace MetInProximityBack.Controllers
 
 
         // I think this is the only place that this method will be used, hence a private controller class
-        private string CreateAccessToken()
-        {
-            List<Claim> accessTokenClaims = new ClaimsBuilder()
-                    .AddClaim("TokenId", Guid.NewGuid().ToString())
-                    .AddClaim("UserId", User.FindFirstValue(ClaimTypes.NameIdentifier))
-                    .AddClaim("UserName", User.Identity.Name)
-                    .AddClaim("Email", User.FindFirstValue(ClaimTypes.Email))
-            .Build();
-
-            string accessToken = _tokenService.CreateToken(accessTokenClaims, 30); // 30 mins
-
-            return accessToken;
-        }
-
-        private string CreateRefreshToken()
-        {
-            List<Claim> refreshTokenClaims = new ClaimsBuilder()
-                .AddClaim("UserId", User.FindFirstValue(ClaimTypes.NameIdentifier))
-                .AddClaim("TokenId", Guid.NewGuid().ToString()) // used to store in DB, and Revoke user access
-                .Build();
-
-            var refreshToken = _tokenService.CreateToken(refreshTokenClaims, 60 * 24 * 30); // Month
-
-            return refreshToken;
-        }
+        
     }
 }
