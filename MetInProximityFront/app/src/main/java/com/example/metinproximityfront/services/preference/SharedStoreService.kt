@@ -4,11 +4,12 @@ import android.content.Context
 import android.content.SharedPreferences
 
 class SharedStoreService(
-    appContext: Context
+    appContext: Context,
+    fileName : String
 ) : IStoreService {
 
-    private val sharedPreferences: SharedPreferences =
-        appContext.getSharedPreferences("messages", Context.MODE_PRIVATE)
+    val sharedPreferences: SharedPreferences =
+        appContext.getSharedPreferences(fileName, Context.MODE_PRIVATE)
 
     override fun saveIntoPref(key: String, value: String) {
         sharedPreferences.edit().apply {

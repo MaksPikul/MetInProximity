@@ -9,41 +9,45 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.metinproximityfront.R
+import com.example.metinproximityfront.config.Constants
 import com.example.metinproximityfront.data.api.ApiTokenWrapper
 import com.example.metinproximityfront.data.api.UserActionApi
 import com.example.metinproximityfront.data.repositories.UserActionRepository
 import com.example.metinproximityfront.services.locaction.LocationService
+import com.example.metinproximityfront.services.preference.EncryptedStoreService
 import com.example.metinproximityfront.services.preference.SharedStoreService
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
 class FirebaseMsgReceiver : FirebaseMessagingService() {
 
-    // sharedPreferences
-    // EncryptedSharedPref
-
     override fun onNewToken(fcmToken: String) {
         super.onNewToken(fcmToken)
 
-        /*
+        // These two services initiated twice
+        val storeService = EncryptedStoreService(applicationContext)
+
         val repo = UserActionRepository(
-            ApiTokenWrapper(authService, storeService)
+            ApiTokenWrapper(storeService)
         )
+        // ----------------------------------
 
         repo.UpdateUserFcm(fcmToken)
-         */
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
-        val sharedPrefs = SharedStoreService(applicationContext)
 
+        val msgStore = MsgStoreService( SharedStoreService(
+            applicationContext,
+            Constants.MsgSharedStoreServiceFileName
+        ) )
 
+        val key : String = msgStore.storeMessage(message)
 
+        // TODO: Use Key to create route for intent based on public or private
 
-        // Custom push notif behaviour
-        // save message
-        // display notif?
+        this.createAndRunNotification()
     }
 
     // TODO : Make Into a Service
@@ -51,7 +55,7 @@ class FirebaseMsgReceiver : FirebaseMessagingService() {
         https://developer.android.com/develop/ui/views/notifications/build-notification
      */
     private fun createAndRunNotification(
-        newMsg : String
+
     ){
         var channelId = "10"
 

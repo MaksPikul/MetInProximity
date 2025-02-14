@@ -6,7 +6,7 @@ using System.Text;
 
 namespace MetInProximityBack.Services.Tokens
 {
-    public class TokenService : ITokenService
+    public abstract class TokenService : ITokenService
 
     {
         protected readonly IConfiguration _config;

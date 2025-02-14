@@ -16,11 +16,6 @@ interface AccountApi  {
         @Query("fcm") fcm: String // code provided by provider
     ): Response<AuthResponse>
 
-    @POST("account/refresh")
-    suspend fun RefreshAccessToken(
-        @Body() refreshToken: String
-    ) : Response<AuthResponse>
-
     @POST("account/logout")
     suspend fun Logout()
 

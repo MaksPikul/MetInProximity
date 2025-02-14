@@ -68,11 +68,11 @@ namespace MetInProximityBack.Controllers
                 string recipientConnId = await _cacheService
                     .GetFromCacheAsync( CacheKeys.ConnIdCacheKey( msgReq.MsgRecipientId) );
 
-                MessageResponse msgRes = MessageFactory.CreateMessageResponse(msgReq, User.GetId(), false);
+                MessageResponse msgRes = MessageFactory.CreateMessageResponse(msgReq, User.GetId(), false, msgReq.MsgRecipientId);
 
                 if (recipientConnId != null)
                 {
-                    await _hubContext.Clients.Client(recipientConnId).SendAsync("ReceivePrivateMessage", msgRes, msgReq.MsgRecipientId);
+                    await _hubContext.Clients.Client(recipientConnId).SendAsync("ReceiveMessage", msgRes);
                 }
                 else
                 {
@@ -101,7 +101,7 @@ namespace MetInProximityBack.Controllers
                     {
                         if (user.connId != null && user.openToMessages)
                         {
-                            await _hubContext.Clients.Client(user.connId).SendAsync("ReceivePublicMessage", msgRes);
+                            await _hubContext.Clients.Client(user.connId).SendAsync("ReceiveMessage", msgRes);
                         }
                         else if (user.openToMessages)
                         {

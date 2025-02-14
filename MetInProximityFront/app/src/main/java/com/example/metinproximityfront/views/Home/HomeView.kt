@@ -10,21 +10,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.metinproximityfront.app.ui.theme.MetInProximityFrontTheme
+import com.example.metinproximityfront.views.Home.components.BottomNavBar
+import com.example.metinproximityfront.views.Home.components.PrivateChatListSheet
+import com.example.metinproximityfront.views.Home.components.ProfileDrawerContent
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeView(
-    //homeVm : HomeViewModel,
+    homeVm : HomeViewModel,
     logout : ()-> Unit
 ) {
 
     // TODO : will need to create a view model which Holds states
-    var currentScreenState by remember { mutableStateOf("Map") }
+    var currentScreenState by remember { mutableStateOf("Chat") }
 
     var drawerState = rememberDrawerState(DrawerValue.Closed)
 
@@ -48,8 +50,12 @@ fun HomeView(
         drawerState = drawerState,
         content = {
             Scaffold (
-                bottomBar = {BottomNavBar(changeSheetState)},
-                content= {padding -> NestedHomeView(padding, currentScreenState, drawerState)}
+                bottomBar = { BottomNavBar(changeSheetState) },
+                content= {padding -> NestedHomeView(
+                    padding,
+                    currentScreenState,
+                    drawerState,
+                )}
             )
         },
         drawerContent = { ProfileDrawerContent(logout) }
@@ -61,6 +67,6 @@ fun HomeView(
 @Composable
 fun GreetingPreview2() {
     MetInProximityFrontTheme {
-        //HomeView({})
+        // HomeView(HomeViewModel(), {})
     }
 }

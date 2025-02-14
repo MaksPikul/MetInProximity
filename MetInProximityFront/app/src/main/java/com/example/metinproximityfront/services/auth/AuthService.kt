@@ -142,16 +142,6 @@ class AuthService(
             }
         }
     }
-
-    override suspend fun RefreshAndReturnToken() : String {
-        val refreshToken : String? = prefStore.getFromPref(Constants.REFRESH_TOKEN_KEY)
-
-        if (!refreshToken.isNullOrBlank()) {
-            return accountRepo.RefreshAccessToken(refreshToken)
-        }
-        return ""
-    }
-
     /*
         this is fine even if the token is expired, because refresh token would revalidate access
         client will make api request with expired token,

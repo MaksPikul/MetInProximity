@@ -1,4 +1,4 @@
-package com.example.metinproximityfront.views.Home
+package com.example.metinproximityfront.views.Home.components
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape

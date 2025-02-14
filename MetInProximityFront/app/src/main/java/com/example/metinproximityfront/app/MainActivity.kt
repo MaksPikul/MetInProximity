@@ -20,8 +20,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 class MainActivity : ComponentActivity() {
     private lateinit var navHostController: NavHostController
 
-    private lateinit var mainVM: MainActivityViewModel
-    //private lateinit var homeVM : HomeViewModel
+    private lateinit var mainVm : MainActivityViewModel
 
     private val loginLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()){
@@ -29,8 +28,7 @@ class MainActivity : ComponentActivity() {
         run {
             // redirect here too, depending on success
             val onSuccessfulLogin = {
-                this.mainVM.startLocationService()
-                this.navHostController.navigate("Home")
+                this.InitAndMoveToHome()
             }
 
             FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
@@ -41,7 +39,7 @@ class MainActivity : ComponentActivity() {
 
                 val fcmToken = task.result
                 // This should return errors if any and update UI in Login page, custom toast that lasts long and is large??
-                mainVM.authService.FinishLogin(result.data!!, onSuccessfulLogin, fcmToken)
+                mainVm.authService.FinishLogin(result.data!!, onSuccessfulLogin, fcmToken)
             }
         }
     }
@@ -51,7 +49,7 @@ class MainActivity : ComponentActivity() {
         // (this.application as Application).setMainActivity(this)
 
         val mainModel: MainActivityViewModel by viewModels()
-        this.mainVM = mainModel
+        this.mainVm = mainModel
 
         //val homeModel: HomeViewModel by viewModels()
         //this.homeVM = homeModel
@@ -67,19 +65,19 @@ class MainActivity : ComponentActivity() {
         super.onPause()
 
         // todo: if (!userWantsBackground location and messages)
-        //this.mainVM.stopLocationService()
+        //this.mainVM.homeVm.stopLocationService()
     }
 
     override fun onResume() {
         super.onResume()
-        if (this.mainVM.authService.IsLoggedIn()) {
-            this.mainVM.startLocationService()
+        if (this.mainVm.authService.IsLoggedIn()) {
+            this.mainVm.homeVm.startServices()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        //this.mainVM.stopLocationService()
+        //this.mainVM.homeVm.stopLocationService()
     }
 
     private fun createViews(){
@@ -90,17 +88,18 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = nhc,
-                    startDestination = if (!this.mainVM.authService.IsLoggedIn()) "Login" else "Home"
+                    // instead of this, check for tokens, if present, run InitAndMoveToHome
+                    startDestination = if (!this.mainVm.authService.IsLoggedIn()) "Login" else "Home"
                 ) {
                     // TODO: Blank Composable? for when loading
                     composable("Login") {
 
                         LoginView(
-                            providers = mainVM.oAuthProviderFactory.getProviders(),
+                            providers = mainVm.oAuthProviderFactory.getProviders(),
                             // This looks hella complicated, but its very nice
                             // pass 1 parameter here, pass a second parameter in login view
                             StartLogin = { provider ->
-                                mainVM.authService.StartLogin(provider) { intent ->
+                                mainVm.authService.StartLogin(provider) { intent ->
                                     loginLauncher.launch(intent)
                                 }
                             }
@@ -108,12 +107,20 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable("Home") { HomeView(
-                        //homeVM,
-                        {mainVM.authService.Logout({navHostController.navigate("Login")})}
+                        mainVm.homeVm,
+                        {mainVm.authService.Logout({navHostController.navigate("Login")})}
                     ) }
                 }
             }
         }
+    }
+
+    private fun InitAndMoveToHome() {
+        this.mainVm.InitHomeViewModel()
+
+        this.mainVm.homeVm.startServices()
+
+        this.navHostController.navigate("Home")
     }
 
 }

@@ -48,28 +48,4 @@ class AccountRepository {
         }
     }
 
-
-    suspend fun RefreshAccessToken(refreshToken: String): String {
-        try {
-
-            val response = accountApi.RefreshAccessToken(refreshToken)
-
-            if (response.isSuccessful && response.body() != null) {
-                val tokenResponse = response.body()!!
-                return tokenResponse.access_token
-            } else {
-                throw Exception("Failed to refresh access token")
-            }
-        } catch (e: Exception) {
-            throw Exception("Error refreshing access token: ${e.message}")
-        }
-    }
-
-
-    /*
-    fun Ping(){
-
-    }
-     */
-
 }

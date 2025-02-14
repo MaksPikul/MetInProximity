@@ -5,5 +5,10 @@ object Constants {
 
     val ACCESS_TOKEN_KEY = "Access_Token"
     val REFRESH_TOKEN_KEY = "Refresh_Token"
+
+    val SIGNALR_URL = "https://localhost:7238/chatHub"
+
+    val MsgSharedStoreServiceFileName = "MESSAGES"
+
 }
 

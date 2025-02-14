@@ -7,14 +7,17 @@ namespace MetInProximityBack.Factories
         public static MessageResponse CreateMessageResponse(
             MessageRequest msgReq,
             string SenderId,
-            bool isPublic
+            bool isPublic,
+            string recipientId = null
         ) {
             return new MessageResponse
             {
                 UserId = SenderId,
                 Body = msgReq.Body,
                 Timestamp = msgReq.Timestamp,
-                isPublic = isPublic
+                isPublic = isPublic,
+                RecipientId = recipientId
+
             };
         }
 

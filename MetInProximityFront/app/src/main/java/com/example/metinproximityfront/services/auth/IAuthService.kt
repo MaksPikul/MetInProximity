@@ -20,10 +20,6 @@ interface IAuthService{
         successRedirect: () -> Unit
     )
 
-    suspend fun RefreshAndReturnToken (
-
-    ) : String
-
     fun IsLoggedIn (): Boolean
 
 
