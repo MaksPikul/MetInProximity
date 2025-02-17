@@ -1,6 +1,5 @@
 package com.example.metinproximityfront.data.repositories
 
-import com.example.metinproximityfront.data.api.AccountApi
 import com.example.metinproximityfront.data.api.ApiTokenWrapper
 import com.example.metinproximityfront.data.api.UserActionApi
 import com.example.metinproximityfront.data.remote.ApiServiceFactory
@@ -10,7 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class UserActionRepository(
-    private val apiTokenWrapper: ApiTokenWrapper<String>
+    private val apiTokenWrapper: ApiTokenWrapper
 ) {
 
     private val userActionApi: UserActionApi by lazy {

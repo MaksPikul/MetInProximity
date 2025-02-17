@@ -69,13 +69,14 @@ namespace MetInProximityBack.Controllers
             [FromQuery(Name = "token")] string token
         )
         {
+            /*
             await _appDbContext
                 .Users
                 .Where(u => u.Id == User.GetId())
                 .ExecuteUpdateAsync(s =>
-                    s.SetProperty(u => u.FcmToken, token)
+                    s.SetProperty(u => u/.FcmToken, token)
                 );
-
+            */
             return Ok();
         }
 

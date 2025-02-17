@@ -22,14 +22,14 @@ namespace MetInProximityBack.Providers
             _configuration = configuration;
         }
 
-        public Dictionary<string, string> GetReqValues(string code)
+        public Dictionary<string, string> GetReqValues(string authCode, string codeVerifier)
         { 
             var req = new Dictionary<string, string>
             {
                 { "client_id", _configuration["Auth:Microsoft:ClientId"] },
                 { "client_secret", _configuration["Auth:Microsoft:ClientSecret"] },
                 { "grant_type", "authorization_code" },
-                { "code", code },
+                { "code", authCode },
                 { "response_mode", "query" },
                 { "redirect_uri", _configuration["Auth:Microsoft:RedirectUri"] },
                 { "scope", "openid profile email" }

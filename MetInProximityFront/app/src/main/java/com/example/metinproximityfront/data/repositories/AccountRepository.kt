@@ -1,6 +1,7 @@
 package com.example.metinproximityfront.data.repositories
 
 import com.example.metinproximityfront.data.api.AccountApi
+import com.example.metinproximityfront.data.entities.account.AuthRequest
 import com.example.metinproximityfront.data.entities.account.AuthResponse
 import com.example.metinproximityfront.data.entities.account.AuthResult
 import com.example.metinproximityfront.data.remote.ApiServiceFactory
@@ -18,11 +19,10 @@ class AccountRepository {
 
     suspend fun Authenticate(
         provider: String,
-        code : String,
-        fcmToken: String
+        authRequest: AuthRequest
     ): AuthResult {
         return try {
-            val response : Response<AuthResponse> = accountApi.Authenticate(provider, code, fcmToken)
+            val response : Response<AuthResponse> = accountApi.Authenticate(provider, authRequest)
 
             if (response.isSuccessful) {
                 val tokens = response.body()
@@ -33,10 +33,13 @@ class AccountRepository {
                 )
 
             } else {
-                AuthResult.error("Authentication failed: ${response.code()}")
+                AuthResult.error(
+                    "code: ${response.code()}",
+                    "Message: ${response.errorBody()?.string()}"
+                )
             }
         } catch (e: Exception) {
-            AuthResult.error("Network error: ${e.message}")
+            AuthResult.error("400", "Network error: ${e.message}")
         }
     }
 

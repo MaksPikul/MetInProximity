@@ -1,8 +1,14 @@
 package com.example.metinproximityfront.data.entities.location
 
-data class LocationObject(
-    val location: () -> Unit = {
-        val type = "Point"
-        val coordinates = doubleArrayOf(-122.4194, 37.7749)
-    }
-)
+class LocationObject(
+    val Longitude : Double ,
+    val Latitude : Double
+) {
+
+    val type: String = "Point"
+    val coordinates = doubleArrayOf(Longitude, Latitude)
+
+}
+
+
+

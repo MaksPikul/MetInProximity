@@ -4,7 +4,8 @@ data class AuthResult(
     val isSuccessful: Boolean,
     val accessToken: String? = null,
     val refreshToken: String? = null,
-    val error: String? = null
+    val error: String? = null,
+    val message: String? = null
 ) {
     companion object {
         fun success(accessToken: String, refreshToken: String) = AuthResult(
@@ -13,9 +14,10 @@ data class AuthResult(
             refreshToken = refreshToken
         )
 
-        fun error(error: String) = AuthResult(
+        fun error(error: String, message: String) = AuthResult(
             isSuccessful = false,
-            error = error
+            error = error,
+            message = message
         )
     }
 }

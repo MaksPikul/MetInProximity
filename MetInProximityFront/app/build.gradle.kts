@@ -69,6 +69,7 @@ dependencies {
     implementation("com.google.firebase:firebase-messaging")
 
     implementation("com.microsoft.signalr:signalr:9.0.1")
+    implementation("com.auth0:java-jwt:4.4.0")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

@@ -43,7 +43,8 @@ fun HomeView(
     PrivateChatListSheet(
         showBottomSheet,
         sheetState,
-        changeSheetState
+        changeSheetState,
+        homeVm
     )
 
     ModalNavigationDrawer(
@@ -55,6 +56,7 @@ fun HomeView(
                     padding,
                     currentScreenState,
                     drawerState,
+                    homeVm
                 )}
             )
         },

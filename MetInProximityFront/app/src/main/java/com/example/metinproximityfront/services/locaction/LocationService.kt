@@ -16,6 +16,7 @@ import android.os.IBinder
 import android.os.Looper
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import com.example.metinproximityfront.data.entities.location.LocationObject
 import com.example.metinproximityfront.data.repositories.LocationRepo
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -23,14 +24,20 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 
 class LocationService(
+    private val appContext: Context,
     private val locationRepo : LocationRepo
 ) : Service() {
 
     private lateinit var locationCallback: LocationCallback
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+    //private val notifService = NotifService(this)
 
     override fun onCreate() {
         super.onCreate()
@@ -42,10 +49,8 @@ class LocationService(
                 p0?.lastLocation?.let { location ->
                     locationRepo.UpdateUserLocation(location)
                 }
-
             }
         }
-
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     }
 
@@ -69,32 +74,26 @@ class LocationService(
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
-        return null // No binding is needed for this service
-
-    }
-
-
-    fun GetCurrentLocation() {
-        if (
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION, // TODO : CHECK for moar permissions?
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            fusedLocationClient.getLastLocation().addOnSuccessListener { location: Location? ->
-                if (location != null) {
-                    //Toast.makeText(this, "Lat: ${location.latitude}, Lng: ${location.longitude}", Toast.LENGTH_LONG).show()
-                } else {
-                    //Toast.makeText(this, "Location not available", Toast.LENGTH_SHORT).show()
+    suspend fun GetCurrentLocation(): LocationObject {
+        return suspendCoroutine { continuation ->
+            if (
+                ContextCompat.checkSelfPermission(
+                    appContext,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                    if (location != null) {
+                        continuation.resume(LocationObject(location.longitude, location.latitude))
+                    } else {
+                        continuation.resumeWithException(Exception("Error Getting Current Location"))
+                    }
                 }
+            } else {
+                continuation.resumeWithException(Exception("Missing location permissions"))
             }
         }
     }
-
-
-
-
 
     private fun CreateNotification(): Notification {
         //https://stackoverflow.com/questions/20857120/what-is-the-proper-way-to-stop-a-service-running-as-foreground
@@ -157,7 +156,8 @@ class LocationService(
 
     }
 
+    override fun onBind(intent: Intent?): IBinder? {
+        return null // No binding is needed for this service
 
-
-
+    }
 }

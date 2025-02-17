@@ -1,10 +1,10 @@
 package com.example.metinproximityfront.views.Chat
 
+import android.app.Application
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,37 +17,45 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.metinproximityfront.app.ui.theme.MetInProximityFrontTheme
-import com.example.metinproximityfront.views.Home.HomeView
+import com.example.metinproximityfront.data.entities.message.MsgResObject
+import com.example.metinproximityfront.services.preference.EncryptedStoreService
+import com.example.metinproximityfront.views.Home.HomeViewModel
 
 @Composable
-fun ChatScreen(
-    messages : SnapshotStateList<String>,
+fun ChatView(
+    homeVm: HomeViewModel,
     privateUser : Boolean = false
 ) {
+    val messages by homeVm.msgService.messages.collectAsState()
+
+    val listState = rememberLazyListState()
+    var text by remember { mutableStateOf("") }
+
+    val onMsgSend = {
+        try {
+            homeVm.msgService.sendMessage(text)
+            text = ""
+        }
+        catch (ex : Throwable) {
+            // TODO : Show an Error
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -56,15 +64,9 @@ fun ChatScreen(
     ) {
         ChatHeader(privateUser)
 
-        val listState = rememberLazyListState()
-        LaunchedEffect(messages.size) {
-            listState.animateScrollToItem(messages.size - 1)
-        }
         LazyColumn(
             state = listState,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
+            modifier = Modifier.weight(1f).fillMaxWidth(),
             reverseLayout = false
         ) {
             items(messages) { message ->
@@ -72,12 +74,16 @@ fun ChatScreen(
             }
         }
 
-        InputBar()
+        InputBar(
+            onMsgSend,
+            text,
+            onTextChange = { text = it }
+        )
     }
 }
 
 @Composable
-fun MessageBubble(message: String, isUser: Boolean) {
+fun MessageBubble(msgObj: MsgResObject, isUser: Boolean) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -101,7 +107,7 @@ fun MessageBubble(message: String, isUser: Boolean) {
         }
 
         Text(
-            text = message,
+            text = msgObj.Body,
             modifier = Modifier.padding(horizontal = 8.dp),
             color = Color.Black
         )
@@ -122,8 +128,11 @@ fun MessageBubble(message: String, isUser: Boolean) {
 
 @Composable
 fun InputBar (
+    onMsgSend : () -> Unit,
+    text : String,
+    onTextChange: (String) -> Unit,
 ) {
-    var text by remember { mutableStateOf("") }
+
 
     Row(
         modifier = Modifier
@@ -134,7 +143,7 @@ fun InputBar (
     ) {
         TextField(
             value = text,
-            onValueChange = { text = it },
+            onValueChange = onTextChange,
             modifier = Modifier
                 .weight(1f)
                 .padding(4.dp), // similar to flex
@@ -143,7 +152,7 @@ fun InputBar (
 
 
         Button(
-            onClick = {},
+            onClick = onMsgSend,
             modifier = Modifier.height(54.dp),
             shape = RoundedCornerShape(4.dp)
         ){
@@ -200,10 +209,17 @@ fun ChatHeader (
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
-fun GreetingPreview7() {
-    MetInProximityFrontTheme {
-        HomeView({})
-    }
+fun ChatViewPreview() {
+    val app = LocalContext.current.applicationContext as Application
+    val context = LocalContext.current
+
+    ChatView(
+        homeVm = HomeViewModel(
+            app,
+            EncryptedStoreService(context)
+        ), // Pass application instance
+        privateUser = false
+    )
 }

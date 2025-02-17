@@ -7,19 +7,20 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import com.example.metinproximityfront.R
 import com.example.metinproximityfront.config.Constants
 import com.example.metinproximityfront.data.api.ApiTokenWrapper
-import com.example.metinproximityfront.data.api.UserActionApi
+import com.example.metinproximityfront.data.entities.message.MsgResObject
 import com.example.metinproximityfront.data.repositories.UserActionRepository
 import com.example.metinproximityfront.services.locaction.LocationService
 import com.example.metinproximityfront.services.preference.EncryptedStoreService
 import com.example.metinproximityfront.services.preference.SharedStoreService
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import java.util.Date
 
 class FirebaseMsgReceiver : FirebaseMessagingService() {
+
+    //private val notifService = NotifService(this)
 
     override fun onNewToken(fcmToken: String) {
         super.onNewToken(fcmToken)
@@ -38,16 +39,33 @@ class FirebaseMsgReceiver : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
-        val msgStore = MsgStoreService( SharedStoreService(
+        /*
+        val msgStore = MessageService( SharedStoreService(
             applicationContext,
             Constants.MsgSharedStoreServiceFileName
         ) )
+         */
 
-        val key : String = msgStore.storeMessage(message)
+        val msgObj : MsgResObject = mapRemoteToMsgRes(message)
+
+        //val key : String = msgStore.storeMessage(msgObj)
 
         // TODO: Use Key to create route for intent based on public or private
 
         this.createAndRunNotification()
+    }
+
+    private fun mapRemoteToMsgRes(
+        message : RemoteMessage
+    ) : MsgResObject{
+
+        return MsgResObject(
+            Body = message.data.get("Body") ?: "",
+            UserId = message.data.get("UserId") ?: "", // owner of message
+            isPublic = message.data.get("isPublic").toBoolean(),
+            RecipientId = message.data.get("RecipientId"),
+            Timestamp = Date() // Parse Date From String
+        )
     }
 
     // TODO : Make Into a Service

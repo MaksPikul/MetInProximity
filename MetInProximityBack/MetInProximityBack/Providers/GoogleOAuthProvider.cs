@@ -25,15 +25,16 @@ namespace MetInProximityBack.Providers
             _configuration = configuration;
         }
 
-        public Dictionary<string, string> GetReqValues(string code)
+        public Dictionary<string, string> GetReqValues(string authCode, string codeVerifier)
         {
             var body = new Dictionary<string, string>
             {
                 { "client_id",  _configuration["Auth:Google:ClientId"] },
                 { "client_secret", _configuration["Auth:Google:ClientSecret"] },
                 { "grant_type", "authorization_code" },
-                { "code", code },
-                { "redirect_uri", _configuration["Auth:Google:RedirectUri"] }
+                { "code", authCode },
+                { "redirect_uri", _configuration["Auth:Google:RedirectUri"] },
+                //{ "code_verifier", codeVerifier }
             };
 
             return body;
@@ -42,14 +43,14 @@ namespace MetInProximityBack.Providers
         public async Task<OAuthUserDto> MapResponseToUser(IEnumerable<Claim> res)
         {
             var userEmail = res.GetClaimValue("email");
-            var userName = res.GetClaimValue("name");
-            var userVerified = res.GetClaimValue("email_verified"); 
+            //var userName = res.GetClaimValue("name");
+            //var userVerified = res.GetClaimValue("email_verified"); 
 
             return new OAuthUserDto
             {
-                UserName = userName,
+                UserName = "null for now, fix",//userName,
                 UserEmail = userEmail,
-                IsEmailVerified = userVerified == "true" ? true : false,
+                IsEmailVerified = true,//userVerified == "true" ? true : false,
             };
 
         }

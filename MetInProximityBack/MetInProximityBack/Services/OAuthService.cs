@@ -25,12 +25,11 @@ namespace MetInProximityBack.Services
             var content = new FormUrlEncodedContent(req);
             Console.WriteLine("in get oauth tokens");
             var response = await _httpClient.PostAsync(url, content);
-            response.EnsureSuccessStatusCode();
 
             if (!response.IsSuccessStatusCode)
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
-                throw new Exception("Failed to fetch OAuth ID_Tokenn: " + errorContent);
+                throw new Exception("Failed to fetch OAuth ID_Token: " + errorContent);
             }
             
             var tokens = await response.Content.ReadFromJsonAsync<OAuthTokenResponse>();

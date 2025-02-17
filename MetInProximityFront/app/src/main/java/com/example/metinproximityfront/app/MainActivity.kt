@@ -18,7 +18,6 @@ import com.google.firebase.messaging.FirebaseMessaging
 
 
 class MainActivity : ComponentActivity() {
-    private lateinit var navHostController: NavHostController
 
     private lateinit var mainVm : MainActivityViewModel
 
@@ -26,11 +25,16 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.StartActivityForResult()){
             result ->
         run {
+
             // redirect here too, depending on success
             val onSuccessfulLogin = {
                 this.InitAndMoveToHome()
             }
+            val fcmToken = "" //task.result
+            // This should return errors if any and update UI in Login page, custom toast that lasts long and is large??
+            mainVm.authService.FinishLogin(result.data!!, onSuccessfulLogin, fcmToken)
 
+            /*
             FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
                     Log.w("FCM", "Fetching FCM token failed :(", task.exception)
@@ -41,6 +45,7 @@ class MainActivity : ComponentActivity() {
                 // This should return errors if any and update UI in Login page, custom toast that lasts long and is large??
                 mainVm.authService.FinishLogin(result.data!!, onSuccessfulLogin, fcmToken)
             }
+             */
         }
     }
 
@@ -51,12 +56,15 @@ class MainActivity : ComponentActivity() {
         val mainModel: MainActivityViewModel by viewModels()
         this.mainVm = mainModel
 
-        //val homeModel: HomeViewModel by viewModels()
-        //this.homeVM = homeModel
-
         this.createViews()
 
-        //TODO: this.model.initialize(this::onLoaded)
+        /*
+        if (this.mainVm.authService.IsLoggedIn()){
+            this.InitAndMoveToHome()
+        }
+         */
+
+        // TODO: this.model.initialize(this::onLoaded)
 
         enableEdgeToEdge()
     }
@@ -84,31 +92,29 @@ class MainActivity : ComponentActivity() {
         setContent {
             MetInProximityFrontTheme {
                 val nhc = rememberNavController()
-                this.navHostController = nhc
+                this.mainVm.navHostController = nhc
 
                 NavHost(
                     navController = nhc,
                     // instead of this, check for tokens, if present, run InitAndMoveToHome
-                    startDestination = if (!this.mainVm.authService.IsLoggedIn()) "Login" else "Home"
+                    startDestination = "Login"
                 ) {
                     // TODO: Blank Composable? for when loading
                     composable("Login") {
+                    LoginView(
+                        providers = mainVm.oAuthProviderFactory.getProviders(),
+                        // This looks hella complicated, but its very nice
+                        // pass 1 parameter here, pass a second parameter in login view
+                        StartLogin = { provider ->
+                            mainVm.authService.StartLogin(provider) { intent ->
+                                loginLauncher.launch(intent)
+                        }}
+                    ) }
 
-                        LoginView(
-                            providers = mainVm.oAuthProviderFactory.getProviders(),
-                            // This looks hella complicated, but its very nice
-                            // pass 1 parameter here, pass a second parameter in login view
-                            StartLogin = { provider ->
-                                mainVm.authService.StartLogin(provider) { intent ->
-                                    loginLauncher.launch(intent)
-                                }
-                            }
-                        )
-                    }
-
-                    composable("Home") { HomeView(
+                    composable("Home") {
+                    HomeView(
                         mainVm.homeVm,
-                        {mainVm.authService.Logout({navHostController.navigate("Login")})}
+                        {mainVm.authService.Logout({mainVm.navHostController.navigate("Login")})}
                     ) }
                 }
             }
@@ -118,9 +124,9 @@ class MainActivity : ComponentActivity() {
     private fun InitAndMoveToHome() {
         this.mainVm.InitHomeViewModel()
 
-        this.mainVm.homeVm.startServices()
+        //this.mainVm.homeVm.startServices()
 
-        this.navHostController.navigate("Home")
+        mainVm.navHostController.navigate("Home")
     }
 
 }

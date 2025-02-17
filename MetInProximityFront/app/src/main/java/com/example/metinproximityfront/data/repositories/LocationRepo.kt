@@ -10,7 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class LocationRepo (
-    private val apiTokenWrapper: ApiTokenWrapper<Unit>
+    private val apiTokenWrapper: ApiTokenWrapper
 ) {
 
     private val locationApi: LocationApi by lazy {

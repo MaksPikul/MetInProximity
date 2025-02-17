@@ -3,15 +3,13 @@ package com.example.metinproximityfront.data.api
 import com.example.metinproximityfront.config.Constants
 import com.example.metinproximityfront.data.remote.ApiServiceFactory
 import com.example.metinproximityfront.data.remote.PublicHttpClient.publicRetrofit
-import com.example.metinproximityfront.services.auth.AuthService
-import com.example.metinproximityfront.services.preference.EncryptedStoreService
 import com.example.metinproximityfront.services.preference.IStoreService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import retrofit2.Response
 
-class ApiTokenWrapper<T> (
+class ApiTokenWrapper(
     private val encryptedStoreService: IStoreService
 ) {
 

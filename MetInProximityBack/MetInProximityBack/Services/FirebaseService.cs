@@ -68,7 +68,7 @@ namespace MetInProximityBack.Services
 
             AppUser user = await _userManager.FindByIdAsync(userId);
 
-            return user.FcmToken;
+            return "s";//user.FcmToken;
         }
 
             

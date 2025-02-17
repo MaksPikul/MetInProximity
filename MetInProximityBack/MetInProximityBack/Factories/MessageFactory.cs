@@ -14,7 +14,6 @@ namespace MetInProximityBack.Factories
             {
                 UserId = SenderId,
                 Body = msgReq.Body,
-                Timestamp = msgReq.Timestamp,
                 isPublic = isPublic,
                 RecipientId = recipientId
 

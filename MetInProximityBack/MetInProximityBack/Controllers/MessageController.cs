@@ -33,7 +33,7 @@ namespace MetInProximityBack.Controllers
         private readonly INotificationService _notifService = notifService;
         private readonly LocationService _locService = locService;
 
-        [HttpPost]
+        [HttpPost("public")]
         [Authorize]
         public async Task<IActionResult> PublicReceiveMessageAndNotify(
             [FromBody] MessageRequest msgReq
@@ -50,14 +50,14 @@ namespace MetInProximityBack.Controllers
 
                 await Task.WhenAll(tasks);
 
-                return Ok("Message Sent");
+                return Ok(msgRes);
             }
             catch (Exception ex) {
                 return StatusCode(500, "Failed to send message: " + ex.Message);
             }
         }
 
-        [HttpPost]
+        [HttpPost("private")]
         [Authorize]
         public async Task<IActionResult> PrivateReceiveMessageAndNotify(
             [FromBody] PrivateMessageRequest msgReq
@@ -79,7 +79,7 @@ namespace MetInProximityBack.Controllers
                     _notifService.SendPushNotification(msgReq.MsgRecipientId, msgRes);
                 }
 
-                return Ok("Message Sent");
+                return Ok(msgRes);
             }
             catch (Exception ex)
             {
@@ -121,12 +121,3 @@ namespace MetInProximityBack.Controllers
 
     }
 }
-
-/*  Unnecessary, leaving this to display time complexity saved
-             
-    List<string> offlineUsers = nearbyUsers
-        .Where(nuser => !socketConnectedUsers.Contains(nuser.UserId))
-        .Select(user => user.UserId)
-        .ToList();
-
-*/

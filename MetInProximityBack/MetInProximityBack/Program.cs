@@ -17,6 +17,7 @@ using Microsoft.Extensions.Hosting;
 using MetInProximityBack.Hubs;
 using MetInProximityBack.Services.Tokens;
 using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -84,7 +85,18 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.InstanceName = "MetinInstance";
 });
 
-builder.Services.AddSingleton<IConnectionMultiplexer>(sp => ConnectionMultiplexer.Connect("    TODO    "));
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+{
+    var configuration = builder.Configuration.GetConnectionString("Redis");
+    return ConnectionMultiplexer.Connect(configuration);
+});
+
+// Register IDatabase as Scoped
+builder.Services.AddScoped<IDatabase>(sp =>
+{
+    var multiplexer = sp.GetRequiredService<IConnectionMultiplexer>();
+    return multiplexer.GetDatabase();
+});
 
 
 
@@ -125,7 +137,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 /* dependency injections*/
-builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<AuthTokenService>();
 builder.Services.AddScoped<IOAuthService, OAuthService>();
 builder.Services.AddScoped<ICacheService, RedisCacheService>();
 builder.Services.AddScoped<INotificationService, FirebaseService>();
@@ -139,6 +151,10 @@ builder.Services.AddTransient<OAuthProviderFactory>();
 https://learn.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests
  */
 builder.Services.AddHttpClient<IOAuthService, OAuthService>();
+builder.Services.AddSignalR();
+
+
+
 
 var app = builder.Build();
 
@@ -152,6 +168,13 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseCors(x => x
+     .AllowAnyMethod()
+     .AllowAnyHeader()
+     .AllowCredentials()
+     .WithOrigins("http://10.0.2.2", "https://localhost:5173")
+     .SetIsOriginAllowed(origin => true));
 
 app.MapHub<ChatHub>("/chathub");
 
