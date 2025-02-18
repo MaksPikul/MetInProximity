@@ -5,11 +5,16 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+
+
+
 
     <application
         android:allowBackup="true"
@@ -53,6 +58,7 @@
             </intent-filter>
         </activity>
 
+        <!--
         <service
             android:name="services.message.FirebaseMsgReceiver"
             android:exported="false">
@@ -60,13 +66,12 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+        -->
 
         <service
-            android:name=".services.locaction.LocationService"
+            android:name=".services.location.LocationService"
             android:foregroundServiceType="location"
-            android:enabled="true"
-            android:exported="false"
-            android:permission="android.permission.FOREGROUND_SERVICE" />
+            />
 
     </application>
 

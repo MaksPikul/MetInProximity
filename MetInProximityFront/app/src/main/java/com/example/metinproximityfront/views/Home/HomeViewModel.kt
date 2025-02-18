@@ -4,17 +4,14 @@ import android.app.Application
 import android.content.Intent
 import android.util.Log
 import com.example.metinproximityfront.config.Constants
-import com.example.metinproximityfront.data.api.ApiTokenWrapper
+import com.example.metinproximityfront.data.remote.ApiTokenWrapper
 import com.example.metinproximityfront.data.repositories.LocationRepo
 import com.example.metinproximityfront.data.repositories.MessageRepository
-import com.example.metinproximityfront.data.repositories.UserActionRepo
-import com.example.metinproximityfront.data.repositories.UserActionRepository
-import com.example.metinproximityfront.services.locaction.LocationService
+import com.example.metinproximityfront.services.location.LocationService
 import com.example.metinproximityfront.services.message.MessageService
 import com.example.metinproximityfront.services.message.SignalRMsgReceiver
 import com.example.metinproximityfront.services.preference.IStoreService
 import com.example.metinproximityfront.services.preference.SharedStoreService
-import com.example.metinproximityfront.services.userAction.UserActionService
 
 class HomeViewModel(
     private val app : Application,
@@ -29,7 +26,7 @@ class HomeViewModel(
     val msgService : MessageService
 
     private val locationRepo : LocationRepo
-    val locationService : LocationService
+    // val locationService : LocationService
 
     /*
     private val userActionRepo : UserActionRepo
@@ -45,10 +42,6 @@ class HomeViewModel(
         this.locationRepo = LocationRepo(
             ApiTokenWrapper(encryptedStoreService)
         )
-        this.locationService = LocationService(
-            //this.app.applicationContext,
-            //locationRepo
-        )
 
         this.msgRepo = MessageRepository(
             ApiTokenWrapper(encryptedStoreService)
@@ -56,7 +49,7 @@ class HomeViewModel(
         this.msgService = MessageService(
             this.storeService,
             this.msgRepo,
-            this.locationService
+            //this.locationService
         )
 
         this.signalRMsgReceiver = SignalRMsgReceiver(
@@ -67,7 +60,6 @@ class HomeViewModel(
         this.userActionRepo = UserActionRepo()
         this.userActionService = UserActionService()
          */
-
     }
 
     /*
@@ -76,21 +68,23 @@ class HomeViewModel(
         Listening for changes to message shared pref file (to update UI)
      */
 
-    fun startServices(
-
-    ) {
+    fun startServices() {
         Log.e("Starting Services", "starting")
-        val intent = Intent(app, LocationService::class.java);
-        app.startForegroundService(intent)
+
+        // Starts Location Service
+        Intent(app.applicationContext, LocationService::class.java).apply {
+            action = Constants.START_LOC_SERVICE
+            app.startService(this)
+        }
 
         // this.signalRMsgReceiver.startConnection()
         // this.msgStoreListener.startListening()
     }
 
-    fun stopLocationService() {
-        val serviceIntent = Intent(app, LocationService::class.java)
+    fun stopServices() {
+        val serviceIntent = Intent(app.applicationContext, LocationService::class.java)
         serviceIntent.setAction( "STOP_SERVICE" )
-        app.stopService(serviceIntent)
+        app.applicationContext.stopService(serviceIntent)
     }
 
 

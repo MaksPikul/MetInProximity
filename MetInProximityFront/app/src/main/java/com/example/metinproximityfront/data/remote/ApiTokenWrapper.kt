@@ -1,7 +1,7 @@
-package com.example.metinproximityfront.data.api
+package com.example.metinproximityfront.data.remote
 
 import com.example.metinproximityfront.config.Constants
-import com.example.metinproximityfront.data.remote.ApiServiceFactory
+import com.example.metinproximityfront.data.api.RefreshTokenApi
 import com.example.metinproximityfront.data.remote.PublicHttpClient.publicRetrofit
 import com.example.metinproximityfront.services.preference.IStoreService
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +30,9 @@ class ApiTokenWrapper(
         return withContext(Dispatchers.IO) {
             val response = try {
                 apiCall(accessToken!!)
+
             } catch (e: Throwable) {
+                encryptedStoreService.removeFromPref(Constants.ACCESS_TOKEN_KEY)
                 if (e is HttpException && e.code() != 401) {
                     throw e
                 }
@@ -38,6 +40,7 @@ class ApiTokenWrapper(
                 accessToken = try {
                     RefreshAccessToken()
                 } catch (refreshError: Throwable) {
+                    encryptedStoreService.removeFromPref(Constants.REFRESH_TOKEN_KEY)
                     throw Exception("Token refresh failed so redirect to login.", refreshError)
                 }
 

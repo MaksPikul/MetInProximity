@@ -1,6 +1,6 @@
 package com.example.metinproximityfront.data.repositories
 
-import com.example.metinproximityfront.data.api.ApiTokenWrapper
+import com.example.metinproximityfront.data.remote.ApiTokenWrapper
 import com.example.metinproximityfront.data.api.UserActionApi
 import com.example.metinproximityfront.data.remote.ApiServiceFactory
 import com.example.metinproximityfront.data.remote.PublicHttpClient.publicRetrofit

@@ -1,22 +1,5 @@
 package com.example.metinproximityfront.services.notification
 
-import android.Manifest
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
-import android.content.Context
-import android.os.Looper
-import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
-import com.example.metinproximityfront.services.locaction.LocationService
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.Priority
-import java.nio.channels.Channel
 /*
 class NotifService(
     private val context : Context

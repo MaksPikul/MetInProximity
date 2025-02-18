@@ -1,6 +1,8 @@
 package com.example.metinproximityfront.app
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -9,13 +11,13 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.metinproximityfront.services.locaction.LocationService
+import com.example.metinproximityfront.config.Constants
+import com.example.metinproximityfront.services.location.LocationService
 import com.example.metinproximityfront.ui.theme.MetInProximityFrontTheme
 import com.example.metinproximityfront.views.Home.HomeView
 import com.example.metinproximityfront.views.loading.LoadingView
@@ -26,27 +28,25 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var mainVm : MainActivityViewModel
 
+    private val permissions = arrayOf(
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.FOREGROUND_SERVICE_LOCATION
+    )
+
     private val loginLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()){
             result ->
         run {
 
-            // redirect here too, depending on success
-            val onSuccessfulLogin = {
-                this.InitAndMoveToHome()
-            }
-
-            val onFailedLogin = {errorMsg : String?, errorCode : String? ->
-                this.mainVm.stopLoadingView("Login")
-                Toast.makeText(this, errorMsg, Toast.LENGTH_LONG).show()
-                Log.e("Auth Error",errorMsg.toString())
-                Unit
-            }
-
-            val fcmToken = "" //task.result
+            //val fcmToken = task.result
             // This should return errors if any and update UI in Login page, custom toast that lasts long and is large??
             this.mainVm.startLoadingView()
-            mainVm.authService.FinishLogin(result.data!!,fcmToken, onSuccessfulLogin, onFailedLogin)
+            mainVm.authService.FinishLogin(
+                result.data!!,
+                "",
+                mainVm.onSuccLogin,
+                mainVm.onFailLogin
+            )
 
             /*
             FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
@@ -65,22 +65,19 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // (this.application as Application).setMainActivity(this)
-        Log.i("Starting", "starting onCreate")
+
+        this.PremissionCheck()
 
         val mainModel: MainActivityViewModel by viewModels()
         this.mainVm = mainModel
 
         this.createViews()
 
-        // TODO: this.model.initialize(this::onLoaded)
-
         enableEdgeToEdge()
     }
 
     override fun onPause() {
         super.onPause()
-
         // todo: if (!userWantsBackground location and messages)
         //this.mainVM.homeVm.stopLocationService()
     }
@@ -105,7 +102,6 @@ class MainActivity : ComponentActivity() {
             MetInProximityFrontTheme {
                 val nhc = rememberNavController()
                 this.mainVm.navHostController = nhc
-
 
                 NavHost(
                     navController = this.mainVm.navHostController,
@@ -134,9 +130,9 @@ class MainActivity : ComponentActivity() {
                     LoadingView()
                     }
                 }
-                val loggedIn by remember { mutableStateOf(mainVm.authService.IsLoggedIn()) }
-                if (loggedIn){
-                    this.InitAndMoveToHome()
+
+                if (mainVm.authService.IsLoggedIn()){
+                    mainVm.InitAndLoadHomeVm()
                 }
                 else {
                     this.mainVm.stopLoadingView("Login")
@@ -145,15 +141,52 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun InitAndMoveToHome() {
-        this.mainVm.InitHomeViewModel()
-        //this.mainVm.homeVm.startServices()
 
-        val intent = Intent(this, LocationService::class.java);
-        applicationContext.startForegroundService(intent)
-        this.mainVm.stopLoadingView("Home")
+
+
+
+    // I need a permission Manager
+
+    private fun PremissionCheck() {
+
+        if (arePermissionsGranted()) {
+
+            Log.e("prems", "prems granted")
+        } else {
+            requestPermissions()
+        }
     }
 
+    private fun arePermissionsGranted(): Boolean {
+        return permissions.all {
+            ContextCompat.checkSelfPermission(applicationContext, it) == PackageManager.PERMISSION_GRANTED
+        }
+    }
+
+    private fun requestPermissions() {
+        ActivityCompat.requestPermissions(this, permissions, 1)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
+        deviceId: Int
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults, deviceId)
+        if (requestCode == 1) {
+            if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+                Log.e("prems","permissions accepted")
+            } else {
+                Toast.makeText(this, "Permissions are required for location access.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        Log.e("Permissions", "Fine location granted: ${ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED}")
+        Log.e("Permissions", "Coarse location granted: ${ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED}")
+        Log.e("Permissions", "Background location granted: ${ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED}")
+        Log.e("Permissions", "Foreground service location granted: ${ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.FOREGROUND_SERVICE_LOCATION) == PackageManager.PERMISSION_GRANTED}")
+    }
 }
 
 

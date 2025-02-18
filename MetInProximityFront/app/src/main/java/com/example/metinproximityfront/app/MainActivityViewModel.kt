@@ -1,6 +1,8 @@
 package com.example.metinproximityfront.app
 
 import android.app.Application
+import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.navigation.NavHostController
 import com.example.metinproximityfront.data.repositories.AccountRepository
@@ -31,7 +33,7 @@ class MainActivityViewModel(
 
     // https://developer.android.com/kotlin/flow/stateflow-and-sharedflow
     private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow() // adding this just in case i need to use it as a state
 
     // These necessary for login page,
     // Once user logs in, other necessary objects are initialised
@@ -50,18 +52,34 @@ class MainActivityViewModel(
         this.oAuthProviderFactory = OAuthProviderFactory()
     }
 
-    fun InitHomeViewModel(){
+    fun InitAndLoadHomeVm(){
+
         this.homeVm = HomeViewModel(app, encryptedStoreService)
+        this.stopLoadingView("Home")
+        this.homeVm.startServices()
     }
 
     fun startLoadingView(){
+
         _isLoading.value = true
         navHostController.navigate("Loading")
     }
 
     fun stopLoadingView(nextScreen : String){
+
         _isLoading.value = false
         navHostController.navigate(nextScreen)
+    }
+
+    val onSuccLogin = {
+        InitAndLoadHomeVm()
+    }
+
+    val onFailLogin = {errorMsg : String?, errorCode : String? ->
+        stopLoadingView("Login")
+        Toast.makeText(app.applicationContext, errorMsg, Toast.LENGTH_LONG).show()
+        Log.e("Auth Error",errorMsg.toString())
+        Unit
     }
 
 }

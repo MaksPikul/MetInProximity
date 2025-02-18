@@ -2,12 +2,11 @@ package com.example.metinproximityfront.services.message
 
 import android.content.SharedPreferences
 import android.util.Log
-import android.widget.Toast
 import com.example.metinproximityfront.data.entities.location.LocationObject
 import com.example.metinproximityfront.data.entities.message.MsgReqObject
 import com.example.metinproximityfront.data.entities.message.MsgResObject
 import com.example.metinproximityfront.data.repositories.MessageRepository
-import com.example.metinproximityfront.services.locaction.LocationService
+import com.example.metinproximityfront.services.location.LocationService
 import com.example.metinproximityfront.services.preference.SharedStoreService
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -20,7 +19,7 @@ import kotlinx.coroutines.launch
 class MessageService(
     private val sharedStore: SharedStoreService,
     private val msgRepo: MessageRepository? = null,
-    private val locationService: LocationService
+    //private val locationService: LocationService
 )
 {
 
@@ -59,8 +58,8 @@ class MessageService(
     ) {
         try {
             CoroutineScope(Dispatchers.IO).launch {
-                val locObj: LocationObject = locationService.GetCurrentLocation()
-
+                //val locObj: LocationObject = locationService.GetCurrentLocation()
+                val locObj = LocationObject (1.0,1.0)
                 val msgObj = MsgReqObject(
                     Body = textToSend,
                     Longitude = locObj.Longitude,

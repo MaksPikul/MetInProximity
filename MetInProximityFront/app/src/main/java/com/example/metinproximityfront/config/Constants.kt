@@ -10,5 +10,8 @@ object Constants {
 
     val MsgSharedStoreServiceFileName = "MESSAGES"
 
+    val START_LOC_SERVICE = "start_location_service"
+    val STOP_LOC_SERVICE = "stop_location_service"
+
 }
 

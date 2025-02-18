@@ -7,13 +7,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
-import com.example.metinproximityfront.config.Constants
-import com.example.metinproximityfront.data.api.ApiTokenWrapper
+import com.example.metinproximityfront.data.remote.ApiTokenWrapper
 import com.example.metinproximityfront.data.entities.message.MsgResObject
 import com.example.metinproximityfront.data.repositories.UserActionRepository
-import com.example.metinproximityfront.services.locaction.LocationService
+import com.example.metinproximityfront.services.location.LocationService
 import com.example.metinproximityfront.services.preference.EncryptedStoreService
-import com.example.metinproximityfront.services.preference.SharedStoreService
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import java.util.Date
