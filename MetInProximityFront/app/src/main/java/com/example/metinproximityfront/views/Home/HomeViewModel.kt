@@ -2,6 +2,7 @@ package com.example.metinproximityfront.views.Home
 
 import android.app.Application
 import android.content.Intent
+import android.util.Log
 import com.example.metinproximityfront.config.Constants
 import com.example.metinproximityfront.data.api.ApiTokenWrapper
 import com.example.metinproximityfront.data.repositories.LocationRepo
@@ -45,8 +46,8 @@ class HomeViewModel(
             ApiTokenWrapper(encryptedStoreService)
         )
         this.locationService = LocationService(
-            this.app.applicationContext,
-            locationRepo
+            //this.app.applicationContext,
+            //locationRepo
         )
 
         this.msgRepo = MessageRepository(
@@ -78,10 +79,11 @@ class HomeViewModel(
     fun startServices(
 
     ) {
+        Log.e("Starting Services", "starting")
         val intent = Intent(app, LocationService::class.java);
         app.startForegroundService(intent)
 
-        this.signalRMsgReceiver.startConnection()
+        // this.signalRMsgReceiver.startConnection()
         // this.msgStoreListener.startListening()
     }
 

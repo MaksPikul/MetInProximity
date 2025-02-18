@@ -43,14 +43,13 @@ namespace MetInProximityBack.Providers
         public async Task<OAuthUserDto> MapResponseToUser(IEnumerable<Claim> res)
         {
             var userEmail = res.GetClaimValue("email");
-            //var userName = res.GetClaimValue("name");
-            //var userVerified = res.GetClaimValue("email_verified"); 
+            var userName = res.GetClaimValue("name");
 
             return new OAuthUserDto
             {
-                UserName = "null for now, fix",//userName,
+                UserName = userName,
                 UserEmail = userEmail,
-                IsEmailVerified = true,//userVerified == "true" ? true : false,
+                IsEmailVerified = userEmail == null ? false : true,
             };
 
         }

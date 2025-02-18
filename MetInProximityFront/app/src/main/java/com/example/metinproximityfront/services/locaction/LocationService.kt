@@ -2,6 +2,7 @@ package com.example.metinproximityfront.services.locaction
 
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -14,6 +15,7 @@ import android.location.Location
 import android.os.Build
 import android.os.IBinder
 import android.os.Looper
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.example.metinproximityfront.data.entities.location.LocationObject
@@ -30,9 +32,11 @@ import kotlin.coroutines.suspendCoroutine
 
 
 class LocationService(
-    private val appContext: Context,
-    private val locationRepo : LocationRepo
+    //private val appContext: Context,
+    //private val locationRepo : LocationRepo
 ) : Service() {
+
+
 
     private lateinit var locationCallback: LocationCallback
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -41,17 +45,24 @@ class LocationService(
 
     override fun onCreate() {
         super.onCreate()
+        Log.e("LocService", "Service Created")
 
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(p0: LocationResult) {
                 super.onLocationResult(p0)
 
                 p0?.lastLocation?.let { location ->
-                    locationRepo.UpdateUserLocation(location)
+                    //locationRepo.UpdateUserLocation(location)
+                    Log.i("Location", location.longitude.toString())
                 }
             }
         }
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        val notification = this.CreateNotification() // Create Notification Service?
+         // Create a permission checking Wrapper?
+
+        startForeground(4523, notification)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -59,10 +70,7 @@ class LocationService(
             stopSelf()
         }
 
-        val notification = this.CreateNotification() // Create Notification Service?
-        this.StartLocationRequests() // Create a permission checking Wrapper?
-
-        startForeground(4523, notification)
+        this.StartLocationRequests()
 
         return super.onStartCommand(intent, flags, startId)
     }
@@ -74,13 +82,24 @@ class LocationService(
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
+    // Clean the permissions
+    @SuppressLint("MissingPermission")
     suspend fun GetCurrentLocation(): LocationObject {
         return suspendCoroutine { continuation ->
-            if (
+
+            if (/*
                 ContextCompat.checkSelfPermission(
                     appContext,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
                 ) == PackageManager.PERMISSION_GRANTED
+
+                &&
+                ContextCompat.checkSelfPermission(
+                    appContext,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                ) == PackageManager.PERMISSION_GRANTED
+                */
+                true
             ) {
                 fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                     if (location != null) {
@@ -102,7 +121,7 @@ class LocationService(
         stopIntent.setAction( "STOP_SERVICE") /*Constants.ACTION.STOPFOREGROUND_ACTION*/
         startService(stopIntent);
 
-        val pendingStopIntent = PendingIntent.getService(this, 0, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val pendingStopIntent = PendingIntent.getService(this, 0, stopIntent, PendingIntent.FLAG_IMMUTABLE)
 
         val channelId = "4523"
 

@@ -28,8 +28,8 @@ class AccountRepository {
                 val tokens = response.body()
 
                 AuthResult.success(
-                    tokens?.access_token ?: "",
-                    tokens?.refresh_token ?: ""
+                    tokens?.accessToken ?: "",
+                    tokens?.refreshToken ?: ""
                 )
 
             } else {

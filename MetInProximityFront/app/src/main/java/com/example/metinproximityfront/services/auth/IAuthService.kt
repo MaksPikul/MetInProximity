@@ -15,8 +15,9 @@ interface IAuthService{
 
     fun FinishLogin(
         responseIntent: Intent,
+        fcmToken : String,
         onSuccessfulLogin : ()-> Unit,
-        fcmToken : String
+        onFailedLogin : (errorMsg : String?, errorCode : String?)-> Unit
     )
 
     fun Logout(

@@ -1,6 +1,8 @@
 package com.example.metinproximityfront.services.message
 
 import android.content.SharedPreferences
+import android.util.Log
+import android.widget.Toast
 import com.example.metinproximityfront.data.entities.location.LocationObject
 import com.example.metinproximityfront.data.entities.message.MsgReqObject
 import com.example.metinproximityfront.data.entities.message.MsgResObject
@@ -55,20 +57,25 @@ class MessageService(
         textToSend : String,
         //TODO : isPublic : Boolean - Currently only for public
     ) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val locObj : LocationObject = locationService.GetCurrentLocation()
+        try {
+            CoroutineScope(Dispatchers.IO).launch {
+                val locObj: LocationObject = locationService.GetCurrentLocation()
 
-            val msgObj = MsgReqObject(
-                Body = textToSend,
-                Longitude = locObj.Longitude,
-                Latitude = locObj.Latitude
-            )
+                val msgObj = MsgReqObject(
+                    Body = textToSend,
+                    Longitude = locObj.Longitude,
+                    Latitude = locObj.Latitude
+                )
 
-            val response : MsgResObject? =  msgRepo?.SendMessage(msgObj)
-            response?.let { msg ->
-                storeMessage(msg)
+                val response: MsgResObject? = msgRepo?.SendMessage(msgObj)
+                response?.let { msg ->
+                    storeMessage(msg)
+                }
+                retrieveMessages() // this changes UI?
             }
-            retrieveMessages() // this changes UI?
+        }
+        catch (ex : Throwable) {
+            Log.e("location error", ex.message.toString())
         }
     }
 

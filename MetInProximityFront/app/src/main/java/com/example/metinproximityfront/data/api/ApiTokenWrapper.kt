@@ -65,7 +65,7 @@ class ApiTokenWrapper(
 
                 if (response.isSuccessful && response.body() != null) {
                     val tokenResponse = response.body()!!
-                    return tokenResponse.access_token
+                    return tokenResponse.accessToken
                 } else {
                     throw Exception("Failed to refresh access token")
                 }

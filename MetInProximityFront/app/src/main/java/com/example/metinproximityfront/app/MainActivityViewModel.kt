@@ -10,13 +10,14 @@ import com.example.metinproximityfront.services.auth.IAuthService
 import com.example.metinproximityfront.services.preference.EncryptedStoreService
 import com.example.metinproximityfront.services.preference.IStoreService
 import com.example.metinproximityfront.views.Home.HomeViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class MainActivityViewModel(
     private val app: Application
 ) : AndroidViewModel(app) {
-
     // Todo : ADD state variables and create two initialisation stages
-    // TODO : Either split up the view model, or two functions which initialise at different times
 
     lateinit var navHostController: NavHostController
 
@@ -27,6 +28,10 @@ class MainActivityViewModel(
     val oAuthProviderFactory : OAuthProviderFactory
 
     lateinit var homeVm : HomeViewModel
+
+    // https://developer.android.com/kotlin/flow/stateflow-and-sharedflow
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     // These necessary for login page,
     // Once user logs in, other necessary objects are initialised
@@ -47,6 +52,16 @@ class MainActivityViewModel(
 
     fun InitHomeViewModel(){
         this.homeVm = HomeViewModel(app, encryptedStoreService)
+    }
+
+    fun startLoadingView(){
+        _isLoading.value = true
+        navHostController.navigate("Loading")
+    }
+
+    fun stopLoadingView(nextScreen : String){
+        _isLoading.value = false
+        navHostController.navigate(nextScreen)
     }
 
 }

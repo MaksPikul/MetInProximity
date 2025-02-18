@@ -22,15 +22,12 @@ import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.AuthorizationService.TokenResponseCallback
 import net.openid.appauth.AuthorizationServiceConfiguration
-import net.openid.appauth.NoClientAuthentication
 import net.openid.appauth.ResponseTypeValues
 import net.openid.appauth.TokenResponse
 import net.openid.appauth.browser.BrowserAllowList
 import net.openid.appauth.browser.VersionedBrowserMatcher
 import java.security.MessageDigest
 import java.security.SecureRandom
-import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 
 /*
@@ -87,8 +84,9 @@ class AuthService(
 
     override fun FinishLogin(
         responseIntent: Intent,
+        fcmToken : String,
         onSuccessfulLogin : ()-> Unit,
-        fcmToken : String
+        onFailedLogin : (errorMsg : String?, errorCode : String?)-> Unit
     ){
         // After redirect back to Mobile App login screen,
         // Response Object and Code extracted
@@ -97,16 +95,16 @@ class AuthService(
 
         // Checking for errors or missing response object
         if (error != null){
-            Toast.makeText(appContext, error.errorDescription, Toast.LENGTH_LONG).show()
-            error.errorDescription?.let { Log.e("OAuth Error", it) }
+            onFailedLogin(error.errorDescription, error.code.toString())
         }
         if (authResponse == null){
-            Toast.makeText(appContext, "Authentication Result is Missing", Toast.LENGTH_LONG).show()
-            Log.e("OAuth Error","Missing Result")
+            onFailedLogin("Authentication Result is Missing", "300")
         }
         val provider = curProvider.toString()
-        Log.i("provider", provider)
 
+        // This Looks so ugly but idk how else to clean it,
+        // Cant lie i dont understand much of the AppAuth Documentation
+        // My ass gotta add a loading screen here too ;-;
         authResponse?.createTokenExchangeRequest()?.let {
             loginAuthService?.performTokenRequest(
                 it,
@@ -114,46 +112,18 @@ class AuthService(
                     override fun onTokenRequestCompleted(resp: TokenResponse?, ex: AuthorizationException?) {
                         if (resp != null) {
 
-                            Log.i("IdToken", resp.idToken.toString())
-                            Log.e("provider", provider)
-
-
+                            Log.e("Starts", "Before Coroutine")
                             CoroutineScope(Dispatchers.IO).launch {
-
-                                val authResult: AuthResult =
-                                    accountRepo.Authenticate(
-                                        provider,
-                                        AuthRequest(
-                                            resp.idToken.toString()
-                                        )
-                                    )
-
-                                withContext(Dispatchers.Main) {
-                                    if (authResult.isSuccessful) {
-
-                                        // Saving tokens into Encrypted Shared Preferences
-                                        storeTokens(
-                                            authResult.accessToken.toString(),
-                                            authResult.refreshToken.toString()
-                                        )
-                                        //storeUser(/* object that comes with login */)
-                                        // Function passed from MainActivity which redirects user to home view
-                                        onSuccessfulLogin()
-                                    } else {
-                                        // Shows error on Login View
-                                        Toast.makeText(
-                                            appContext,
-                                            authResult.error,
-                                            Toast.LENGTH_LONG
-                                        ).show()
-                                        authResult.message?.let { Log.e("API Error", it) }
-                                    }
-                                }
+                                AuthenticateWithWebServer(
+                                    provider,
+                                    onSuccessfulLogin,
+                                    resp
+                                )
                             }
 
                         } else {
                             // Authorization failed, check 'ex' for more details
-                            Log.e("OAuth Error", ex?.localizedMessage ?: "Unknown error")
+                            onFailedLogin(ex?.localizedMessage ?: "Unknown error", ex?.code.toString())
                         }
                     }
                 }
@@ -189,20 +159,50 @@ class AuthService(
         we could check here if the refresh token is expired, to save on resources, a design decision for later :D
     */
     override fun IsLoggedIn() : Boolean {
-
         return this.prefStore.getFromPref(Constants.ACCESS_TOKEN_KEY) != ""
     }
 
     /*
-    override fun GetUser() : User {
-        val jwt = this.prefStore.getFromPref(Constants.ACCESS_TOKEN_KEY)
-    }
-    */
-
-    /*
         Helper Functions
     */
+    suspend private fun AuthenticateWithWebServer(
+        provider: String,
+        onSuccessfulLogin : ()-> Unit,
+        resp : TokenResponse
+    ){
 
+        val authResult: AuthResult =
+            accountRepo.Authenticate(
+                provider,
+                AuthRequest(
+                    resp.idToken.toString()
+                )
+            )
+        Log.e("Runs", "after coroutine")
+
+        withContext(Dispatchers.Main) {
+            if (authResult.isSuccessful) {
+
+                Log.i("tokens", authResult.toString())
+                // Saving tokens into Encrypted Shared Preferences
+                storeTokens(
+                    authResult.accessToken.toString(),
+                    authResult.refreshToken.toString()
+                )
+                //storeUser(/* object that comes with login */)
+                // Function passed from MainActivity which redirects user to home view
+                onSuccessfulLogin()
+            } else {
+                // Shows error on Login View
+                Toast.makeText(
+                    appContext,
+                    authResult.error,
+                    Toast.LENGTH_LONG
+                ).show()
+                authResult.message?.let { Log.e("API Error", it) }
+            }
+        }
+    }
 
     private fun createVerifierAndChallenge (): Pair<String, String> {
         val secureRandom = SecureRandom()
@@ -231,12 +231,6 @@ class AuthService(
         return AuthorizationService(
             appContext,
             appAuthConfiguration)
-    }
-
-    private fun storeUser(
-        accessToken: String
-    ){
-
     }
 
     private fun storeTokens (

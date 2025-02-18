@@ -40,15 +40,19 @@ namespace MetInProximityBack.Controllers
         ) {
             try {
 
-                List<NearbyUser> nearbyUsers = await _locService.GetNearbyUsersAsync(msgReq.Longitude, msgReq.Latitude);
+                Console.WriteLine(msgReq);
+                //List<NearbyUser> nearbyUsers = await _locService.GetNearbyUsersAsync(msgReq.Longitude, msgReq.Latitude);
 
-                List<NearbyUserWithConnId> nuwConnId = await _locService.GetUserConnIdsAsync(nearbyUsers);
+                //List<NearbyUserWithConnId> nuwConnId = await _locService.GetUserConnIdsAsync(nearbyUsers);
 
                 MessageResponse msgRes = MessageFactory.CreateMessageResponse(msgReq, User.GetId(), true);
 
-                List<Task> tasks = this.CreateMsgTasksForParallel(msgRes, nuwConnId);
+                //List<Task> tasks = this.CreateMsgTasksForParallel(msgRes, nuwConnId);
 
-                await Task.WhenAll(tasks);
+                //await Task.WhenAll(tasks);
+                
+                Console.WriteLine("-----------------");
+                Console.WriteLine(msgRes);
 
                 return Ok(msgRes);
             }
