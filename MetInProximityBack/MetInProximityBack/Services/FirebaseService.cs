@@ -1,6 +1,5 @@
 ﻿using Azure.Core;
 using System.Net.Http.Headers;
-using MetInProximityBack.Interfaces;
 using Microsoft.Azure.Cosmos.Serialization.HybridRow;
 using System.Net;
 using System.Net.Http;
@@ -8,6 +7,7 @@ using System.Text;
 using MetInProximityBack.Types.Message;
 using MetInProximityBack.Models;
 using Microsoft.AspNetCore.Identity;
+using MetInProximityBack.Interfaces.IServices;
 
 namespace MetInProximityBack.Services
 {

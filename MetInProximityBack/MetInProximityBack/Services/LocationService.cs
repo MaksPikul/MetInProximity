@@ -1,6 +1,6 @@
 ﻿using MetInProximityBack.Constants;
-using MetInProximityBack.Data;
-using MetInProximityBack.Interfaces;
+using MetInProximityBack.Interfaces.IRepos;
+using MetInProximityBack.Repositories;
 using MetInProximityBack.Types.Location;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Reflection;
@@ -8,12 +8,12 @@ using System.Reflection;
 namespace MetInProximityBack.Services
 {
     public class LocationService (
-        AzureCosmos cosmosDb,
-        ICacheService cacheService
+        CosmoLocationRepo cosmosDb,
+        ICacheRepo cacheService
     ) 
     {
-        private readonly AzureCosmos _cosmosDb = cosmosDb;
-        private readonly ICacheService _cacheService = cacheService;
+        private readonly CosmoLocationRepo _cosmosDb = cosmosDb;
+        private readonly ICacheRepo _cacheService = cacheService;
 
         public async Task<List<NearbyUser>> GetNearbyUsersAsync(double longitude, double latitude, string RequestingUserId)
         {
@@ -33,10 +33,9 @@ namespace MetInProximityBack.Services
             List<string> connectionIds = await _cacheService
                     .GetManyFromCacheAsync(
                         nearbyUsers
-                        .Select(user => CacheKeys.ConnIdCacheKey(user.UserId))
+                        .Select(user => AppConstants.ConnIdCacheKey(user.UserId))
                         .ToList()
                     );
-            Console.WriteLine(connectionIds[0] + "LocService");
 
             List<NearbyUserWithConnId> nuwConnId = this.MapUserToConnId(nearbyUsers, connectionIds);
             return nuwConnId;
@@ -45,19 +44,18 @@ namespace MetInProximityBack.Services
         // get by any field
         public async Task<LocationObject> GetLatestLocationAsync(string userId)
         {
-            LocationObject locationObject = await _cosmosDb.GetLocationObjectByUserId(userId);
+            LocationObject locationObject = await _cosmosDb.GetLocationByUserId(userId);
             return locationObject;
         }
 
         public async void UpdateLocation(LocationObject locationObject, string propertyName, object newVal)
         {
-
             PropertyInfo property = typeof(LocationObject).GetProperty(propertyName);
 
             if ((property != null && property.CanWrite) && property.PropertyType == newVal.GetType())
             {
                 property.SetValue(locationObject, newVal);
-                await _cosmosDb.AddLocation(locationObject);
+                await _cosmosDb.AddOrUpdateLocation(locationObject);
             }
             else
             {

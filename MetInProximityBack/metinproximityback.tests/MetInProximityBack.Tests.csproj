@@ -35,4 +35,8 @@
     <ProjectReference Include="..\MetInProximityBack\MetInProximityBack.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ControllerTests\" />
+  </ItemGroup>
+
 </Project>

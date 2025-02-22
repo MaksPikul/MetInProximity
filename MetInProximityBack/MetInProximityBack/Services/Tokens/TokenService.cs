@@ -1,4 +1,4 @@
-﻿using MetInProximityBack.Interfaces;
+﻿using MetInProximityBack.Interfaces.IServices;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

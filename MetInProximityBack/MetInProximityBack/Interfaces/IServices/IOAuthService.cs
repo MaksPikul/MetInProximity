@@ -1,6 +1,6 @@
 ﻿using MetInProximityBack.Types.OAuth;
 
-namespace MetInProximityBack.Interfaces
+namespace MetInProximityBack.Interfaces.IServices
 {
     public interface IOAuthService
     {

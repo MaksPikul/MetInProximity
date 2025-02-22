@@ -1,9 +1,9 @@
 ﻿using MetInProximityBack.Types.Location;
 using Microsoft.Azure.Cosmos.Spatial;
 
-namespace MetInProximityBack.Interfaces
+namespace MetInProximityBack.Interfaces.IRepos
 {
-    public interface INoSqlDb
+    public interface ILocationRepo
     {
         Task AddLocation(LocationObject locObj);
 

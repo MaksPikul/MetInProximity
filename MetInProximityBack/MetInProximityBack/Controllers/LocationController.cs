@@ -1,8 +1,8 @@
-﻿using MetInProximityBack.Data;
-using MetInProximityBack.Enums;
+﻿using MetInProximityBack.Enums;
 using MetInProximityBack.Extensions;
 using MetInProximityBack.Interfaces;
 using MetInProximityBack.Models;
+using MetInProximityBack.Repositories;
 using MetInProximityBack.Types.Location;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -19,13 +19,13 @@ namespace MetInProximityBack.Controllers
     [ApiController]
     public class LocationController(
         UserManager<AppUser> userManager,
-        AzureCosmos cosmosDb
+        CosmoLocationRepo cosmosDb
 
     ) : Controller
     {
         
         private readonly UserManager<AppUser> _userManager = userManager;
-        private readonly AzureCosmos _cosmosDb = cosmosDb;
+        private readonly CosmoLocationRepo _cosmosDb = cosmosDb;
 
         // TEST MANUALLY, WORKS
         [HttpPut]
@@ -43,7 +43,7 @@ namespace MetInProximityBack.Controllers
                 LocationObject locObj = LocationFactory
                     .CreateLocObj( User.GetId(), longitude, latitude, open);
 
-                await _cosmosDb.AddLocation(locObj);
+                await _cosmosDb.AddOrUpdateLocation(locObj);
 
                 return Ok(locObj);
             }

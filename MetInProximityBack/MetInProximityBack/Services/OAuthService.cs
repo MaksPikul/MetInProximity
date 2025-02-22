@@ -1,7 +1,7 @@
-﻿using MetInProximityBack.Interfaces;
-using System;
+﻿using System;
 using Azure.Core;
 using MetInProximityBack.Types.OAuth;
+using MetInProximityBack.Interfaces.IServices;
 
 namespace MetInProximityBack.Services
 {
@@ -23,7 +23,7 @@ namespace MetInProximityBack.Services
         public async Task<OAuthTokenResponse> GetOAuthTokens(string url, Dictionary<string,string> req)
         {
             var content = new FormUrlEncodedContent(req);
-            Console.WriteLine("in get oauth tokens");
+
             var response = await _httpClient.PostAsync(url, content);
 
             if (!response.IsSuccessStatusCode)

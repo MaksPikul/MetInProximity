@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace MetInProximityBack.Interfaces
+namespace MetInProximityBack.Interfaces.IServices
 {
     public interface ITokenService
     {

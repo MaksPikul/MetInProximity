@@ -1,15 +1,15 @@
 ﻿using MetInProximityBack.Constants;
 using MetInProximityBack.Extensions;
-using MetInProximityBack.Interfaces;
+using MetInProximityBack.Interfaces.IRepos;
 using Microsoft.AspNetCore.SignalR;
 
 namespace MetInProximityBack.Hubs
 {
     public class ChatHub(
-        ICacheService cache
+        ICacheRepo cache
         ) : Hub
     {
-        private readonly ICacheService _cacheService = cache;
+        private readonly ICacheRepo _cacheService = cache;
 
         public override async Task OnConnectedAsync()
         {
@@ -27,7 +27,7 @@ namespace MetInProximityBack.Hubs
                     return;
                 }
 
-                string connectionKey = CacheKeys.ConnIdCacheKey(userId);
+                string connectionKey = Constants.AppConstants.ConnIdCacheKey(userId);
                 
                 await _cacheService.AddToCacheAsync(connectionKey, Context.ConnectionId);
 
@@ -46,11 +46,10 @@ namespace MetInProximityBack.Hubs
         {
             var userId = Context.User.GetId();
 
-            string connectionKey = CacheKeys.ConnIdCacheKey(userId);
+            string connectionKey = Constants.AppConstants.ConnIdCacheKey(userId);
             string connectionId = await _cacheService.GetFromCacheAsync(connectionKey);
 
-            await _cacheService
-                .RemoveFromCacheAsync(connectionKey);
+            _cacheService.RemoveFromCacheAsync(connectionKey);
 
             var connection = Context.ConnectionAborted;
             if (!connection.IsCancellationRequested)

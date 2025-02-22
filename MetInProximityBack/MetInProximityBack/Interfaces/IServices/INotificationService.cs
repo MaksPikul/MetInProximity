@@ -1,6 +1,6 @@
 ﻿using MetInProximityBack.Types.Message;
 
-namespace MetInProximityBack.Interfaces
+namespace MetInProximityBack.Interfaces.IServices
 {
     public interface INotificationService
     {

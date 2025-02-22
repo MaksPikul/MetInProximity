@@ -13,6 +13,9 @@ using StackExchange.Redis;
 using MetInProximityBack.Hubs;
 using MetInProximityBack.Services.Tokens;
 using Microsoft.OpenApi.Models;
+using MetInProximityBack.Repositories;
+using MetInProximityBack.Interfaces.IRepos;
+using MetInProximityBack.Interfaces.IServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,27 +71,16 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 builder.Services.AddSingleton<CosmosClient>(sp =>
-    {
-        var x = new CosmosClient(
-            builder.Configuration["CosmosDb:AccountEndpoint"],
-            builder.Configuration["CosmosDb:AuthKey"],
-            clientOptions: options
-        );
-        
-        return x;
-    }
+    new CosmosClient(
+        builder.Configuration["CosmosDb:AccountEndpoint"],
+        builder.Configuration["CosmosDb:AuthKey"],
+        clientOptions: options
+    )
 );
-builder.Services.AddSingleton<AzureCosmos>(sp =>
-    {
-
-        var x = new AzureCosmos(
-            sp.GetRequiredService<CosmosClient>(),
-            builder.Configuration["CosmosDb:DatabaseName"],
-            builder.Configuration["CosmosDb:ContainerName"]
-        );
-
-        return x;
-    }
+builder.Services.AddSingleton<CosmoLocationRepo>(sp =>
+    new CosmoLocationRepo(
+        sp.GetRequiredService<CosmosClient>()
+    )
 );
 
 builder.Services.AddStackExchangeRedisCache(options =>
@@ -155,7 +147,7 @@ builder.Services.AddScoped<AuthTokenService>();
 builder.Services.AddScoped<LocationService>();
 
 builder.Services.AddScoped<IOAuthService, OAuthService>();
-builder.Services.AddScoped<ICacheService, RedisCacheService>();
+builder.Services.AddScoped<ICacheRepo, RedisCacheRepo>();
 builder.Services.AddScoped<INotificationService, FirebaseService>();
 
 builder.Services.AddTransient<IOAuthProvider, GoogleOAuthProvider>();

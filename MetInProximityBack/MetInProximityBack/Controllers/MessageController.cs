@@ -1,5 +1,4 @@
-﻿using MetInProximityBack.Interfaces;
-using MetInProximityBack.Enums;
+﻿using MetInProximityBack.Enums;
 using MetInProximityBack.Models;
 using MetInProximityBack.Types.Location;
 using MetInProximityBack.Types.Message;
@@ -15,20 +14,22 @@ using Microsoft.Azure.Cosmos;
 using System.Collections.Generic;
 using MetInProximityBack.Constants;
 using MetInProximityBack.Services;
+using MetInProximityBack.Interfaces.IRepos;
+using MetInProximityBack.Interfaces.IServices;
 
 namespace MetInProximityBack.Controllers
 {
     [Route("api/message")]
     [ApiController]
     public class MessageController(
-        ICacheService cacheService,
+        ICacheRepo cacheService,
         IHubContext<ChatHub> hubContext,
         INotificationService notifService,
         LocationService locService
 
     ) : Controller
     {
-        private readonly ICacheService _cacheService = cacheService;
+        private readonly ICacheRepo _cacheService = cacheService;
         private readonly IHubContext<ChatHub> _hubContext = hubContext;
         private readonly INotificationService _notifService = notifService;
         private readonly LocationService _locService = locService;
@@ -65,7 +66,7 @@ namespace MetInProximityBack.Controllers
             try
             {
                 string recipientConnId = await _cacheService
-                    .GetFromCacheAsync( CacheKeys.ConnIdCacheKey( msgReq.MsgRecipientId) );
+                    .GetFromCacheAsync(Constants.AppConstants.ConnIdCacheKey( msgReq.MsgRecipientId) );
 
                 MessageResponse msgRes = MessageFactory.CreateMessageResponse(msgReq, User.GetId(), false, msgReq.MsgRecipientId);
 

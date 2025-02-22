@@ -1,41 +1,48 @@
 ﻿using Microsoft.Azure.Cosmos;
+using MetInProximityBack.Constants;
 using Microsoft.Azure.Cosmos.Spatial;
-using MetInProximityBack.Interfaces;
 using MetInProximityBack.Types.Location;
 using Microsoft.Azure.Cosmos.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.ClientModel.Primitives;
+using System.Threading;
 
 
-namespace MetInProximityBack.Data
+namespace MetInProximityBack.Repositories
 {
-    public class AzureCosmos
+    public class CosmoLocationRepo
     {
 
         private Container _container;
-        
-        public AzureCosmos (CosmosClient cosmosClient, string databaseName, string containerName)
+
+        public CosmoLocationRepo(CosmosClient cosmosClient)
         {
-           
-            Container con = cosmosClient.GetContainer(databaseName, containerName);
-            _container = con;
+            _container = cosmosClient.GetContainer(
+                AppConstants.COSMO_LOC_DB,
+                AppConstants.COSMO_LOC_CON
+            );
         }
 
         // TESTED MANUALLY WORKS
-        public async Task AddLocation(LocationObject locObj)
+        public async Task<ItemResponse<LocationObject>> AddOrUpdateLocation(LocationObject locObj)
         {
-            try
-            {
-                ItemResponse<LocationObject> res = await _container.UpsertItemAsync(locObj, new PartitionKey(locObj.UserId));
-                Console.WriteLine($"Upsert Successful! Item: {res.Resource}");
-            }
-            catch (CosmosException ex)
-            {
-                Console.WriteLine($"CosmosException: {ex.StatusCode} - {ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Unexpected error: {ex.Message} - {ex.InnerException}");
-            }
+            ItemResponse<LocationObject> response = await _container.UpsertItemAsync(
+                locObj, 
+                new PartitionKey(locObj.UserId)
+            );
+
+            return response;
+        }
+
+        // Mostly used for testing icl
+        public async Task<ItemResponse<LocationObject>> RemoveLocation(LocationObject locObj)
+        {
+            ItemResponse<LocationObject> response = await _container.DeleteItemAsync<LocationObject>(
+                locObj.Id, 
+                new PartitionKey(locObj.UserId)
+            );
+
+            return response;
         }
 
         public async Task<List<NearbyUser>> GetNearbyLocations(Point contextPoint, string RequestingUserId)
@@ -43,7 +50,7 @@ namespace MetInProximityBack.Data
             var NearbyLocations = new List<NearbyUser>();
 
             var query = _container.GetItemLinqQueryable<LocationObject>()
-                .Where(locObj => (locObj.Location.Distance(contextPoint) < 2000) && locObj.UserId != RequestingUserId )
+                .Where(locObj => locObj.Location.Distance(contextPoint) < 2000 && locObj.UserId != RequestingUserId)
                 .Select(locObj => new NearbyUser
                 {
                     UserId = locObj.UserId,
@@ -58,22 +65,19 @@ namespace MetInProximityBack.Data
                 var response = await query.ReadNextAsync();
                 NearbyLocations.AddRange(response);
             }
-            
 
             return NearbyLocations.ToList();
         }
 
-        public async Task<LocationObject> GetLocationObjectByUserId( string userId)
+        public async Task<LocationObject?> GetLocationByUserId(string userId)
         {
-            LocationObject locObj =  await _container.GetItemLinqQueryable<LocationObject>()
+            LocationObject? locObj = await _container.GetItemLinqQueryable<LocationObject>()
                 .Where(locObj => userId == locObj.UserId)
                 .OrderByDescending(locObj => locObj.Timestamp)
-                .FirstAsync();
+                .FirstOrDefaultAsync();
 
             return locObj;
         }
-
-
 
     }
 }
