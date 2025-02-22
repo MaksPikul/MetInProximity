@@ -8,20 +8,21 @@ using System.Reflection;
 namespace MetInProximityBack.Services
 {
     public class LocationService (
-        INoSqlDb cosmosDb,
+        AzureCosmos cosmosDb,
         ICacheService cacheService
     ) 
     {
-        private readonly INoSqlDb _cosmosDb = cosmosDb;
+        private readonly AzureCosmos _cosmosDb = cosmosDb;
         private readonly ICacheService _cacheService = cacheService;
 
-        public async Task<List<NearbyUser>> GetNearbyUsersAsync(double longitude, double latitude)
+        public async Task<List<NearbyUser>> GetNearbyUsersAsync(double longitude, double latitude, string RequestingUserId)
         {
             // UserId : ConnectionString (SignalR)
             // List of Connection Ids
             List<NearbyUser> nearbyUsers = await _cosmosDb
                     .GetNearbyLocations(
-                        LocationFactory.CreatePoint(longitude, latitude)
+                        LocationFactory.CreatePoint(longitude, latitude),
+                        RequestingUserId
                     );
 
             return nearbyUsers;
@@ -30,11 +31,12 @@ namespace MetInProximityBack.Services
         public async Task<List<NearbyUserWithConnId>> GetUserConnIdsAsync(List<NearbyUser> nearbyUsers)
         {
             List<string> connectionIds = await _cacheService
-                    .GetManyFromCacheAsync<string>(
+                    .GetManyFromCacheAsync(
                         nearbyUsers
                         .Select(user => CacheKeys.ConnIdCacheKey(user.UserId))
                         .ToList()
                     );
+            Console.WriteLine(connectionIds[0] + "LocService");
 
             List<NearbyUserWithConnId> nuwConnId = this.MapUserToConnId(nearbyUsers, connectionIds);
             return nuwConnId;

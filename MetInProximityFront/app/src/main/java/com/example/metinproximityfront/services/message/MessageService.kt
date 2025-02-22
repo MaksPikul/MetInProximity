@@ -1,7 +1,13 @@
 package com.example.metinproximityfront.services.message
 
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.content.SharedPreferences
+import android.os.IBinder
 import android.util.Log
+import com.example.metinproximityfront.binders.MessageLocationBinder
 import com.example.metinproximityfront.data.entities.location.LocationObject
 import com.example.metinproximityfront.data.entities.message.MsgReqObject
 import com.example.metinproximityfront.data.entities.message.MsgResObject
@@ -15,11 +21,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.util.Date
 
 class MessageService(
     private val sharedStore: SharedStoreService,
     private val msgRepo: MessageRepository? = null,
-    //private val locationService: LocationService
+    private val msgLocBinder : MessageLocationBinder,
 )
 {
 
@@ -27,8 +34,8 @@ class MessageService(
     val messages: StateFlow<List<MsgResObject>> = _messages // Expose immutable StateFlow
 
     init {
-        startListening()
-        retrieveMessages()
+        //startListening()
+        //retrieveMessages()
     }
 
     fun storeMessage(msg : MsgResObject) : String{
@@ -59,14 +66,30 @@ class MessageService(
         try {
             CoroutineScope(Dispatchers.IO).launch {
                 //val locObj: LocationObject = locationService.GetCurrentLocation()
-                val locObj = LocationObject (1.0,1.0)
+                // that into this
+                Log.e("msg","in msgSer")
+                val locObj : LocationObject = msgLocBinder.getCurrentLocation()
+
                 val msgObj = MsgReqObject(
                     Body = textToSend,
                     Longitude = locObj.Longitude,
                     Latitude = locObj.Latitude
                 )
+                Log.e("long", locObj.Longitude.toString())
 
                 val response: MsgResObject? = msgRepo?.SendMessage(msgObj)
+
+                /*
+                val response = MsgResObject(
+                    Body= textToSend,
+                    UserId = "2",
+                    true,
+                    "3",
+                    Date()
+                )
+                 */
+
+                Log.e("server respo", response.toString())
                 response?.let { msg ->
                     storeMessage(msg)
                 }

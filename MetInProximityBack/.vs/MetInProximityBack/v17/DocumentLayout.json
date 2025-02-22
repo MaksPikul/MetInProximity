@@ -3,12 +3,16 @@
   "WorkspaceRootPath": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metinproximityback\\metinproximityback\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|solutionrelative:metinproximityback\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7F6A8ADA-C49B-4024-BD1F-0AE210AF0DE1}|MetInProximityBack.Tests\\MetInProximityBack.Tests.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metinproximityback\\metinproximityback.tests\\servicetests\\rediscachetest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7F6A8ADA-C49B-4024-BD1F-0AE210AF0DE1}|MetInProximityBack.Tests\\MetInProximityBack.Tests.csproj|solutionrelative:metinproximityback.tests\\servicetests\\rediscachetest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metinproximityback\\metinproximityback\\controllers\\messagecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|solutionrelative:metinproximityback\\controllers\\messagecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metinproximityback\\metinproximityback\\services\\rediscacheservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|solutionrelative:metinproximityback\\services\\rediscacheservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metinproximityback\\metinproximityback\\metinproximityback.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|solutionrelative:metinproximityback\\metinproximityback.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,32 +22,45 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "MetInProximityBack",
+              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\MetInProximityBack.csproj",
+              "RelativeDocumentMoniker": "MetInProximityBack\\MetInProximityBack.csproj",
+              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\MetInProximityBack.csproj",
+              "RelativeToolTip": "MetInProximityBack\\MetInProximityBack.csproj",
+              "ViewState": "AQIAABgAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-02-22T17:26:31.531Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "AccountController.cs",
-              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Controllers\\AccountController.cs",
-              "RelativeDocumentMoniker": "MetInProximityBack\\Controllers\\AccountController.cs",
-              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Controllers\\AccountController.cs",
-              "RelativeToolTip": "MetInProximityBack\\Controllers\\AccountController.cs",
-              "ViewState": "AQIAAFEAAAAAAAAAAAAAAGkAAAANAAAA",
+              "Title": "RedisCacheTEST.cs",
+              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack.Tests\\ServiceTests\\RedisCacheTEST.cs",
+              "RelativeDocumentMoniker": "MetInProximityBack.Tests\\ServiceTests\\RedisCacheTEST.cs",
+              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack.Tests\\ServiceTests\\RedisCacheTEST.cs",
+              "RelativeToolTip": "MetInProximityBack.Tests\\ServiceTests\\RedisCacheTEST.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAEAAAAaAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-18T10:56:28.37Z",
+              "WhenOpened": "2025-02-22T17:08:17.603Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "MessageController.cs",
-              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Controllers\\MessageController.cs",
-              "RelativeDocumentMoniker": "MetInProximityBack\\Controllers\\MessageController.cs",
-              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Controllers\\MessageController.cs",
-              "RelativeToolTip": "MetInProximityBack\\Controllers\\MessageController.cs",
-              "ViewState": "AQIAACUAAAAAAAAAAAA1wCwAAAAAAAAA",
+              "Title": "RedisCacheService.cs",
+              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Services\\RedisCacheService.cs",
+              "RelativeDocumentMoniker": "MetInProximityBack\\Services\\RedisCacheService.cs",
+              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Services\\RedisCacheService.cs",
+              "RelativeToolTip": "MetInProximityBack\\Services\\RedisCacheService.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAUAAAAXAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-18T10:17:15.313Z",
+              "WhenOpened": "2025-02-22T16:59:43.823Z",
               "EditorCaption": ""
             }
           ]

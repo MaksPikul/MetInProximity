@@ -1,0 +1,160 @@
+name: dockercompose11972178259193786532
+services:
+  cosmosdb:
+    container_name: azure_cosmos
+    environment:
+      AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE: "true"
+      AZURE_COSMOS_EMULATOR_PARTITION_COUNT: "3"
+    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8081
+        published: "8081"
+        protocol: tcp
+      - mode: ingress
+        target: 10250
+        published: "10250"
+        protocol: tcp
+      - mode: ingress
+        target: 10251
+        published: "10251"
+        protocol: tcp
+      - mode: ingress
+        target: 10252
+        published: "10252"
+        protocol: tcp
+      - mode: ingress
+        target: 10253
+        published: "10253"
+        protocol: tcp
+      - mode: ingress
+        target: 10254
+        published: "10254"
+        protocol: tcp
+      - mode: ingress
+        target: 10255
+        published: "10255"
+        protocol: tcp
+    restart: always
+    volumes:
+      - type: volume
+        source: cosmosdb_data
+        target: /cosmosdb
+        volume: {}
+  metinproximityback:
+    build:
+      context: C:\Users\mmaks\Coding Projects\MetInProximity\MetInProximityBack
+      dockerfile: MetInProximityBack/Dockerfile
+      args:
+        BUILD_CONFIGURATION: Debug
+      labels:
+        com.microsoft.created-by: visual-studio
+        com.microsoft.visual-studio.project-name: MetInProximityBack
+      target: base
+    container_name: MetInProximityBack_1
+    entrypoint:
+      - dotnet
+      - --roll-forward
+      - Major
+      - /VSTools/DistrolessHelper/DistrolessHelper.dll
+      - --wait
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ASPNETCORE_HTTPS_PORTS: "8081"
+      ASPNETCORE_LOGGING__CONSOLE__DISABLECOLORS: "true"
+      DOTNET_USE_POLLING_FILE_WATCHER: "1"
+      NUGET_FALLBACK_PACKAGES: ""
+    image: metinproximityback:dev
+    labels:
+      com.microsoft.visualstudio.debuggee.arguments: ' --additionalProbingPath /.nuget/packages  "/app/bin/Debug/net8.0/MetInProximityBack.dll"'
+      com.microsoft.visualstudio.debuggee.killprogram: dotnet --roll-forward Major /VSTools/DistrolessHelper/DistrolessHelper.dll --stop dotnet
+      com.microsoft.visualstudio.debuggee.program: dotnet
+      com.microsoft.visualstudio.debuggee.workingdirectory: /app
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8080
+        protocol: tcp
+      - mode: ingress
+        target: 8081
+        protocol: tcp
+    tty: true
+    volumes:
+      - type: bind
+        source: C:\Users\mmaks\AppData\Roaming\Microsoft\UserSecrets
+        target: /home/app/.microsoft/usersecrets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\mmaks\AppData\Roaming\ASP.NET\Https
+        target: /home/app/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\mmaks\Coding Projects\MetInProximity\MetInProximityBack\MetInProximityBack
+        target: /app
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\mmaks\Coding Projects\MetInProximity\MetInProximityBack
+        target: /src
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\mmaks\vsdbg\vs2017u5
+        target: /remote_debugger
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\mmaks\.nuget\packages
+        target: /.nuget/packages
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\mmaks\AppData\Roaming\ASP.NET\Https
+        target: /root/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\mmaks\AppData\Roaming\Microsoft\UserSecrets
+        target: /root/.microsoft/usersecrets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Sdks\Microsoft.Docker.Sdk\tools\linux-x64\net8.0
+        target: /VSTools
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\HotReload
+        target: /HotReloadAgent
+        read_only: true
+        bind:
+          create_host_path: true
+  redis:
+    container_name: azure_redis
+    image: redis:latest
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 6379
+        published: "6379"
+        protocol: tcp
+    restart: always
+networks:
+  default:
+    name: dockercompose11972178259193786532_default
+volumes:
+  cosmosdb_data:
+    name: dockercompose11972178259193786532_cosmosdb_data

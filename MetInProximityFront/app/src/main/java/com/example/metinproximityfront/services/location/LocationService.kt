@@ -7,6 +7,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
@@ -28,6 +29,8 @@ class LocationService: Service() {
     private lateinit var locationClient: LocationClient
     private lateinit var locationRepo : LocationRepo
 
+    private val binder = LocationServiceBinder(this)
+
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onCreate() {
@@ -39,6 +42,7 @@ class LocationService: Service() {
                 EncryptedStoreService(applicationContext)
             )
         )
+
 
         locationClient = LocationClient(
             applicationContext,
@@ -78,11 +82,15 @@ class LocationService: Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder? {
-        return null // No binding is needed for this service
+        return binder
     }
 
     suspend fun GetCurrentLocation() : LocationObject {
         return locationClient.GetCurrentLocation()
+    }
+
+    inner class LocationServiceBinder(private val service: LocationService) : Binder() {
+        fun getService(): LocationService = service
     }
 
     private fun CreateNotification(): Notification {

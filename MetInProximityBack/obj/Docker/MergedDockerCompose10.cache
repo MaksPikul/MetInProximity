@@ -1,0 +1,93 @@
+name: dockercompose11972178259193786532
+services:
+  cosmosdb:
+    container_name: azure_cosmosDb
+    environment:
+      AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE: "true"
+      AZURE_COSMOS_EMULATOR_PARTITION_COUNT: "3"
+    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8081
+        published: "8081"
+        protocol: tcp
+      - mode: ingress
+        target: 10250
+        published: "10250"
+        protocol: tcp
+      - mode: ingress
+        target: 10251
+        published: "10251"
+        protocol: tcp
+      - mode: ingress
+        target: 10252
+        published: "10252"
+        protocol: tcp
+      - mode: ingress
+        target: 10253
+        published: "10253"
+        protocol: tcp
+      - mode: ingress
+        target: 10254
+        published: "10254"
+        protocol: tcp
+      - mode: ingress
+        target: 10255
+        published: "10255"
+        protocol: tcp
+    restart: always
+    volumes:
+      - type: volume
+        source: cosmosdb_data
+        target: /cosmosdb
+        volume: {}
+  metinproximityback:
+    build:
+      context: C:\Users\mmaks\Coding Projects\MetInProximity\MetInProximityBack
+      dockerfile: MetInProximityBack/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ASPNETCORE_HTTPS_PORTS: "8081"
+    image: metinproximityback
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8080
+        protocol: tcp
+      - mode: ingress
+        target: 8081
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: C:\Users\mmaks\AppData\Roaming/Microsoft/UserSecrets
+        target: /home/app/.microsoft/usersecrets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\mmaks\AppData\Roaming/ASP.NET/Https
+        target: /home/app/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+  redis:
+    container_name: azure_redis
+    image: redis:latest
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 6379
+        published: "6379"
+        protocol: tcp
+    restart: always
+networks:
+  default:
+    name: dockercompose11972178259193786532_default
+volumes:
+  cosmosdb_data:
+    name: dockercompose11972178259193786532_cosmosdb_data

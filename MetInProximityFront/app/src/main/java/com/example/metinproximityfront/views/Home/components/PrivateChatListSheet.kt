@@ -24,7 +24,7 @@ fun PrivateChatListSheet (
     showBottomSheet : Boolean,
     sheetState : SheetState,
     changeState : () -> Unit,
-    homeVm: HomeViewModel
+    homeVm: HomeViewModel?
 ) {
     // function to make publicly available
 

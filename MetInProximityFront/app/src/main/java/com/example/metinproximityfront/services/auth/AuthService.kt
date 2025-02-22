@@ -112,11 +112,11 @@ class AuthService(
                     override fun onTokenRequestCompleted(resp: TokenResponse?, ex: AuthorizationException?) {
                         if (resp != null) {
 
-                            Log.e("Starts", "Before Coroutine")
                             CoroutineScope(Dispatchers.IO).launch {
                                 AuthenticateWithWebServer(
                                     provider,
                                     onSuccessfulLogin,
+                                    onFailedLogin,
                                     resp
                                 )
                             }
@@ -132,7 +132,6 @@ class AuthService(
 
         this.loginAuthService?.dispose()
         this.loginAuthService = null
-        curProvider = null
 
     }
 
@@ -141,7 +140,7 @@ class AuthService(
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                accountRepo.Logout()
+                //accountRepo.Logout()
                 removeTokens()
                 withContext(Dispatchers.Main) {
                     successRedirect()
@@ -159,15 +158,20 @@ class AuthService(
         we could check here if the refresh token is expired, to save on resources, a design decision for later :D
     */
     override fun IsLoggedIn() : Boolean {
-        return this.prefStore.getFromPref(Constants.ACCESS_TOKEN_KEY) != ""
+        val accessToken = Constants.ACCESS_TOKEN_KEY
+
+        val isEmpty = this.prefStore.getFromPref(accessToken) != ""
+        //val isExpired = this
+        return isEmpty
     }
 
     /*
         Helper Functions
     */
-    suspend private fun AuthenticateWithWebServer(
+    private suspend fun AuthenticateWithWebServer(
         provider: String,
         onSuccessfulLogin : ()-> Unit,
+        onFailedLogin : (errorMsg : String?, errorCode : String?)-> Unit,
         resp : TokenResponse
     ){
 
@@ -178,12 +182,12 @@ class AuthService(
                     resp.idToken.toString()
                 )
             )
-        Log.e("Runs", "after coroutine")
 
         withContext(Dispatchers.Main) {
             if (authResult.isSuccessful) {
 
-                Log.i("tokens", authResult.toString())
+                Log.i("access", authResult.accessToken.toString(),)
+                Log.i("refresh", authResult.refreshToken.toString(),)
                 // Saving tokens into Encrypted Shared Preferences
                 storeTokens(
                     authResult.accessToken.toString(),
@@ -194,12 +198,7 @@ class AuthService(
                 onSuccessfulLogin()
             } else {
                 // Shows error on Login View
-                Toast.makeText(
-                    appContext,
-                    authResult.error,
-                    Toast.LENGTH_LONG
-                ).show()
-                authResult.message?.let { Log.e("API Error", it) }
+                onFailedLogin(authResult.error, "400")
             }
         }
     }

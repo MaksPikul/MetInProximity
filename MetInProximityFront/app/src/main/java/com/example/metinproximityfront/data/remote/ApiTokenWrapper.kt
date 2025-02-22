@@ -1,5 +1,6 @@
 package com.example.metinproximityfront.data.remote
 
+import android.util.Log
 import com.example.metinproximityfront.config.Constants
 import com.example.metinproximityfront.data.api.RefreshTokenApi
 import com.example.metinproximityfront.data.remote.PublicHttpClient.publicRetrofit
@@ -17,19 +18,23 @@ class ApiTokenWrapper(
         ApiServiceFactory(publicRetrofit)
     }
 
+    class AuthException(message: String) : Exception(message)
+
     suspend fun <T> callApiWithToken(
         apiCall: suspend (accessToken: String) -> Response<T>
     ): T {
         var accessToken = encryptedStoreService.getFromPref(Constants.ACCESS_TOKEN_KEY)
+        Log.i("ApiTokenWrapper", "Access Token : $accessToken")
 
         if (accessToken.isNullOrBlank()) {
             // Todo : Implement UI changes or sumthing
-            throw Exception("Access token is missing. Redirect to login.")
+            throw
+            AuthException("Access token is missing. Redirect to login.")
         }
 
         return withContext(Dispatchers.IO) {
             val response = try {
-                apiCall(accessToken!!)
+                apiCall(getAuthHeader(accessToken!!))
 
             } catch (e: Throwable) {
                 encryptedStoreService.removeFromPref(Constants.ACCESS_TOKEN_KEY)
@@ -41,25 +46,29 @@ class ApiTokenWrapper(
                     RefreshAccessToken()
                 } catch (refreshError: Throwable) {
                     encryptedStoreService.removeFromPref(Constants.REFRESH_TOKEN_KEY)
-                    throw Exception("Token refresh failed so redirect to login.", refreshError)
+                    throw AuthException("Token refresh failed: $refreshError")
                 }
 
-                apiCall(accessToken!!)
+                apiCall(getAuthHeader(accessToken!!))
             }
 
             if (response.isSuccessful) {
-                response.body() ?: throw Exception("API response body is null")
+                response.body() ?: throw AuthException("API response body is null")
             } else {
                 throw HttpException(response)
             }
         }
     }
 
+    private fun getAuthHeader(accessToken: String) : String{
+        return "Bearer $accessToken"
+    }
+
     // This method only gets used here,
     // used to be in authService,
     // decoupled this whole class by moving this here
     // Now i should be able to use this in firebaseMsgReceiver, Only need to pass encrypted store
-    suspend fun RefreshAccessToken(): String {
+    private suspend fun RefreshAccessToken(): String {
         try {
             val refreshToken = encryptedStoreService.getFromPref(Constants.REFRESH_TOKEN_KEY)
 
@@ -80,4 +89,6 @@ class ApiTokenWrapper(
             throw Exception("Error refreshing access token: ${e.message}")
         }
     }
+
+
 }

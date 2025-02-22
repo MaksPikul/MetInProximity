@@ -29,7 +29,7 @@ namespace MetInProximityBack.Controllers
             [FromQuery(Name = "lat")] double latitude
         )
         {
-            List<NearbyUser> nearbyUsers = await _locService.GetNearbyUsersAsync(longitude, latitude);
+            List<NearbyUser> nearbyUsers = await _locService.GetNearbyUsersAsync(longitude, latitude, User.GetId());
 
             IEnumerable<NearbyUser> usersOpenToPrivate = nearbyUsers.Where(x => x.openToMessages == true);
 

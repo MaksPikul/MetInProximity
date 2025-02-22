@@ -1,6 +1,7 @@
 package com.example.metinproximityfront.data.repositories
 
 import android.location.Location
+import android.util.Log
 import com.example.metinproximityfront.data.remote.ApiTokenWrapper
 import com.example.metinproximityfront.data.api.LocationApi
 import com.example.metinproximityfront.data.remote.ApiServiceFactory
@@ -21,10 +22,17 @@ class LocationRepo (
         loc : Location
     ) {
         // This doesnt Update ui, Just sends data to server so that it can be used for requests
-        CoroutineScope(Dispatchers.IO).launch {
-            apiTokenWrapper.callApiWithToken { token: String ->
-                locationApi.PutUserLocation(loc.longitude, loc.latitude, token)
+        try {
+            CoroutineScope(Dispatchers.IO).launch {
+                apiTokenWrapper.callApiWithToken { token: String ->
+                    locationApi.PutUserLocation(loc.longitude, loc.latitude, token)
+                }
             }
+        }catch (ex : ApiTokenWrapper.AuthException){
+            Log.e("Auth", ex.message.toString())
+        }
+        catch (ex : Throwable) {
+            Log.e("Location", ex.message.toString())
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using MetInProximityBack.Interfaces;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -26,6 +27,12 @@ namespace MetInProximityBack.Services.Tokens
 
             var claims = jwt.Claims;
 
+            foreach (var claim in jwt.Payload)
+            {
+                Console.WriteLine(claim.Key);
+                Console.WriteLine(claim.Value);
+            }
+
             return claims;
         }
 
@@ -38,7 +45,7 @@ namespace MetInProximityBack.Services.Tokens
             {
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.Now.AddMinutes(mins),      // Keep, or set manually with claims builder?
-                SigningCredentials = creds,
+                SigningCredentials = creds, 
                 Issuer = _config["JWT:Issuer"],
                 Audience = _config["JWT:Audience"]
             };
@@ -48,6 +55,32 @@ namespace MetInProximityBack.Services.Tokens
             return _tokenHandler.WriteToken(token);
         }
 
-        
+        public ClaimsPrincipal ValidateToken(string token)
+        {
+            var validationParams = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = _key,
+                ValidateIssuer = true,
+                ValidIssuer = _config["JWT:Issuer"],
+                ValidateAudience = true,
+                ValidAudience = _config["JWT:Audience"],
+                ValidateLifetime = true
+            };
+            try
+            {
+                _tokenHandler.InboundClaimTypeMap.Clear();
+                ClaimsPrincipal validatedToken = _tokenHandler.ValidateToken(token, validationParams, out SecurityToken x);
+
+                return validatedToken;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Token validation failed: {ex.Message}");
+                return null;
+            }
+        }
+
+
     }
 }

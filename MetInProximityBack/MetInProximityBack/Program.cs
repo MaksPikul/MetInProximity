@@ -8,16 +8,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System;
 using Microsoft.Azure.Cosmos;
-using Microsoft.Azure.StackExchangeRedis;
 using StackExchange.Redis;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using MetInProximityBack.Hubs;
 using MetInProximityBack.Services.Tokens;
 using Microsoft.OpenApi.Models;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,6 +52,15 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
+CosmosClientOptions options = new()
+{
+    HttpClientFactory = () => new HttpClient(new HttpClientHandler()
+    {
+        ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+    }),
+    ConnectionMode = ConnectionMode.Gateway,
+};
+
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -64,19 +68,27 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 builder.Services.AddSingleton<CosmosClient>(sp =>
-
-    new CosmosClient(
-        builder.Configuration["CosmosDb:AccountEndpoint"],
-        builder.Configuration["CosmosDb:AuthKey"]
-    )
+    {
+        var x = new CosmosClient(
+            builder.Configuration["CosmosDb:AccountEndpoint"],
+            builder.Configuration["CosmosDb:AuthKey"],
+            clientOptions: options
+        );
+        
+        return x;
+    }
 );
-builder.Services.AddSingleton<INoSqlDb, CosmosDb>(sp =>
+builder.Services.AddSingleton<AzureCosmos>(sp =>
+    {
 
-    new CosmosDb(
-        sp.GetRequiredService<CosmosClient>(),
-        builder.Configuration["CosmosDb:DatabaseName"],
-        builder.Configuration["CosmosDb:ContainerName"]
-    )
+        var x = new AzureCosmos(
+            sp.GetRequiredService<CosmosClient>(),
+            builder.Configuration["CosmosDb:DatabaseName"],
+            builder.Configuration["CosmosDb:ContainerName"]
+        );
+
+        return x;
+    }
 );
 
 builder.Services.AddStackExchangeRedisCache(options =>
@@ -87,20 +99,22 @@ builder.Services.AddStackExchangeRedisCache(options =>
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
-    var configuration = builder.Configuration.GetConnectionString("Redis");
-    return ConnectionMultiplexer.Connect(configuration);
-});
+    var configuration = builder.Configuration.GetConnectionString("RedisConnectionString");
 
-// Register IDatabase as Scoped
+    var redis = ConnectionMultiplexer.Connect(configuration);
+    return redis;
+
+});
 builder.Services.AddScoped<IDatabase>(sp =>
 {
     var multiplexer = sp.GetRequiredService<IConnectionMultiplexer>();
-    return multiplexer.GetDatabase();
+    var db = multiplexer.GetDatabase();
+    return db;
+    
 });
 
-
-
-
+builder.Logging.AddDebug();
+builder.Logging.AddConsole();
 
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
@@ -138,6 +152,8 @@ builder.Services.AddAuthentication(options =>
 
 /* dependency injections*/
 builder.Services.AddScoped<AuthTokenService>();
+builder.Services.AddScoped<LocationService>();
+
 builder.Services.AddScoped<IOAuthService, OAuthService>();
 builder.Services.AddScoped<ICacheService, RedisCacheService>();
 builder.Services.AddScoped<INotificationService, FirebaseService>();
@@ -145,6 +161,7 @@ builder.Services.AddScoped<INotificationService, FirebaseService>();
 builder.Services.AddTransient<IOAuthProvider, GoogleOAuthProvider>();
 builder.Services.AddTransient<IOAuthProvider, MicrosoftOAuthProvider>();
 builder.Services.AddTransient<OAuthProviderFactory>();
+
 
 /*
  following
@@ -173,7 +190,7 @@ app.UseCors(x => x
      .AllowAnyMethod()
      .AllowAnyHeader()
      .AllowCredentials()
-     .WithOrigins("http://10.0.2.2", "https://localhost:5173")
+     //.WithOrigins("http://10.0.2.2", "https://localhost:5173")
      .SetIsOriginAllowed(origin => true));
 
 app.MapHub<ChatHub>("/chathub");
@@ -181,3 +198,5 @@ app.MapHub<ChatHub>("/chathub");
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }

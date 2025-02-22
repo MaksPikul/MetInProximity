@@ -18,6 +18,9 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 
 class LocationClient(
@@ -62,7 +65,8 @@ class LocationClient(
                 override fun onLocationResult(p0: LocationResult) {
                     super.onLocationResult(p0)
                     p0.lastLocation?.let { location ->
-                        Log.i("Location", location.longitude.toString())
+                        Log.i("Long", location.longitude.toString())
+                        Log.i("Lat", location.latitude.toString())
                         launch { send(location) }
                     }
                 }
@@ -79,9 +83,6 @@ class LocationClient(
             }
         }
     }
-
-    /*
-        Need to fix binding, so that i can use it in message service, until then, commented out
 
     suspend fun GetCurrentLocation(): LocationObject {
         return suspendCoroutine { continuation ->
@@ -112,6 +113,6 @@ class LocationClient(
             }
         }
     }
-    */
+
 
 }

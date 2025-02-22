@@ -1,63 +1,66 @@
 ﻿using MetInProximityBack.Interfaces;
-using Microsoft.Extensions.Caching.Distributed;
-using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using System.Text.Json;
 
 namespace MetInProximityBack.Services
 {
-    public class RedisCacheService( 
-        IDistributedCache cache,
-        IDatabase db
-        ) : ICacheService
+    public class RedisCacheService : ICacheService
     {
-        private readonly IDistributedCache _dCache = cache;
-        private readonly IDatabase _db = db;
+
+        private readonly IDatabase _db;
+
+        public RedisCacheService(IDatabase db)
+        {
+            _db = db;
+        }
 
         public async Task AddToCacheAsync(string key, object obj)
         {
             string value = JsonSerializer.Serialize(obj);
-            _dCache.SetStringAsync(key, value);
+            await _db.StringSetAsync(key, value);
         }
+
         public async Task<string> GetFromCacheAsync(string key)
         {
-            return await _dCache.GetStringAsync(key);
+            RedisValue value =  await _db.StringGetAsync(key);
+            return this.DeserializeRedisValue(value);
         }
         
-        public async Task<List<T>> GetManyFromCacheAsync<T>(List<string> keys)
+        public async Task<List<string>> GetManyFromCacheAsync(List<string> keys)
         {
             RedisKey[] redisKeys = keys.ConvertAll(key => new RedisKey(key) ).ToArray();
 
-            RedisValue[] values = await db.StringGetAsync(redisKeys);
+            RedisValue[] values = await _db.StringGetAsync(redisKeys);
+            Console.WriteLine(values[0].ToString()+ " Redis cache");
 
-            List<T> deserializeValues = this.DeserializeRedisValues<T>(values);
+            List<string> deserializeValues = this.DeserializeRedisValues(values);
 
             return deserializeValues;
         }
 
-        public async Task RemoveFromCacheAsync(string key)
+        public void RemoveFromCacheAsync(string key)
         {
-            _dCache.Remove(key);
+            _db.KeyDelete(key);
         }
 
-        private T DeserializeRedisValue<T>(RedisValue value)
+        private string DeserializeRedisValue(RedisValue value)
         {
             if (value.IsNull)
             {
                 return default;
             }
-            T obj = JsonSerializer.Deserialize<T>(value);
+            // if not string, deserialise and turn json into string?
 
-            return obj;
+            return value.ToString();
         }
 
-        private List<T> DeserializeRedisValues<T>(RedisValue[] values)
+        private List<string> DeserializeRedisValues(RedisValue[] values)
         {
-            List<T> deserializeValues = new List<T>();
+            List<string> deserializeValues = new List<string>();
 
             foreach (var value in values)
             {
-                T deserializeValue = this.DeserializeRedisValue<T>(value);
+                string deserializeValue = this.DeserializeRedisValue(value);
                 deserializeValues.Add(deserializeValue);
             }
 

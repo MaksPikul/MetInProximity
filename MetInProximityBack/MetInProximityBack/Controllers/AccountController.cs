@@ -11,6 +11,7 @@ using Azure.Core;
 using MetInProximityBack.Types.OAuth;
 using MetInProximityBack.Services.Tokens;
 using System.Web;
+using RTools_NTS.Util;
 
 namespace MetInProximityBack.Controllers
 {
@@ -89,7 +90,7 @@ namespace MetInProximityBack.Controllers
                 }
 
                 await _signInManager.SignInAsync(appUser, isPersistent: true);
-
+                
                 // Token for accessing app resources 30 minutes duration
                 string accessToken = _authTokenService.CreateAccessToken(User); 
                 // Token for refreshing access token 1 month duration
@@ -118,23 +119,23 @@ namespace MetInProximityBack.Controllers
         ) {
             try {
 
-                IEnumerable<Claim> decodedToken = _authTokenService.DecodeToken(refreshToken);
+                // Below wont work for security reasons, they must be validated
+                ClaimsPrincipal principle = _authTokenService.ValidateToken(refreshToken);
 
-                var tokenId = decodedToken.GetClaimValue("TokenId");
-                var expiration = decodedToken.GetClaimValue("expiration");
-                var userId = decodedToken.GetClaimValue("UserId");
+                var tokenId = principle.Claims.GetClaimValue("TokenId");
+                var userId = principle.Claims.GetClaimValue("UserId");
 
                 AppUser user = await _userManager.FindByIdAsync(userId);
 
                 // User doesn't exist or token expired
-                if (user == null || DateTime.Parse(expiration) > DateTime.UtcNow)
+                if (user == null)
                 {
-                    return BadRequest("Go back to login");
+                    throw new InvalidOperationException("Failed to refresh token, user doesnt exist");
                 }
 
                 // Find token in DB
 
-                var accessToken = _authTokenService.CreateAccessToken(User);
+                var accessToken = _authTokenService.CreateAccessToken(user);
 
                 // Optional : create new refresh token and send that back too
 
@@ -142,7 +143,7 @@ namespace MetInProximityBack.Controllers
             }
             catch (Exception ex) {
 
-                return StatusCode(500, "Failed to refresh");
+                return StatusCode(500, "Failed to refresh: " + ex.Message);
             }
         }
 

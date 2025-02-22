@@ -7,6 +7,11 @@ using MetInProximityBack.Types.Location;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Cosmos;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace MetInProximityBack.Controllers
 {
@@ -14,15 +19,15 @@ namespace MetInProximityBack.Controllers
     [ApiController]
     public class LocationController(
         UserManager<AppUser> userManager,
-        INoSqlDb cosmosDb
+        AzureCosmos cosmosDb
 
     ) : Controller
     {
-
+        
         private readonly UserManager<AppUser> _userManager = userManager;
-        private readonly INoSqlDb _cosmosDb = cosmosDb;
+        private readonly AzureCosmos _cosmosDb = cosmosDb;
 
-
+        // TEST MANUALLY, WORKS
         [HttpPut]
         [Authorize]
         public async Task<IActionResult> PutUserLocation(
@@ -30,20 +35,22 @@ namespace MetInProximityBack.Controllers
             [FromQuery(Name = "lat")] double latitude,
             [FromQuery(Name = "open")] bool open
         ) {
+
             try
             {
-                // Validate Long and Lat parameters?
+                var claims = User.Claims.ToList();
 
                 LocationObject locObj = LocationFactory
                     .CreateLocObj( User.GetId(), longitude, latitude, open);
 
-                _cosmosDb.AddLocation(locObj);
+                await _cosmosDb.AddLocation(locObj);
 
-                return Ok("Succeeded to update User Location");
+                return Ok(locObj);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Failed to update User Location");
+                Console.WriteLine($"Failed to update User Location: {ex.Message} - {ex.InnerException}");
+                return StatusCode(500, $"Failed to update User Location: {ex.Message} - {ex.InnerException}");
             }
         }
 

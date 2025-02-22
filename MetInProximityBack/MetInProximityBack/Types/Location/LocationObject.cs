@@ -8,7 +8,7 @@ namespace MetInProximityBack.Types.Location
         [JsonProperty("id")]
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
-        [JsonProperty("user_id")]
+        [JsonProperty("UserId")]
         public string UserId { get; set; }
 
         [JsonProperty("timestamp")]

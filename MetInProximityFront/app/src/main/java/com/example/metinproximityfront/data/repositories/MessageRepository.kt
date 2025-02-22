@@ -1,5 +1,7 @@
 package com.example.metinproximityfront.data.repositories
 
+import android.util.Log
+import androidx.navigation.NavController
 import com.example.metinproximityfront.data.remote.ApiTokenWrapper
 import com.example.metinproximityfront.data.api.MessageApi
 import com.example.metinproximityfront.data.entities.message.MsgReqObject
@@ -8,7 +10,8 @@ import com.example.metinproximityfront.data.remote.ApiServiceFactory
 import com.example.metinproximityfront.data.remote.PublicHttpClient.publicRetrofit
 
 class MessageRepository(
-    private val apiTokenWrapper: ApiTokenWrapper
+    private val apiTokenWrapper: ApiTokenWrapper,
+    private val navController: NavController
 ) {
 
     private val messageApi: MessageApi by lazy {
@@ -23,8 +26,13 @@ class MessageRepository(
             apiTokenWrapper.callApiWithToken { token: String ->
                 messageApi.SendPublicMessage(msgObj, token) // Extract response body
             }
-        } catch (e: Exception) {
-            // TODO : Throw Error? Idk man
+        } catch (e : ApiTokenWrapper.AuthException){
+            Log.e("Auth Error", e.message.toString())
+            navController.navigate("Login")
+            null
+        }
+        catch (e: Exception) {
+            Log.e("Api Call Error", e.message.toString())
             null
         }
     }

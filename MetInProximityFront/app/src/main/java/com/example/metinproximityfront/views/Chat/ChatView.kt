@@ -1,6 +1,7 @@
 package com.example.metinproximityfront.views.Chat
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -49,12 +50,14 @@ fun ChatView(
 
     val onMsgSend = {
         try {
+            Log.e("chat", "attemps messsage?")
             homeVm.msgService.sendMessage(text)
             text = ""
         }
         catch (ex : Throwable) {
-            // TODO : Show an Error
+            Log.e("chat error", ex.message.toString())
         }
+        Unit
     }
 
     Column(
@@ -75,7 +78,7 @@ fun ChatView(
         }
 
         InputBar(
-            onMsgSend,
+            onMsgSend ,
             text,
             onTextChange = { text = it }
         )
@@ -214,12 +217,14 @@ fun ChatHeader (
 fun ChatViewPreview() {
     val app = LocalContext.current.applicationContext as Application
     val context = LocalContext.current
-
+/*
     ChatView(
         homeVm = HomeViewModel(
             app,
             EncryptedStoreService(context)
+            NavController()
         ), // Pass application instance
         privateUser = false
     )
+ */
 }

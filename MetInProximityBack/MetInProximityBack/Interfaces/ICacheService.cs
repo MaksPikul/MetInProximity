@@ -6,7 +6,7 @@ namespace MetInProximityBack.Interfaces
     {
         Task AddToCacheAsync(string key, object value);
         Task<string> GetFromCacheAsync(string key);
-        Task<List<T>> GetManyFromCacheAsync<T>(List<string> keys);
-        Task RemoveFromCacheAsync(string key);
+        Task<List<string>> GetManyFromCacheAsync(List<string> keys);
+        void RemoveFromCacheAsync(string key);
     }
 }

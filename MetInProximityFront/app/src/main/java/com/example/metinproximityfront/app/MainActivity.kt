@@ -1,6 +1,8 @@
 package com.example.metinproximityfront.app
 
 import android.Manifest
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -18,6 +20,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.metinproximityfront.config.Constants
 import com.example.metinproximityfront.services.location.LocationService
+import com.example.metinproximityfront.services.permissions.PermissionListener
+import com.example.metinproximityfront.services.permissions.PermissionManager
 import com.example.metinproximityfront.ui.theme.MetInProximityFrontTheme
 import com.example.metinproximityfront.views.Home.HomeView
 import com.example.metinproximityfront.views.loading.LoadingView
@@ -27,11 +31,7 @@ import com.example.metinproximityfront.views.Login.LoginView
 class MainActivity : ComponentActivity() {
 
     private lateinit var mainVm : MainActivityViewModel
-
-    private val permissions = arrayOf(
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.FOREGROUND_SERVICE_LOCATION
-    )
+    val permissionListener = PermissionListener(this) // Really dont like the fact this is here, dont want to have a large nesting of parameters tho
 
     private val loginLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()){
@@ -66,35 +66,14 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        this.PremissionCheck()
-
         val mainModel: MainActivityViewModel by viewModels()
         this.mainVm = mainModel
+
+        this.mainVm.permissionManager.checkPermissions(this, permissionListener)
 
         this.createViews()
 
         enableEdgeToEdge()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        // todo: if (!userWantsBackground location and messages)
-        //this.mainVM.homeVm.stopLocationService()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        /*
-        Log.i("correct", this.mainVm.authService.IsLoggedIn().toString())
-        if (this.mainVm.authService.IsLoggedIn() /* TODO HOMEVM && Check if initialized */) {
-            this.mainVm.homeVm.startServices()
-        }
-         */
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        //this.mainVM.homeVm.stopLocationService()
     }
 
     private fun createViews(){
@@ -141,32 +120,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
-
-
-
-    // I need a permission Manager
-
-    private fun PremissionCheck() {
-
-        if (arePermissionsGranted()) {
-
-            Log.e("prems", "prems granted")
-        } else {
-            requestPermissions()
-        }
-    }
-
-    private fun arePermissionsGranted(): Boolean {
-        return permissions.all {
-            ContextCompat.checkSelfPermission(applicationContext, it) == PackageManager.PERMISSION_GRANTED
-        }
-    }
-
-    private fun requestPermissions() {
-        ActivityCompat.requestPermissions(this, permissions, 1)
-    }
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -174,19 +127,30 @@ class MainActivity : ComponentActivity() {
         deviceId: Int
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults, deviceId)
-        if (requestCode == 1) {
-            if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-                Log.e("prems","permissions accepted")
-            } else {
-                Toast.makeText(this, "Permissions are required for location access.", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        Log.e("Permissions", "Fine location granted: ${ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED}")
-        Log.e("Permissions", "Coarse location granted: ${ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED}")
-        Log.e("Permissions", "Background location granted: ${ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED}")
-        Log.e("Permissions", "Foreground service location granted: ${ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.FOREGROUND_SERVICE_LOCATION) == PackageManager.PERMISSION_GRANTED}")
+        mainVm.permissionManager.handlePermissionsResult(this, requestCode, grantResults, permissionListener)
     }
+
+    override fun onPause() {
+        super.onPause()
+        // todo: if (!userWantsBackground location and messages)
+        //this.mainVM.homeVm.stopLocationService()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        /*
+        Log.i("correct", this.mainVm.authService.IsLoggedIn().toString())
+        if (this.mainVm.authService.IsLoggedIn() /* TODO HOMEVM && Check if initialized */) {
+            this.mainVm.homeVm.startServices()
+        }
+         */
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        //this.mainVM.homeVm.stopLocationService()
+    }
+
 }
 
 

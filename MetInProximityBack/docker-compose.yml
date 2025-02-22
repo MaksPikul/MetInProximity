@@ -1,0 +1,32 @@
+version: '3.4'
+
+services:
+  metinproximityback:
+    image: ${DOCKER_REGISTRY-}metinproximityback
+    build:
+      context: .
+      dockerfile: MetInProximityBack/Dockerfile
+
+  cosmosdb:
+    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator
+    container_name: azure_cosmos_db 
+    ports:
+      - "8081:8081"  # API endpoint
+      - "10250-10255:10250-10255" 
+    environment:
+      - AZURE_COSMOS_EMULATOR_PARTITION_COUNT=3
+      - AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE=true
+      #- AZURE_COSMOS_EMULATOR_IP_ADDRESS_OVERRIDE=127.0.0.1
+    restart: always
+    volumes:
+    - cosmosdb_data:/cosmosdb
+
+  redis:
+    image: redis:latest
+    container_name: azure_redis
+    ports:
+      - "6379:6379"  # Redis default port
+    restart: always
+
+volumes:
+    cosmosdb_data:
