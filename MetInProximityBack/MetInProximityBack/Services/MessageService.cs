@@ -18,12 +18,12 @@ namespace MetInProximityBack.Services
     // LocationAndConnectionIdService would not be a good name
     public class MessageService (
         CosmoLocationRepo cosmosDb,
-        RedisCacheRepo cacheService
+        RedisCacheRepo cacheRepo
     ) : IMessageService
     {
 
         private readonly CosmoLocationRepo _cosmosDb = cosmosDb;
-        private readonly RedisCacheRepo _cacheService = cacheService;
+        private readonly RedisCacheRepo _cacheRepo = cacheRepo;
 
         public async Task<List<NearbyUser>> GetNearbyUsersAsync(double longitude, double latitude, string RequestingUserId)
         {
@@ -40,12 +40,12 @@ namespace MetInProximityBack.Services
 
         public async Task<string> GetConnectionIdAsync(string recipientId)
         {
-            return await _cacheService.GetFromCacheAsync(AppConstants.ConnIdCacheKey(recipientId));
+            return await _cacheRepo.GetFromCacheAsync(AppConstants.ConnIdCacheKey(recipientId));
         }
 
         public async Task<List<NearbyUserWithConnId>> GetConnectionIdsAsync(List<NearbyUser> nearbyUsers)
         {
-            List<string> connectionIds = await _cacheService
+            List<string> connectionIds = await _cacheRepo
                     .GetManyFromCacheAsync(
                         nearbyUsers
                         .Select(user => AppConstants.ConnIdCacheKey(user.UserId))
@@ -84,6 +84,8 @@ namespace MetInProximityBack.Services
 
             if ((property != null && property.CanWrite) && property.PropertyType == newVal.GetType())
             {
+                
+
                 property.SetValue(locationObject, newVal);
                 await _cosmosDb.AddOrUpdateLocation(locationObject);
                 return locationObject;

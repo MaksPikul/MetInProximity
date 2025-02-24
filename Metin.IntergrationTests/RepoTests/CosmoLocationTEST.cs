@@ -36,6 +36,8 @@ namespace MetInProximityBack.Tests.ServiceTests
             );
         }
 
+        // TODO : TEST UpdateLatestLocation
+
         [Fact] // Some long function name lol
         public async Task TEST_AddOrUpdateLocation_GetLocationByUserId_RemoveLocation()
         {
