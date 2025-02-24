@@ -144,16 +144,21 @@ builder.Services.AddAuthentication(options =>
 });
 
 /* dependency injections*/
-builder.Services.AddScoped<AuthTokenService>();
-builder.Services.AddScoped<MessageService>();
-
 builder.Services.AddScoped<IOAuthService, OAuthService>();
-builder.Services.AddScoped<ICacheRepo, RedisCacheRepo>();
-builder.Services.AddScoped<INotificationService, FirebaseService>();
+builder.Services.AddScoped<AuthTokenService>();
 
+builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<ICacheRepo, RedisCacheRepo>();
+builder.Services.AddScoped<CosmoLocationRepo>();
+
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<FirebaseService>();
+builder.Services.AddScoped<SignalRService>();
+
+builder.Services.AddTransient<OAuthProviderFactory>();
 builder.Services.AddTransient<IOAuthProvider, GoogleOAuthProvider>();
 builder.Services.AddTransient<IOAuthProvider, MicrosoftOAuthProvider>();
-builder.Services.AddTransient<OAuthProviderFactory>();
+
 
 
 /*

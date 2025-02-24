@@ -11,6 +11,16 @@ using Microsoft.Azure.Cosmos;
 using MetInProximityBack.Types.Message;
 using MetInProximityBack.Types.Location;
 using Microsoft.Azure.Cosmos.Serialization.HybridRow;
+using MetInProximityBack.Hubs;
+using Microsoft.AspNetCore.SignalR;
+using System.Dynamic;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
+using MetInProximityBack.Repositories;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Azure.Cosmos.Linq;
+using Castle.Core.Configuration;
+using System.Net;
+using Moq.Protected;
 
 namespace Metin.UnitTests.ServiceTests
 {
@@ -20,6 +30,19 @@ namespace Metin.UnitTests.ServiceTests
         private readonly Mock<SignalRService> _mockSrService;
         private readonly Mock<FirebaseService> _mockFbService;
         private readonly NotificationService _notifService;
+
+
+        private Mock<SignalRService> MockSignalR()
+        {
+
+        }
+
+        private Mock<FirebaseService> MockFirebase()
+        {
+            
+        }
+
+
         public NotificationTEST()
         {
             _mockSrService = new Mock<SignalRService>();

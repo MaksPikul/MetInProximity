@@ -17,6 +17,7 @@ namespace MetInProximityBack.Types.Location
 
             var location = new LocationObject
             {
+                Id = userId,
                 UserId = userId,
                 Location = CreatePoint(longitude, latitude),
                 Geohash = geohasher.Encode(latitude, longitude),

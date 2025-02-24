@@ -14,6 +14,7 @@ namespace MetInProximityBack.Repositories
             _db = db;
         }
 
+
         public async Task AddToCacheAsync(string key, string value)
         {
             //string value = JsonSerializer.Serialize(obj);
@@ -44,14 +45,14 @@ namespace MetInProximityBack.Repositories
 
         private List<string> DeserializeRedisValues(RedisValue[] values)
         {
-            List<string> deserializeValues = new List<string>();
+            List<string> deserializedValues = new List<string>();
 
             foreach (var value in values)
             {
-                this.DeserializeRedisValue(value);
+                deserializedValues.Add(this.DeserializeRedisValue(value));
             }
 
-            return deserializeValues;
+            return deserializedValues;
         }
 
 
@@ -65,7 +66,6 @@ namespace MetInProximityBack.Repositories
             {
                 return value.ToString();
             }
-            // if not string, deserialise and turn json into string?
         }
 
 

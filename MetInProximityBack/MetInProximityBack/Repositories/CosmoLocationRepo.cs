@@ -6,11 +6,12 @@ using Microsoft.Azure.Cosmos.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.ClientModel.Primitives;
 using System.Threading;
+using NetTopologySuite.Index.HPRtree;
 
 
 namespace MetInProximityBack.Repositories
 {
-    public class CosmoLocationRepo
+    public class CosmoLocationRepo 
     {
 
         private Container _container;
@@ -23,7 +24,7 @@ namespace MetInProximityBack.Repositories
             );
         }
 
-        // TESTED MANUALLY WORKS
+
         public async Task<ItemResponse<LocationObject>> AddOrUpdateLocation(LocationObject locObj)
         {
             ItemResponse<LocationObject> response = await _container.UpsertItemAsync(
@@ -37,12 +38,22 @@ namespace MetInProximityBack.Repositories
         // Mostly used for testing icl
         public async Task<ItemResponse<LocationObject>> RemoveLocation(LocationObject locObj)
         {
-            ItemResponse<LocationObject> response = await _container.DeleteItemAsync<LocationObject>(
-                locObj.Id, 
-                new PartitionKey(locObj.UserId)
-            );
+            try
+            {
+                ItemResponse<LocationObject> response = await _container.DeleteItemAsync<LocationObject>(
+                    locObj.Id,
+                    new PartitionKey(locObj.UserId)
+                );
 
-            return response;
+                return response;
+            }
+            catch (CosmosException ex)
+            {
+                if (ex.StatusCode == System.Net.HttpStatusCode.NotFound) {
+                    return null;
+                }
+                throw new Exception(ex.Message);
+            }
         }
 
         public async Task<List<NearbyUser>> GetNearbyLocations(Point contextPoint, string RequestingUserId)
@@ -50,7 +61,7 @@ namespace MetInProximityBack.Repositories
             var NearbyLocations = new List<NearbyUser>();
 
             var query = _container.GetItemLinqQueryable<LocationObject>()
-                .Where(locObj => locObj.Location.Distance(contextPoint) < 2000 && locObj.UserId != RequestingUserId)
+                .Where(locObj => locObj.Location.Distance(contextPoint) < 300 && locObj.UserId != RequestingUserId)
                 .Select(locObj => new NearbyUser
                 {
                     UserId = locObj.UserId,
@@ -69,16 +80,24 @@ namespace MetInProximityBack.Repositories
             return NearbyLocations.ToList();
         }
 
+        // This shoudl get latest
+        // Didnt give any lint errors
+        // FOR ASYNC OPS, use this setup (while loop)
         public async Task<LocationObject?> GetLocationByUserId(string userId)
         {
-            LocationObject? locObj = await _container.GetItemLinqQueryable<LocationObject>()
+            var query = _container.GetItemLinqQueryable<LocationObject>()
                 .Where(locObj => userId == locObj.UserId)
                 .OrderByDescending(locObj => locObj.Timestamp)
-                .FirstOrDefaultAsync();
+                .ToFeedIterator();
 
-            return locObj;
+            while (query.HasMoreResults)
+            {
+                var response = await query.ReadNextAsync();
+                return response.FirstOrDefault(); // Get the first item from the response
+            }
+
+            return null;
         }
-
     }
 }
 

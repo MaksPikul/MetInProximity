@@ -2,7 +2,6 @@
 using MetInProximityBack.Types.Location;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Spatial;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MetInProximityBack.Tests.ServiceTests
 {
@@ -36,37 +35,30 @@ namespace MetInProximityBack.Tests.ServiceTests
             );
         }
 
-        // TODO : TEST UpdateLatestLocation
 
         [Fact] // Some long function name lol
         public async Task TEST_AddOrUpdateLocation_GetLocationByUserId_RemoveLocation()
         {
-            var locObj_0 = new LocationObject
-            {
-                UserId = "1234",
-                Location = new Point(0.0, 0.0)
-            };
+
+
+            var locObj_0 = LocationFactory.CreateLocObj("1234", 0.0, 0.0, false);
 
             ItemResponse<LocationObject> response_0 = await _cosmoRepo.AddOrUpdateLocation( locObj_0 );
 
             // Item added
-            Assert.Equal("200", response_0.StatusCode.ToString());
+            Assert.Equal("Created", response_0.StatusCode.ToString());
 
             LocationObject? locObj_Response = await _cosmoRepo.GetLocationByUserId(locObj_0.UserId);
 
             // Item can be fetched
             Assert.Equal(locObj_0, locObj_Response);
 
-            var locObj_1 = new LocationObject
-            {
-                UserId = "1234",
-                Location = new Point(20.0, 20.0)
-            };
+            var locObj_1 = LocationFactory.CreateLocObj("1234", 20.0, 0.0, false);
 
             ItemResponse<LocationObject> response_1 = await _cosmoRepo.AddOrUpdateLocation(locObj_0);
 
             // Item replaced
-            Assert.Equal("201", response_1.StatusCode.ToString());
+            Assert.Equal("OK", response_1.StatusCode.ToString());
 
             await _cosmoRepo.RemoveLocation( locObj_1 );
 
@@ -77,6 +69,34 @@ namespace MetInProximityBack.Tests.ServiceTests
         }
 
         [Fact]
+        public async Task TEST_GetLocationByUserId_returnsLatestEntry()
+        {
+            // Arrange 
+            var locObj_0 = new LocationObject
+            {
+                UserId = "1234",
+                Location = new Point(0.0, 0.0)
+            };
+            var locObj_1 = new LocationObject
+            {
+                UserId = "1234",
+                Location = new Point(20.0, 0.0)
+            };
+
+            // Act
+            ItemResponse<LocationObject> response_0 = await _cosmoRepo.AddOrUpdateLocation(locObj_0);
+            ItemResponse<LocationObject> response_1 = await _cosmoRepo.AddOrUpdateLocation(locObj_1);
+
+            LocationObject latestLocObj = await _cosmoRepo.GetLocationByUserId("1234");
+
+            // Assert
+            Assert.Equal(latestLocObj, locObj_1);
+
+            //DB clean up
+            await _cosmoRepo.RemoveLocation(locObj_1);
+        }
+
+        [Fact]
         public async Task TEST_GetNearbyLocations()
         {
 
@@ -84,25 +104,16 @@ namespace MetInProximityBack.Tests.ServiceTests
             // userId 1111 is fetching, 
             // only userId 2222 should be in nearby user list
 
-            var locObj_0 = new LocationObject
-            {
-                UserId = "1111",
-                Location = new Point(0.0, 0.0)
-            };
+            // Person At Qmul Clock Tower
+            var locObj_0 = LocationFactory.CreateLocObj("1111", -0.040175, 51.522996, false);
 
-            var locObj_1 = new LocationObject
-            {
-                UserId = "2222",
-                Location = new Point(0.0, 0.0)
-            };
+            // Person in range to user 1111
+            // Person at Qmul Library
+            var locObj_1 = LocationFactory.CreateLocObj("2222", -0.039617, 51.524331, false);
 
             // This location is out of range
-
-            var locObj_2 = new LocationObject
-            {
-                UserId = "3333",
-                Location = new Point(/* TODO */)
-            };
+            // Person at Mile end Church
+            var locObj_2 = LocationFactory.CreateLocObj("3333", -0.035602, 51.524718, false);
 
             ItemResponse<LocationObject> response_0 = await _cosmoRepo.AddOrUpdateLocation(locObj_0);
             ItemResponse<LocationObject> response_1 = await _cosmoRepo.AddOrUpdateLocation(locObj_1);
@@ -127,7 +138,5 @@ namespace MetInProximityBack.Tests.ServiceTests
             await _cosmoRepo.RemoveLocation(locObj_1);
             await _cosmoRepo.RemoveLocation(locObj_2);
         }
-
-
     }
 }

@@ -7,7 +7,7 @@
             return $"CHAT/USER:{userId}";
         }
 
-        public static string COSMO_LOC_DB = "MetinCosmo";
+        public static string COSMO_LOC_DB = "MetinCosmos";
         public static string COSMO_LOC_CON = "Locations";
 
 

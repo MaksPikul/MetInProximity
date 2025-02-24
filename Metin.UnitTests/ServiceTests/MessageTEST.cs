@@ -11,6 +11,9 @@ using MetInProximityBack.Types.Location;
 using System.Threading.Channels;
 using Microsoft.Azure.Cosmos.Spatial;
 using MetInProximityBack.Constants;
+using Microsoft.Azure.Cosmos;
+using StackExchange.Redis;
+using Xunit.Abstractions;
 
 namespace Metin.UnitTests.ServiceTests
 {
@@ -18,34 +21,79 @@ namespace Metin.UnitTests.ServiceTests
     // Because most are just wrappers for Cosmo/Redis Repos
 
     // These two have some sort of logic which other than send/get data
+
+
+   
+
+
+
     public class MessageTEST
     {
-
         private readonly Mock<CosmoLocationRepo> _mockCosmoRepo;
         private readonly Mock<RedisCacheRepo> _mockRedisRepo;
         private readonly MessageService _msgService;
 
-        public MessageTEST() {
 
-            _mockCosmoRepo = new Mock<CosmoLocationRepo>();
-            _mockRedisRepo = new Mock<RedisCacheRepo>();
+
+        public interface IDatabase_Mock
+        {
+            Task<List<string>> StringGetAsync(RedisKey[] keys);
+        }
+
+        private Mock<RedisCacheRepo> MockRedis()
+        {
+            var mockDB = new Mock<IDatabase>();
+
+            // https://stackoverflow.com/questions/79040132/cant-setup-mocked-redis-idatabase-using-moq
+            mockDB
+                .Setup(_ => _.StringGetAsync(It.IsAny<RedisKey[]>(), It.IsAny<CommandFlags>()))
+                .ReturnsAsync(new RedisValue[] { "connId1", RedisValue.Null });
+
+            var _mockRedisRepo = new Mock<RedisCacheRepo>(mockDB.Object);
+
+            return _mockRedisRepo;
+
+        }
+
+        // https://stackoverflow.com/questions/59067239/i-need-xunit-test-case-of-this-microsoft-azure-cosmos-container
+        private Mock<CosmoLocationRepo> MockCosmos()
+        {
+            var container = new Mock<Container>();
+            var client = new Mock<CosmosClient>();
+
+            client.Setup(x => x.GetContainer(It.IsAny<string>(), It.IsAny<string>())).Returns(container.Object);
+
+
+            var mockResponse = new Mock<ItemResponse<LocationObject>>();
+            mockResponse.SetupGet(r => r.Resource).Returns(new LocationObject
+            {
+                UserId = "1234",
+                Location = new Point(20.0, 20.0)
+            });
+
+            container.Setup(c => c.UpsertItemAsync(
+                It.IsAny<LocationObject>(),
+                It.IsAny<PartitionKey>(),
+                It.IsAny<ItemRequestOptions>(),
+                It.IsAny<CancellationToken>())
+            ).ReturnsAsync(mockResponse.Object);
+
+            var _mockCosmoRepo = new Mock<CosmoLocationRepo>(client.Object);
+
+            return _mockCosmoRepo;
+        }
+
+
+
+        public MessageTEST(ITestOutputHelper output) {
 
             _msgService = new MessageService(
-                _mockCosmoRepo.Object,
-                _mockRedisRepo.Object
+                MockCosmos().Object,
+                MockRedis().Object
             );
         }
 
-        // GetNearbyUsersAsync
-        // Tested with CosmoRepo
-
-        // GetConnectionId
-        // Tested with RedisRepo
-
-        // GetLatestLocationAsync
-        // Tested With CosmoRepo
-
-
+        [Fact]
         public async Task TEST_GetConnectionIdsAsync()
         {
             // Arrange
@@ -53,16 +101,6 @@ namespace Metin.UnitTests.ServiceTests
 
             testList.Add(new NearbyUser() { UserId = "0"}); // Has a connection Id Saved in redis
             testList.Add(new NearbyUser() { UserId = "1" }); // Doesnt Have a connection Id Saved in redis
-
-            var returnedConnIds = new List<string> { "1", null };
-
-            _mockRedisRepo
-                .Setup(cs => cs.GetManyFromCacheAsync(
-                    testList
-                    .Select(user => AppConstants.ConnIdCacheKey(user.UserId))
-                    .ToList())
-                )
-                .ReturnsAsync(returnedConnIds);
 
             // Act
             List<NearbyUserWithConnId> resultList = await _msgService.GetConnectionIdsAsync(testList);
@@ -72,8 +110,8 @@ namespace Metin.UnitTests.ServiceTests
             Assert.Equal("0", resultList[0].UserId);
             Assert.Equal("1", resultList[1].UserId);
 
-            Assert.NotNull(resultList[0]);
-            Assert.Null(resultList[1]);
+            Assert.NotNull(resultList[0].connId);
+            Assert.Null(resultList[1].connId);
         }
 
         [Fact]
@@ -82,17 +120,17 @@ namespace Metin.UnitTests.ServiceTests
             // Arrange
             var locObj = LocationFactory.CreateLocObj("1", 0.0, 0.0, false);
 
-            // Act
-            var changedLocation = await _msgService.UpdateLocation(locObj, "Location", new Point(2.2, 2.2));
-            var changedId = await _msgService.UpdateLocation(locObj, "UserId", "2");
-            var changedOpen = await _msgService.UpdateLocation(locObj, "openToMessages", true);
+            // Act locObj changes inside the method
+            await _msgService.UpdateLocation(locObj, "Location", new Point(2.2, 2.2));
+            await _msgService.UpdateLocation(locObj, "UserId", "2");
+            await _msgService.UpdateLocation(locObj, "openToMessages", true);
 
             var exeption = _msgService.UpdateLocation(locObj, "field that dont exist", true);
 
             // Assert
-            Assert.NotEqual(changedLocation.Location, locObj.Location);
-            Assert.NotEqual(changedId.UserId, locObj.UserId);
-            Assert.NotEqual(changedId.openToMessages, locObj.openToMessages);
+            Assert.NotEqual(0.0, locObj.Location.Position.Latitude);
+            Assert.NotEqual("1", locObj.UserId);
+            Assert.NotEqual(false, locObj.openToMessages);
 
             var exception = Assert.ThrowsAsync<Exception>(() =>
                 _msgService.UpdateLocation(locObj, "Field dont exist :(", true)

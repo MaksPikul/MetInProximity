@@ -25,6 +25,8 @@ namespace MetInProximityBack.Services
         private readonly CosmoLocationRepo _cosmosDb = cosmosDb;
         private readonly RedisCacheRepo _cacheRepo = cacheRepo;
 
+
+
         public async Task<List<NearbyUser>> GetNearbyUsersAsync(double longitude, double latitude, string RequestingUserId)
         {
             // UserId : ConnectionString (SignalR)
@@ -43,7 +45,7 @@ namespace MetInProximityBack.Services
             return await _cacheRepo.GetFromCacheAsync(AppConstants.ConnIdCacheKey(recipientId));
         }
 
-        public async Task<List<NearbyUserWithConnId>> GetConnectionIdsAsync(List<NearbyUser> nearbyUsers)
+        public virtual async Task<List<NearbyUserWithConnId>> GetConnectionIdsAsync(List<NearbyUser> nearbyUsers)
         {
             List<string> connectionIds = await _cacheRepo
                     .GetManyFromCacheAsync(
@@ -69,9 +71,18 @@ namespace MetInProximityBack.Services
 
             for (int i = 0; i < nearbyUsers.Count; i++)
             {
-                result.Add(
-                    new NearbyUserWithConnId(nearbyUsers[i], connectionIds[i])
-                );
+                if (connectionIds[i] == null)
+                {
+                    result.Add(
+                        new NearbyUserWithConnId(nearbyUsers[i], null)
+                    );
+                }
+                else
+                {
+                    result.Add(
+                        new NearbyUserWithConnId(nearbyUsers[i], connectionIds[i])
+                    );
+                }
             }
 
             return result;
@@ -84,8 +95,6 @@ namespace MetInProximityBack.Services
 
             if ((property != null && property.CanWrite) && property.PropertyType == newVal.GetType())
             {
-                
-
                 property.SetValue(locationObject, newVal);
                 await _cosmosDb.AddOrUpdateLocation(locationObject);
                 return locationObject;
