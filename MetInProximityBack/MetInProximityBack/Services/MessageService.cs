@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace MetInProximityBack.Services
 {
-    public class LocationService (
+    public class MessageService (
         CosmoLocationRepo cosmosDb,
         ICacheRepo cacheService
     ) 
@@ -28,7 +28,12 @@ namespace MetInProximityBack.Services
             return nearbyUsers;
         }
 
-        public async Task<List<NearbyUserWithConnId>> GetUserConnIdsAsync(List<NearbyUser> nearbyUsers)
+        public async Task<string> GetConnectionIdAsync(string recipientId)
+        {
+            return await _cacheService.GetFromCacheAsync(AppConstants.ConnIdCacheKey(recipientId));
+        }
+
+        public async Task<List<NearbyUserWithConnId>> GetConnectionIdsAsync(List<NearbyUser> nearbyUsers)
         {
             List<string> connectionIds = await _cacheService
                     .GetManyFromCacheAsync(
@@ -41,26 +46,11 @@ namespace MetInProximityBack.Services
             return nuwConnId;
         }
 
-        // get by any field
-        public async Task<LocationObject> GetLatestLocationAsync(string userId)
+        // get by any field?
+        public async Task<LocationObject?> GetLatestLocationAsync(string userId)
         {
-            LocationObject locationObject = await _cosmosDb.GetLocationByUserId(userId);
+            LocationObject? locationObject = await _cosmosDb.GetLocationByUserId(userId);
             return locationObject;
-        }
-
-        public async void UpdateLocation(LocationObject locationObject, string propertyName, object newVal)
-        {
-            PropertyInfo property = typeof(LocationObject).GetProperty(propertyName);
-
-            if ((property != null && property.CanWrite) && property.PropertyType == newVal.GetType())
-            {
-                property.SetValue(locationObject, newVal);
-                await _cosmosDb.AddOrUpdateLocation(locationObject);
-            }
-            else
-            {
-                throw new Exception("Property doesn't exist or cannot be changed."); 
-            }
         }
 
         private List<NearbyUserWithConnId> MapUserToConnId(List<NearbyUser> nearbyUsers, List<string> connectionIds)
@@ -75,6 +65,22 @@ namespace MetInProximityBack.Services
             }
 
             return result;
+        }
+
+        // Trying something out
+        public async void UpdateLocation(LocationObject locationObject, string propertyName, object newVal)
+        {
+            PropertyInfo? property = typeof(LocationObject).GetProperty(propertyName);
+
+            if ((property != null && property.CanWrite) && property.PropertyType == newVal.GetType())
+            {
+                property.SetValue(locationObject, newVal);
+                await _cosmosDb.AddOrUpdateLocation(locationObject);
+            }
+            else
+            {
+                throw new Exception("Property doesn't exist or cannot be changed.");
+            }
         }
     }
 }

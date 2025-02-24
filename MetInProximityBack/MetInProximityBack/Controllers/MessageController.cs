@@ -22,17 +22,15 @@ namespace MetInProximityBack.Controllers
     [Route("api/message")]
     [ApiController]
     public class MessageController(
-        ICacheRepo cacheService,
         IHubContext<ChatHub> hubContext,
         INotificationService notifService,
-        LocationService locService
+        MessageService msgService
 
     ) : Controller
     {
-        private readonly ICacheRepo _cacheService = cacheService;
         private readonly IHubContext<ChatHub> _hubContext = hubContext;
         private readonly INotificationService _notifService = notifService;
-        private readonly LocationService _locService = locService;
+        private readonly MessageService _msgService = msgService;
 
         [HttpPost("public")]
         [Authorize]
@@ -41,9 +39,9 @@ namespace MetInProximityBack.Controllers
         ) {
 
             try {
-                List<NearbyUser> nearbyUsers = await _locService.GetNearbyUsersAsync(msgReq.Longitude, msgReq.Latitude, User.GetId());
+                List<NearbyUser> nearbyUsers = await _msgService.GetNearbyUsersAsync(msgReq.Longitude, msgReq.Latitude, User.GetId());
 
-                List<NearbyUserWithConnId> nuwConnId = await _locService.GetUserConnIdsAsync(nearbyUsers);
+                List<NearbyUserWithConnId> nuwConnId = await _msgService.GetConnectionIdsAsync(nearbyUsers);
 
                 MessageResponse msgRes = MessageFactory.CreateMessageResponse(msgReq, User.GetId(), true);
 
@@ -65,8 +63,7 @@ namespace MetInProximityBack.Controllers
         ) {
             try
             {
-                string recipientConnId = await _cacheService
-                    .GetFromCacheAsync(Constants.AppConstants.ConnIdCacheKey( msgReq.MsgRecipientId) );
+                string recipientConnId = await _msgService.GetConnectionIdAsync( msgReq.MsgRecipientId );
 
                 MessageResponse msgRes = MessageFactory.CreateMessageResponse(msgReq, User.GetId(), false, msgReq.MsgRecipientId);
 
@@ -79,7 +76,7 @@ namespace MetInProximityBack.Controllers
                     _notifService.SendPushNotification(msgReq.MsgRecipientId, msgRes);
                 }
 
-                return Ok(msgRes);
+                return Ok( msgRes );
             }
             catch (Exception ex)
             {

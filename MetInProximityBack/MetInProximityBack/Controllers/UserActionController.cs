@@ -13,12 +13,12 @@ namespace MetInProximityBack.Controllers
     [Route("api/user")]
     [ApiController]
     public class UserActionController(
-        LocationService locService,
+        MessageService locService,
         AuthTokenService authTokenService,
         AppDbContext appDbContext
     ) : Controller
     {
-        private readonly LocationService _locService = locService;
+        private readonly MessageService _locService = locService;
         private readonly AuthTokenService _authTokenService = authTokenService;
         private readonly AppDbContext _appDbContext = appDbContext;
 

@@ -22,8 +22,8 @@ namespace MetInProximityBack.Controllers
         CosmoLocationRepo cosmosDb
 
     ) : Controller
-    {
-        
+    { 
+
         private readonly UserManager<AppUser> _userManager = userManager;
         private readonly CosmoLocationRepo _cosmosDb = cosmosDb;
 
@@ -35,9 +35,9 @@ namespace MetInProximityBack.Controllers
             [FromQuery(Name = "lat")] double latitude,
             [FromQuery(Name = "open")] bool open
         ) {
-
             try
             {
+
                 var claims = User.Claims.ToList();
 
                 LocationObject locObj = LocationFactory

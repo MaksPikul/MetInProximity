@@ -144,7 +144,7 @@ builder.Services.AddAuthentication(options =>
 
 /* dependency injections*/
 builder.Services.AddScoped<AuthTokenService>();
-builder.Services.AddScoped<LocationService>();
+builder.Services.AddScoped<MessageService>();
 
 builder.Services.AddScoped<IOAuthService, OAuthService>();
 builder.Services.AddScoped<ICacheRepo, RedisCacheRepo>();
@@ -191,4 +191,5 @@ app.MapControllers();
 
 app.Run();
 
+// this here for testing :3
 public partial class Program { }

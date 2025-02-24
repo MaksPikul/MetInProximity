@@ -36,7 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ControllerTests\" />
+    <Folder Include="HubTests\" />
   </ItemGroup>
 
 </Project>

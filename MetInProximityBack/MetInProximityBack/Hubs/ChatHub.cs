@@ -27,7 +27,7 @@ namespace MetInProximityBack.Hubs
                     return;
                 }
 
-                string connectionKey = Constants.AppConstants.ConnIdCacheKey(userId);
+                string connectionKey = AppConstants.ConnIdCacheKey(userId);
                 
                 await _cacheService.AddToCacheAsync(connectionKey, Context.ConnectionId);
 
