@@ -38,8 +38,6 @@ namespace MetInProximityBack.Controllers
             try
             {
 
-                var claims = User.Claims.ToList();
-
                 LocationObject locObj = LocationFactory
                     .CreateLocObj( User.GetId(), longitude, latitude, open);
 

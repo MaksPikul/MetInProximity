@@ -1,10 +1,11 @@
-﻿using MetInProximityBack.Types.Message;
+﻿using MetInProximityBack.Types.Location;
+using MetInProximityBack.Types.Message;
 
 namespace MetInProximityBack.Interfaces.IServices
 {
     public interface INotificationService
     {
-        // userId is in msgRes, but i think this makes things clearer
-        void SendPushNotification(string recipientId, MessageResponse msgRes);
+        List<Task> CreatePublicTasksAsync(MessageResponse msgRes, List<NearbyUserWithConnId> users);
+        Task CreatePrivateTaskAsync(string recipientConnId, MessageResponse msgRes);
     }
 }

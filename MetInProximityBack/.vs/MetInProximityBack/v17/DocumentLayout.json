@@ -1,12 +1,53 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{B9813295-45D7-4A14-B9B4-756F12E5404A}|..\\Metin.UnitTests\\Metin.UnitTests.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metin.unittests\\servicetests\\notificationtest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metinproximityback\\metinproximityback\\services\\notificationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|solutionrelative:metinproximityback\\services\\notificationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "NotificationTEST.cs",
+              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\Metin.UnitTests\\ServiceTests\\NotificationTEST.cs",
+              "RelativeDocumentMoniker": "..\\Metin.UnitTests\\ServiceTests\\NotificationTEST.cs",
+              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\Metin.UnitTests\\ServiceTests\\NotificationTEST.cs",
+              "RelativeToolTip": "..\\Metin.UnitTests\\ServiceTests\\NotificationTEST.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAkAAAABAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-24T11:34:13.788Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "NotificationService.cs",
+              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Services\\NotificationService.cs",
+              "RelativeDocumentMoniker": "MetInProximityBack\\Services\\NotificationService.cs",
+              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Services\\NotificationService.cs",
+              "RelativeToolTip": "MetInProximityBack\\Services\\NotificationService.cs",
+              "ViewState": "AQIAACQAAAAAAAAAAAAowCAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-24T11:33:03.036Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }

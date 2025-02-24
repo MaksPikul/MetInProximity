@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace MetInProximityBack.Tests
+namespace Metin.UnitTests.FactoryTests
 {
     public class OAuthProviderFactoryTest
     {

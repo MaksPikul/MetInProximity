@@ -1,7 +1,10 @@
-﻿namespace MetInProximityBack.Types.Message
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace MetInProximityBack.Types.Message
 {
     public class PrivateMessageRequest : MessageRequest
     {
-        public string MsgRecipientId { get; set; } = String.Empty;
+        [Required]
+        public string MsgRecipientId { get; set; } = string.Empty;
     }
 }

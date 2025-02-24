@@ -1,19 +1,29 @@
 ﻿using MetInProximityBack.Constants;
+using MetInProximityBack.Hubs;
 using MetInProximityBack.Interfaces.IRepos;
+using MetInProximityBack.Interfaces.IServices;
 using MetInProximityBack.Repositories;
 using MetInProximityBack.Types.Location;
+using MetInProximityBack.Types.Message;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Reflection;
 
 namespace MetInProximityBack.Services
 {
+    // This Class handles User Locations and Connection IDs,
+    // This class is necessary for message controller to work, hence why i chose this name,
+    // Notification Service actually sends out the messages,
+    // LocationAndConnectionIdService would not be a good name
     public class MessageService (
         CosmoLocationRepo cosmosDb,
-        ICacheRepo cacheService
-    ) 
+        RedisCacheRepo cacheService
+    ) : IMessageService
     {
+
         private readonly CosmoLocationRepo _cosmosDb = cosmosDb;
-        private readonly ICacheRepo _cacheService = cacheService;
+        private readonly RedisCacheRepo _cacheService = cacheService;
 
         public async Task<List<NearbyUser>> GetNearbyUsersAsync(double longitude, double latitude, string RequestingUserId)
         {
@@ -68,7 +78,7 @@ namespace MetInProximityBack.Services
         }
 
         // Trying something out
-        public async void UpdateLocation(LocationObject locationObject, string propertyName, object newVal)
+        public async Task<LocationObject> UpdateLocation(LocationObject locationObject, string propertyName, object newVal)
         {
             PropertyInfo? property = typeof(LocationObject).GetProperty(propertyName);
 
@@ -76,6 +86,7 @@ namespace MetInProximityBack.Services
             {
                 property.SetValue(locationObject, newVal);
                 await _cosmosDb.AddOrUpdateLocation(locationObject);
+                return locationObject;
             }
             else
             {

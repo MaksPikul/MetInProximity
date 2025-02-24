@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MetInProximityBack\MetInProximityBack.csproj" />
+    <ProjectReference Include="..\MetInProximityBack\MetInProximityBack\MetInProximityBack.csproj" />
   </ItemGroup>
 
   <ItemGroup>

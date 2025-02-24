@@ -9,14 +9,13 @@ using MetInProximityBack.Models;
 using Microsoft.AspNetCore.Identity;
 using MetInProximityBack.Interfaces.IServices;
 
-namespace MetInProximityBack.Services
+namespace MetInProximityBack.Services.Notifications
 {
     public class FirebaseService(
         IHttpClientFactory httpClientFactory,
         IConfiguration configuration,
         UserManager<AppUser> userManager
-
-    ) : INotificationService
+    )
     {
         private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
         private readonly IConfiguration _config = configuration;
@@ -25,11 +24,11 @@ namespace MetInProximityBack.Services
         /*
          *  https://stackoverflow.com/questions/38184432/fcm-firebase-cloud-messaging-push-notification-with-asp-net
          */
-        public async void SendPushNotification(string recipientId, MessageResponse msgRes)
+        public async Task SendPushNotification(string recipientId, MessageResponse msgRes)
         {
             string fcmSecretKey = _config["Firebase:SecretKey"];
             string fcmUrl = _config["Firebase:Url"];
-            string fcmToken = await this.GetUserFcmToken(recipientId);
+            string fcmToken = await GetUserFcmToken(recipientId);
 
             // correct usage of Http Client
             HttpClient _httpClient = _httpClientFactory.CreateClient();
@@ -39,7 +38,7 @@ namespace MetInProximityBack.Services
             /*
              * https://firebase.google.com/docs/cloud-messaging/send-message#send_using_the_fcm_v1_http_api
              */
-            var payload = this.CreateFcmPayload(fcmToken, msgRes);
+            var payload = CreateFcmPayload(fcmToken, msgRes);
 
             var jsonPayload = Newtonsoft.Json.JsonConvert.SerializeObject(payload);
 
@@ -53,25 +52,27 @@ namespace MetInProximityBack.Services
             }
             else
             {
-                throw new Exception("HttpClient failed to post message to firebase, StatusCode: " + response.StatusCode );
+                throw new Exception("HttpClient failed to post message to firebase, StatusCode: " + response.StatusCode);
             }
         }
 
-        private FcmPayload CreateFcmPayload(string fcmToken, MessageResponse msgRes){
+        private FcmPayload CreateFcmPayload(string fcmToken, MessageResponse msgRes)
+        {
 
             var payload = new FcmPayload(fcmToken, msgRes);
 
             return payload;
         }
 
-        private async Task<string> GetUserFcmToken(string userId){
+        private async Task<string> GetUserFcmToken(string userId)
+        {
 
             AppUser user = await _userManager.FindByIdAsync(userId);
 
             return "s";//user.FcmToken;
         }
 
-            
+
 
     }
 

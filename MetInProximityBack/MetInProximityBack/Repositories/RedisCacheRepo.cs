@@ -23,7 +23,7 @@ namespace MetInProximityBack.Repositories
         public async Task<string> GetFromCacheAsync(string key)
         {
             RedisValue value = await _db.StringGetAsync(key);
-            return DeserializeRedisValue(value);
+            return this.DeserializeRedisValue(value);
         }
 
         public async Task<List<string>> GetManyFromCacheAsync(List<string> keys)
@@ -48,14 +48,7 @@ namespace MetInProximityBack.Repositories
 
             foreach (var value in values)
             {
-                if (value.IsNull)
-                {
-                    deserializeValues.Add(null);
-                }
-                else
-                {
-                    deserializeValues.Add(value.ToString());
-                }
+                this.DeserializeRedisValue(value);
             }
 
             return deserializeValues;
@@ -66,11 +59,13 @@ namespace MetInProximityBack.Repositories
         {
             if (value.IsNull)
             {
-                return default;
+                return null;
+            }
+            else
+            {
+                return value.ToString();
             }
             // if not string, deserialise and turn json into string?
-
-            return value.ToString();
         }
 
 

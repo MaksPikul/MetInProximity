@@ -16,6 +16,7 @@ using Microsoft.OpenApi.Models;
 using MetInProximityBack.Repositories;
 using MetInProximityBack.Interfaces.IRepos;
 using MetInProximityBack.Interfaces.IServices;
+using MetInProximityBack.Services.Notifications;
 
 var builder = WebApplication.CreateBuilder(args);
 

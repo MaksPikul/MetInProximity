@@ -40,7 +40,12 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
-	<InternalsVisibleTo Include="..\MetInProximityBack.Tests" />
+	<InternalsVisibleTo Include="..\Metin.IntergrationTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<Folder Include="Migrations\" />
+	<InternalsVisibleTo Include="..\Metin.UnitTests" />
   </ItemGroup>
 
 </Project>
