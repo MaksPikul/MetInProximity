@@ -18,7 +18,12 @@ class UserActionService(
     private var _visibility = MutableStateFlow(false)
     val visibility : StateFlow<Boolean> = _visibility
 
-    private var _chatUsers = MutableStateFlow<List<ChatUser>>(emptyList())
+    val testUser = ChatUser(
+        "1234",
+        "tester"
+    )
+
+    private var _chatUsers = MutableStateFlow<List<ChatUser>>(mutableListOf(testUser))
     val chatUsers : StateFlow<List<ChatUser>> = _chatUsers
 
     fun changeVisibility() {

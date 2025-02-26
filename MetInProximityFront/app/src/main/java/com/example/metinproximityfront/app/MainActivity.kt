@@ -1,36 +1,29 @@
 package com.example.metinproximityfront.app
 
-import android.Manifest
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.metinproximityfront.config.Constants
-import com.example.metinproximityfront.services.location.LocationService
 import com.example.metinproximityfront.services.permissions.PermissionListener
-import com.example.metinproximityfront.services.permissions.PermissionManager
 import com.example.metinproximityfront.ui.theme.MetInProximityFrontTheme
 import com.example.metinproximityfront.views.Home.HomeView
+import com.example.metinproximityfront.views.Home.HomeViewModel
+import com.example.metinproximityfront.views.Home.MainViewModel
 import com.example.metinproximityfront.views.loading.LoadingView
 import com.example.metinproximityfront.views.Login.LoginView
 
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var mainVm : MainActivityViewModel
+    private lateinit var mainVm : MainViewModel
+    private lateinit var authVm : AuthViewModel
+    private lateinit var homeVm : HomeViewModel
+
     val permissionListener = PermissionListener(this) // Really dont like the fact this is here, dont want to have a large nesting of parameters tho
 
     private val loginLauncher = registerForActivityResult(
@@ -40,12 +33,12 @@ class MainActivity : ComponentActivity() {
 
             //val fcmToken = task.result
             // This should return errors if any and update UI in Login page, custom toast that lasts long and is large??
-            this.mainVm.startLoadingView()
-            mainVm.authService.FinishLogin(
+            this.authVm.startLoadingView()
+            this.authVm.authService.FinishLogin(
                 result.data!!,
                 "",
-                mainVm.onSuccLogin,
-                mainVm.onFailLogin
+                this.authVm.onSuccLogin,
+                this.authVm.onFailLogin
             )
 
             /*
@@ -66,10 +59,21 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val mainModel: MainActivityViewModel by viewModels()
+        val mainModel: MainViewModel by viewModels( )
         this.mainVm = mainModel
 
-        this.mainVm.permissionManager.checkPermissions(this, permissionListener)
+        this.authVm = AuthViewModel(
+            application,
+            mainVm
+        )
+
+        this.homeVm = HomeViewModel(
+            application,
+            mainVm.userActionService,
+            mainVm.msgService
+        )
+
+        this.authVm.permissionManager.checkPermissions(this, permissionListener)
 
         this.createViews()
 
@@ -79,30 +83,30 @@ class MainActivity : ComponentActivity() {
     private fun createViews(){
         setContent {
             MetInProximityFrontTheme {
-                val nhc = rememberNavController()
-                this.mainVm.navHostController = nhc
+                val nc = rememberNavController()
+                mainVm.navController = nc
 
                 NavHost(
-                    navController = this.mainVm.navHostController,
+                    navController = nc,
                     // instead of this, check for tokens, if present, run InitAndMoveToHome
-                    startDestination = "Loading"
+                    startDestination = "Home"
                 ) {
                     // TODO: Blank Composable? for when loading
                     composable("Login") {
                     LoginView(
-                        providers = mainVm.oAuthProviderFactory.getProviders(),
+                        providers = this@MainActivity.authVm.oAuthProviderFactory.getProviders(),
                         // This looks hella complicated, but its very nice
                         // pass 1 parameter here, pass a second parameter in login view
                         StartLogin = { provider ->
-                            mainVm.authService.StartLogin(provider) { intent ->
+                            this@MainActivity.authVm.authService.StartLogin(provider) { intent ->
                                 loginLauncher.launch(intent)
                         }}
                     ) }
 
                     composable("Home") {
                     HomeView(
-                        mainVm.homeVm,
-                        {mainVm.authService.Logout({mainVm.navHostController.navigate("Login")})}
+                        homeVm,
+                        { this@MainActivity.authVm.authService.Logout({ this@MainActivity.mainVm.navController.navigate("Login")})}
                     ) }
 
                     composable("Loading"){
@@ -110,15 +114,20 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                if (mainVm.authService.IsLoggedIn()){
-                    mainVm.InitAndLoadHomeVm()
-                }
-                else {
-                    this.mainVm.stopLoadingView("Login")
-                }
+                //this.CheckLoginStatus()
             }
         }
     }
+
+    private fun CheckLoginStatus() {
+        if (authVm.authService.IsLoggedIn()){
+            authVm.onSuccLogin()
+        }
+        else {
+            authVm.stopLoadingView("Login")
+        }
+    }
+
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -127,7 +136,7 @@ class MainActivity : ComponentActivity() {
         deviceId: Int
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults, deviceId)
-        mainVm.permissionManager.handlePermissionsResult(this, requestCode, grantResults, permissionListener)
+        this.authVm.permissionManager.handlePermissionsResult(this, requestCode, grantResults, permissionListener)
     }
 
     override fun onPause() {

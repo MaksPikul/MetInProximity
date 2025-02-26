@@ -3,36 +3,31 @@ package com.example.metinproximityfront.app
 import android.app.Application
 import android.util.Log
 import android.widget.Toast
-import androidx.lifecycle.AndroidViewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.NavOptions
+import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
 import com.example.metinproximityfront.data.repositories.AccountRepository
 import com.example.metinproximityfront.factories.OAuthProviderFactory
 import com.example.metinproximityfront.services.permissions.PermissionManager
 import com.example.metinproximityfront.services.auth.AuthService
 import com.example.metinproximityfront.services.auth.IAuthService
-import com.example.metinproximityfront.services.preference.EncryptedStoreService
 import com.example.metinproximityfront.services.preference.IStoreService
-import com.example.metinproximityfront.views.Home.HomeViewModel
+import com.example.metinproximityfront.views.Home.MainViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class MainActivityViewModel(
-    private val app: Application
-) : AndroidViewModel(app) {
+class AuthViewModel(
+    private val app: Application,
+    private val mainVm : MainViewModel
+) : ViewModel() {
     // Todo : ADD state variables and create two initialisation stages
 
     // Utility Classes
-    lateinit var navHostController: NavHostController
-    private val encryptedStoreService : IStoreService
     var permissionManager: PermissionManager
 
     val accountRepo: AccountRepository
     val authService : IAuthService
     val oAuthProviderFactory : OAuthProviderFactory
-
-    lateinit var homeVm : HomeViewModel
 
     // https://developer.android.com/kotlin/flow/stateflow-and-sharedflow
     private val _isLoading = MutableStateFlow(false)
@@ -45,44 +40,30 @@ class MainActivityViewModel(
         this.permissionManager = PermissionManager()
         this.accountRepo = AccountRepository()
 
-        this.encryptedStoreService = EncryptedStoreService(this.app.applicationContext)
-
         this.authService = AuthService(
             this.app.applicationContext,
-            this.encryptedStoreService,
+            mainVm.encryptedStoreService,
             this.accountRepo
         )
 
         this.oAuthProviderFactory = OAuthProviderFactory()
     }
 
-    fun InitAndLoadHomeVm(){
-        this.homeVm = HomeViewModel(app, encryptedStoreService, navHostController)
-        this.stopLoadingView("Home")
-
-        navHostController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.route == "Login") {
-                homeVm.stopServices()
-            }
-        }
-
-        this.homeVm.startServices()
-    }
-
     fun startLoadingView(){
 
         _isLoading.value = true
-        navHostController.navigate("Loading")
+        mainVm.navController.navigate("Loading")
     }
 
     fun stopLoadingView(nextScreen : String){
 
         _isLoading.value = false
-        navHostController.navigate(nextScreen)
+        mainVm.navController.navigate(nextScreen)
     }
 
     val onSuccLogin = {
-        InitAndLoadHomeVm()
+        this.stopLoadingView("Home")
+        mainVm.startServices()
         authService.curProvider = null
     }
 

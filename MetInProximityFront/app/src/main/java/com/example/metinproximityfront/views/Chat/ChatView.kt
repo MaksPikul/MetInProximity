@@ -2,6 +2,7 @@ package com.example.metinproximityfront.views.Chat
 
 import android.app.Application
 import android.util.Log
+import androidx.annotation.Nullable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,9 +35,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.metinproximityfront.app.ui.theme.MetInProximityFrontTheme
 import com.example.metinproximityfront.data.entities.message.MsgResObject
 import com.example.metinproximityfront.data.entities.users.ChatUser
 import com.example.metinproximityfront.views.Home.HomeViewModel
+
+
 
 @Composable
 fun ChatView(
@@ -65,7 +69,7 @@ fun ChatView(
             .fillMaxSize()
             .background(Color.Green, RoundedCornerShape(8.dp))
     ) {
-        //ChatHeader(privateUser)
+        ChatHeader(chatUser)
 
         LazyColumn(
             state = listState,
@@ -180,7 +184,7 @@ fun InputBar (
 
 @Composable
 fun ChatHeader (
-    isPublic : Boolean
+    chatUser: ChatUser?
 ){
     Row(
         modifier = Modifier
@@ -191,7 +195,7 @@ fun ChatHeader (
         horizontalArrangement = Arrangement.Center
     )
     {
-        if (isPublic){
+        if (chatUser == null){
             Text(
                 text = "Public Chat",
                 color = Color.Red,

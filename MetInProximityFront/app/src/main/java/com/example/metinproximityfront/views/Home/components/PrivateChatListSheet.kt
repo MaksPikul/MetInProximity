@@ -22,28 +22,25 @@ import com.example.metinproximityfront.data.entities.users.ChatUser
 import com.example.metinproximityfront.data.enums.LoadingState
 import com.example.metinproximityfront.data.enums.ScreenState
 import com.example.metinproximityfront.views.Home.HomeViewModel
+import com.example.metinproximityfront.views.Home.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrivateChatListSheet (
-    showBottomSheet : Boolean,
     sheetState : SheetState,
-    changeState : () -> Unit,
-    changeScreen : (ScreenState, ChatUser?) -> Unit,
-    privUsersLoadState : LoadingState,
     homeVm: HomeViewModel
 ) {
     // function to make publicly available
     val chatUsers by homeVm.userActionService.chatUsers.collectAsState()
     val visibility by homeVm.userActionService.visibility.collectAsState()
 
-    if (showBottomSheet) {
+    if (homeVm.uiState.value.botSheetVisible) {
         ModalBottomSheet(
             modifier = Modifier.
                 fillMaxWidth().
                 heightIn(300.dp),
             sheetState = sheetState,
-            onDismissRequest = changeState
+            onDismissRequest = { homeVm.toggleBottomSheet() }
         ) {
             Column (
 
@@ -65,10 +62,11 @@ fun PrivateChatListSheet (
                     }
                 }
                 // TODO : crreate screen manager, too much nesting, looks ugly
-                when (privUsersLoadState) {
-                    LoadingState.LOADING -> null
+                //when (homeVm.uiState.value.loadingState) {
+                    //LoadingState.LOADING -> null
 
-                    LoadingState.READY -> LazyColumn(
+                    //LoadingState.READY ->
+                LazyColumn(
                         //state = listState,
                         modifier = Modifier.weight(1f).fillMaxWidth(),
                         reverseLayout = false
@@ -76,11 +74,11 @@ fun PrivateChatListSheet (
                         items(chatUsers) { chatUser ->
                             ChatUserBubble (
                                 chatUser,
-                                changeScreen
+                                homeVm
                             )
                         }
                     }
-                }
+                //}
                 // TODO -------------------------------------------------------
             }
         }
@@ -90,13 +88,21 @@ fun PrivateChatListSheet (
 @Composable
 fun ChatUserBubble (
     chatUser: ChatUser,
-    changePrivateUser : (ScreenState, ChatUser?) -> Unit,
+    homeVm: HomeViewModel,
 ) {
-    Button(
-        onClick = {changePrivateUser(ScreenState.PRIVATE, chatUser)}
-    ) {
 
+    Button(
+        onClick = {
+            homeVm.changeScreen(ScreenState.PRIVATE, chatUser)
+        }
+    ) {
+        Text(
+            text = chatUser.UserName,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
+        )
     }
+
 }
 
 

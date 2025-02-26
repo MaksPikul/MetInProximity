@@ -8,6 +8,7 @@ import com.example.metinproximityfront.data.entities.message.MsgResObject
 import com.example.metinproximityfront.data.entities.users.ChatUser
 import com.example.metinproximityfront.data.repositories.MessageRepository
 import com.example.metinproximityfront.factories.MessageFactory
+import com.example.metinproximityfront.services.preference.IStoreService
 import com.example.metinproximityfront.services.preference.SharedStoreService
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -18,7 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class MessageService(
-    private val sharedStore: SharedStoreService,
+    private val sharedStore: IStoreService,
     private val msgRepo: MessageRepository? = null,
     private val msgLocBinder : MessageLocationBinder,
 )
@@ -27,6 +28,8 @@ class MessageService(
     // Does it without the list of observers, signalR updater, message service observer
     private val _messages = MutableStateFlow<List<MsgResObject>>( emptyList() ) // StateFlow for UI
     val messages: StateFlow<List<MsgResObject>> = _messages // Expose immutable StateFlow
+
+
 
     fun storeMessage(msg : MsgResObject) : String{
 
@@ -55,11 +58,15 @@ class MessageService(
             }
         }
 
-        val json = sharedStore.getFromPref(
-            key
-        )
+        val json = sharedStore.getFromPref(key)
+        if (json.isNullOrEmpty()) {
+            // Handle the case where json is null or empty
+            _messages.value = emptyList() // You can return empty list as a fallback
+            return emptyList()
+        }
+
         val type = object : TypeToken<List<MsgResObject>>() {}.type
-        val messagesList: List<MsgResObject> = Gson().fromJson(json, type) ?: emptyList()
+        val messagesList: List<MsgResObject> = Gson().fromJson(json, type)
 
         _messages.value = messagesList
         return messagesList
@@ -78,7 +85,6 @@ class MessageService(
                     textToSend,
                     locObj.Longitude,
                     locObj.Latitude,
-
                 )
                 var result: MsgResObject? = null
                 if (chatUser == null) {

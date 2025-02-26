@@ -16,39 +16,39 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.example.metinproximityfront.data.entities.users.ChatUser
 import com.example.metinproximityfront.data.enums.ScreenState
+import com.example.metinproximityfront.views.Home.HomeViewModel
+import com.example.metinproximityfront.views.Home.HomeVmState
 
 @Composable
 fun BottomNavBar(
-    changeSheetState : () -> Unit,
-    changeScreen : (ScreenState, ChatUser?) -> Unit
+    homeVm: HomeViewModel
 ) {
 
     NavigationBar(
         modifier = Modifier.padding(12.dp).clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
     ) {
         NavigationBarItem(
-            onClick = {
-                changeScreen(ScreenState.MAP, null)
-            },
+            onClick = { homeVm.changeScreen(ScreenState.MAP) }
+            ,
             label = { Text("Home") },
             icon = { Icon(Icons.Default.Home , contentDescription = "Home Page") },
-            selected = false,
+            selected = homeVm.uiState.value.currentScreen == ScreenState.MAP,
             //unselectedIcon = Icons.Outlined.Home,
         )
         NavigationBarItem(
             onClick = {
-                changeScreen(ScreenState.PUBLIC, null)
+                homeVm.changeScreen(ScreenState.PUBLIC)
             },
             label = { Text("Public") },
-            icon = { Icon(Icons.Default.Menu , contentDescription = "Home Page") },
-            selected = false,
+            icon = { Icon(Icons.Default.Menu , contentDescription = "Public Chat Page") },
+            selected = homeVm.uiState.value.currentScreen == ScreenState.PUBLIC,
             //unselectedIcon = Icons.Outlined.Home,
         )
         NavigationBarItem(
-            onClick =  changeSheetState ,
+            onClick =  { homeVm.toggleBottomSheet() } ,
             label = { Text("Private") },
-            icon = { Icon(Icons.Default.Menu , contentDescription = "Home Page") },
-            selected = false,
+            icon = { Icon(Icons.Default.Menu , contentDescription = "Private Chat Page") },
+            selected = homeVm.uiState.value.currentScreen == ScreenState.PRIVATE,
             //unselectedIcon = Icons.Outlined.Home,
         )
         NavigationBarItem(

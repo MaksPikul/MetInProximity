@@ -7,12 +7,14 @@ object MessageFactory {
     fun CreateMsg(
         Body : String,
         Longitude : Double,
-        Latitude : Double
+        Latitude : Double,
+        recipientId : String? = null
     ) : MsgReqObject {
         return MsgReqObject(
             Body,
             Longitude,
-            Latitude
+            Latitude,
+            recipientId
         )
     }
 
