@@ -15,7 +15,7 @@ namespace MetInProximityBack.Services
         private readonly SignalRService _srService = signalRService;
         private readonly FirebaseService _fbService = firebaseService;
 
-        public List<Task> CreatePublicTasksAsync(MessageResponse msgRes, List<NearbyUserWithConnId> users)
+        public async Task RunPublicTasksAsync(MessageResponse msgRes, List<NearbyUserWithConnId> users)
         {
             var tasks = new List<Task>();
 
@@ -26,9 +26,9 @@ namespace MetInProximityBack.Services
                     await this.CreatePublicTask(user.connId, msgRes, user.openToMessages);
 
                 }));
-
             }
-            return tasks;
+
+            await Task.WhenAll(tasks);
         }
 
         public async Task CreatePrivateTaskAsync(string recipientConnId, MessageResponse msgRes)

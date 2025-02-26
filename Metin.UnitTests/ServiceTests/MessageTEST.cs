@@ -83,8 +83,6 @@ namespace Metin.UnitTests.ServiceTests
             return _mockCosmoRepo;
         }
 
-
-
         public MessageTEST(ITestOutputHelper output) {
 
             _msgService = new MessageService(

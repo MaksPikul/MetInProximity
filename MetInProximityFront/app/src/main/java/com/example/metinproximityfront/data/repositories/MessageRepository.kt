@@ -18,7 +18,7 @@ class MessageRepository(
         ApiServiceFactory(publicRetrofit)
     }
 
-    suspend fun SendMessage(
+    suspend fun SendPublicMessageRepo(
         msgObj : MsgReqObject
         // onSuccess : ()-> Unit
     ) : MsgResObject? {
@@ -37,5 +37,22 @@ class MessageRepository(
         }
     }
 
-
+    suspend fun SendPrivateMessageRepo(
+        msgObj : MsgReqObject
+        // onSuccess : ()-> Unit
+    ) : MsgResObject? {
+        return try {
+            apiTokenWrapper.callApiWithToken { token: String ->
+                messageApi.SendPrivateMessage(msgObj, token) // Extract response body
+            }
+        } catch (e : ApiTokenWrapper.AuthException){
+            Log.e("Auth Error", e.message.toString())
+            navController.navigate("Login")
+            null
+        }
+        catch (e: Exception) {
+            Log.e("Api Call Error", e.message.toString())
+            null
+        }
+    }
 }

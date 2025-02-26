@@ -34,9 +34,7 @@ namespace MetInProximityBack.Controllers
 
                 MessageResponse msgRes = MessageFactory.CreateMessageResponse(msgReq, User.GetId(), true);
 
-                List<Task> tasks = _notifService.CreatePublicTasksAsync(msgRes, nearUserswConnId);
-
-                await Task.WhenAll(tasks);
+                await _notifService.RunPublicTasksAsync(msgRes, nearUserswConnId);
 
                 return Ok(msgRes);
             }

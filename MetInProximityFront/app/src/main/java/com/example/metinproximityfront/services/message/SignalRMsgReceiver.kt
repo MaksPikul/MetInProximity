@@ -39,7 +39,6 @@ class SignalRMsgReceiver(
             { error -> Log.e("SignalR", "Connection Failed: ${error.message} + ${error.localizedMessage}") }
         )
 
-        //Log.i("ConnId", hubConnection.get)
     }
 
     fun stopConnection(){
@@ -47,10 +46,10 @@ class SignalRMsgReceiver(
     }
 
     private fun defineHubMethods() {
+        hubConnection.on("ReceiveMessage", { msg: MsgResObject  ->
+            val key : String = msgService.storeMessage( msg )
 
-        hubConnection.on("ReceiveMessage", { message: MsgResObject  ->
-            val key : String = msgService.storeMessage( message )
-            msgService.retrieveMessages()
+            msgService.retrieveMessages( msg )
 
         }, String::class.java)
 

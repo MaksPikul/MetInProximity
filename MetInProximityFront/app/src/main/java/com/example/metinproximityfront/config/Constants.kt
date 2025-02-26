@@ -13,5 +13,14 @@ object Constants {
     val START_LOC_SERVICE = "start_location_service"
     val STOP_LOC_SERVICE = "stop_location_service"
 
+    val PUBLIC_CHAT_KEY = "public"
+
+    fun PRIVATE_CHAT_KEY (
+        userId : String,
+        recipientId: String?
+    ) : String {
+        return "private-${userId}-${recipientId}"
+    }
+
 }
 

@@ -5,7 +5,7 @@ namespace MetInProximityBack.Interfaces.IServices
 {
     public interface INotificationService
     {
-        List<Task> CreatePublicTasksAsync(MessageResponse msgRes, List<NearbyUserWithConnId> users);
+        Task RunPublicTasksAsync(MessageResponse msgRes, List<NearbyUserWithConnId> users);
         Task CreatePrivateTaskAsync(string recipientConnId, MessageResponse msgRes);
     }
 }

@@ -13,48 +13,51 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.metinproximityfront.app.ui.theme.MetInProximityFrontTheme
+import com.example.metinproximityfront.data.entities.users.ChatUser
+import com.example.metinproximityfront.data.enums.ScreenState
 import com.example.metinproximityfront.views.Chat.ChatView
 import com.example.metinproximityfront.views.Home.components.ProfileButton
 
 @Composable
 fun NestedHomeView (
     padding: PaddingValues,
-    currentScreen: String,
+    currentScreen: ScreenState,
+    currentChatUser : ChatUser?,
     drawerState: DrawerState,
     homeVm : HomeViewModel
 ) {
-
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(
-                    PaddingValues(
-                        start = 16.dp,
-                        top = padding.calculateTopPadding() + 16.dp,
-                        end = 16.dp,
-                        bottom = padding.calculateBottomPadding()
-                    )
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(
+                PaddingValues(
+                    start = 16.dp,
+                    top = padding.calculateTopPadding() + 16.dp,
+                    end = 16.dp,
+                    bottom = padding.calculateBottomPadding()
                 )
-                .background(color = Color.Red, shape = RoundedCornerShape(16.dp)),
-        ) {
-            ScreenManager(
-                currentScreen,
-                homeVm
             )
-            ProfileButton(drawerState)
-        }
+            .background(color = Color.Red, shape = RoundedCornerShape(16.dp)),
+    ) {
+        ScreenManager(
+            currentScreen,
+            homeVm,
+            currentChatUser
+        )
+        ProfileButton(drawerState)
+    }
 }
 
 @Composable
 fun ScreenManager(
-    currentScreen: String,
-    homeVm: HomeViewModel
+    currentScreen: ScreenState,
+    homeVm: HomeViewModel,
+    currentChatUser : ChatUser?
 ) {
-
     when (currentScreen) {
-        "Map" -> MapScreen()
-        "Chat" -> ChatView(homeVm, true)
+        ScreenState.MAP -> MapScreen()
+        ScreenState.PUBLIC -> ChatView(homeVm, null)
+        ScreenState.PRIVATE -> ChatView(homeVm, currentChatUser)
     }
 }
 

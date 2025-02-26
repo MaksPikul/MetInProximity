@@ -25,11 +25,9 @@ namespace MetInProximityBack.Controllers
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> GetAvailableForPrivateUserMsg(
-            [FromQuery(Name = "long")] double longitude,
-            [FromQuery(Name = "lat")] double latitude
-        )
-        {
-            List<NearbyUser> nearbyUsers = await _locService.GetNearbyUsersAsync(longitude, latitude, User.GetId());
+            [FromBody] LongLatObject locObj
+        ) {
+            List<NearbyUser> nearbyUsers = await _locService.GetNearbyUsersAsync(locObj.longitude, locObj.latitude, User.GetId());
 
             IEnumerable<NearbyUser> usersOpenToPrivate = nearbyUsers.Where(x => x.openToMessages == true);
 

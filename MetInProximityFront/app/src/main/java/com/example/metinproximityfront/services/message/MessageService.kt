@@ -1,18 +1,13 @@
 package com.example.metinproximityfront.services.message
 
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
-import android.content.SharedPreferences
-import android.os.IBinder
 import android.util.Log
 import com.example.metinproximityfront.binders.MessageLocationBinder
+import com.example.metinproximityfront.config.Constants
 import com.example.metinproximityfront.data.entities.location.LocationObject
-import com.example.metinproximityfront.data.entities.message.MsgReqObject
 import com.example.metinproximityfront.data.entities.message.MsgResObject
+import com.example.metinproximityfront.data.entities.users.ChatUser
 import com.example.metinproximityfront.data.repositories.MessageRepository
-import com.example.metinproximityfront.services.location.LocationService
+import com.example.metinproximityfront.factories.MessageFactory
 import com.example.metinproximityfront.services.preference.SharedStoreService
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -21,7 +16,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.util.Date
 
 class MessageService(
     private val sharedStore: SharedStoreService,
@@ -29,20 +23,16 @@ class MessageService(
     private val msgLocBinder : MessageLocationBinder,
 )
 {
-
-    private val _messages = MutableStateFlow<List<MsgResObject>>(emptyList()) // StateFlow for UI
+    // Ik this class be using the observer method someone
+    // Does it without the list of observers, signalR updater, message service observer
+    private val _messages = MutableStateFlow<List<MsgResObject>>( emptyList() ) // StateFlow for UI
     val messages: StateFlow<List<MsgResObject>> = _messages // Expose immutable StateFlow
-
-    init {
-        //startListening()
-        //retrieveMessages()
-    }
 
     fun storeMessage(msg : MsgResObject) : String{
 
-        var key = "public"/*-${msg.UserId}"*/
+        var key = Constants.PUBLIC_CHAT_KEY/*-${msg.UserId}"*/
         if (!msg.isPublic){
-            key = "private-${msg.UserId}-${msg.RecipientId}"
+            key = Constants.PRIVATE_CHAT_KEY(msg.UserId, msg.RecipientId)
         }
 
         val json = Gson().toJson(_messages.value + msg)
@@ -51,73 +41,63 @@ class MessageService(
         return key
     }
 
-    fun retrieveMessages() {
-        val json = sharedStore.getFromPref("public")
+    fun retrieveMessages(
+        latestMsg : MsgResObject? = null,
+        passedkey : String? = null
+    ) : List<MsgResObject> {
+        var key = passedkey
+
+        if (key == null) {
+            key = if (latestMsg?.isPublic == true && latestMsg?.RecipientId != null) {
+                Constants.PRIVATE_CHAT_KEY(latestMsg.UserId, latestMsg.RecipientId)
+            } else {
+                Constants.PUBLIC_CHAT_KEY
+            }
+        }
+
+        val json = sharedStore.getFromPref(
+            key
+        )
         val type = object : TypeToken<List<MsgResObject>>() {}.type
         val messagesList: List<MsgResObject> = Gson().fromJson(json, type) ?: emptyList()
 
         _messages.value = messagesList
+        return messagesList
     }
 
     fun sendMessage(
         textToSend : String,
-        //TODO : isPublic : Boolean - Currently only for public
+        chatUser : ChatUser? = null
     ) {
         try {
             CoroutineScope(Dispatchers.IO).launch {
-                //val locObj: LocationObject = locationService.GetCurrentLocation()
-                // that into this
-                Log.e("msg","in msgSer")
+
                 val locObj : LocationObject = msgLocBinder.getCurrentLocation()
 
-                val msgObj = MsgReqObject(
-                    Body = textToSend,
-                    Longitude = locObj.Longitude,
-                    Latitude = locObj.Latitude
+                var msgObj = MessageFactory.CreateMsg(
+                    textToSend,
+                    locObj.Longitude,
+                    locObj.Latitude,
+
                 )
-                Log.e("long", locObj.Longitude.toString())
-
-                val response: MsgResObject? = msgRepo?.SendMessage(msgObj)
-
-                /*
-                val response = MsgResObject(
-                    Body= textToSend,
-                    UserId = "2",
-                    true,
-                    "3",
-                    Date()
-                )
-                 */
-
-                Log.e("server respo", response.toString())
-                response?.let { msg ->
-                    storeMessage(msg)
+                var result: MsgResObject? = null
+                if (chatUser == null) {
+                    result = msgRepo?.SendPublicMessageRepo(msgObj)
                 }
-                retrieveMessages() // this changes UI?
+                else {
+                    msgObj.recipientId = chatUser.Id
+                    result = msgRepo?.SendPrivateMessageRepo(msgObj)
+                }
+
+                result?.let { msg ->
+                    storeMessage(msg)
+
+                    retrieveMessages(msg)
+                }
             }
         }
         catch (ex : Throwable) {
             Log.e("location error", ex.message.toString())
         }
     }
-
-    val preferenceChangeListener =
-        SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key == "public") {
-                retrieveMessages()
-            }
-        }
-
-    fun startListening() {
-        sharedStore.
-        sharedPreferences.
-        registerOnSharedPreferenceChangeListener(preferenceChangeListener)
-    }
-
-    fun stopListening() {
-        sharedStore.
-        sharedPreferences.
-        unregisterOnSharedPreferenceChangeListener(preferenceChangeListener)
-    }
-
 }

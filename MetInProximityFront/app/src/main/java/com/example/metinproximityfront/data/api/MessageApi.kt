@@ -13,7 +13,6 @@ interface MessageApi {
 
     @POST("message/public")
     suspend fun SendPublicMessage(
-        // THIS NEEDS CHANGING TO A BODY
         @Body() msgObj: MsgReqObject,
         @Header("Authorization") authHeader: String
     ) : Response<MsgResObject>

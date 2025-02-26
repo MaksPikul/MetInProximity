@@ -13,6 +13,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.metinproximityfront.app.ui.theme.MetInProximityFrontTheme
+import com.example.metinproximityfront.config.Constants
+import com.example.metinproximityfront.data.entities.users.ChatUser
+import com.example.metinproximityfront.data.enums.LoadingState
+import com.example.metinproximityfront.data.enums.ScreenState
 import com.example.metinproximityfront.views.Home.components.BottomNavBar
 import com.example.metinproximityfront.views.Home.components.PrivateChatListSheet
 import com.example.metinproximityfront.views.Home.components.ProfileDrawerContent
@@ -26,24 +30,48 @@ fun HomeView(
 ) {
 
     // TODO : will need to create a view model which Holds states
-    var currentScreenState by remember { mutableStateOf("Chat") }
+    var currentScreenState by remember { mutableStateOf(ScreenState.MAP) }
 
-    var drawerState = rememberDrawerState(DrawerValue.Closed)
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
 
     var showBottomSheet by remember { mutableStateOf(false) }
+
+    var privUsersLoadState by remember { mutableStateOf(LoadingState.READY) }
+    var currentChatUser by remember { mutableStateOf<ChatUser?>(null) }
 
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = false,
     )
 
-    var changeSheetState = {
+    val changeSheetState = {
+        if (showBottomSheet == false){
+            privUsersLoadState = LoadingState.LOADING
+            homeVm.userActionService.getPrivateUsers()
+            privUsersLoadState = LoadingState.READY
+        }
+
         showBottomSheet = !showBottomSheet
+    }
+
+    val changeScreen : (ScreenState, ChatUser?) -> Unit = { newScreen, newChatUser ->
+        var key = Constants.PUBLIC_CHAT_KEY
+        if (newChatUser != null){
+            key = Constants.PRIVATE_CHAT_KEY("MY USER ID", newChatUser.Id)
+            currentChatUser = newChatUser
+        }
+        showBottomSheet = false
+        if (newScreen != ScreenState.MAP){
+            homeVm.msgService.retrieveMessages(passedkey = key)
+        }
+        currentScreenState = newScreen
     }
 
     PrivateChatListSheet(
         showBottomSheet,
         sheetState,
         changeSheetState,
+        changeScreen,
+        privUsersLoadState,
         homeVm
     )
 
@@ -51,10 +79,14 @@ fun HomeView(
         drawerState = drawerState,
         content = {
             Scaffold (
-                bottomBar = { BottomNavBar(changeSheetState) },
+                bottomBar = { BottomNavBar(
+                    changeSheetState,
+                    changeScreen
+                ) },
                 content= {padding -> NestedHomeView(
                     padding,
                     currentScreenState,
+                    currentChatUser,
                     drawerState,
                     homeVm
                 )}
@@ -71,4 +103,9 @@ fun GreetingPreview2() {
     MetInProximityFrontTheme {
         // HomeView(HomeViewModel(), {})
     }
+}
+
+@Composable
+fun TESTHomeView(){
+
 }

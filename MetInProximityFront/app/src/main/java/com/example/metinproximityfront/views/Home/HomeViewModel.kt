@@ -9,11 +9,13 @@ import com.example.metinproximityfront.config.Constants
 import com.example.metinproximityfront.data.remote.ApiTokenWrapper
 import com.example.metinproximityfront.data.repositories.LocationRepo
 import com.example.metinproximityfront.data.repositories.MessageRepository
+import com.example.metinproximityfront.data.repositories.UserActionRepo
 import com.example.metinproximityfront.services.location.LocationService
 import com.example.metinproximityfront.services.message.MessageService
 import com.example.metinproximityfront.services.message.SignalRMsgReceiver
 import com.example.metinproximityfront.services.preference.IStoreService
 import com.example.metinproximityfront.services.preference.SharedStoreService
+import com.example.metinproximityfront.services.userAction.UserActionService
 
 class HomeViewModel(
     private val app : Application,
@@ -22,17 +24,14 @@ class HomeViewModel(
 ){
 
     private val storeService : IStoreService
-
-
     private val signalRMsgReceiver : SignalRMsgReceiver
+    private val msgLocBinder : MessageLocationBinder
 
     private val msgRepo : MessageRepository
     val msgService : MessageService
 
-    /*
     private val userActionRepo : UserActionRepo
     val userActionService : UserActionService
-     */
 
     init {
         this.storeService = SharedStoreService(
@@ -45,8 +44,8 @@ class HomeViewModel(
             navController
         )
 
-        val msgLocBinder = MessageLocationBinder(app.applicationContext)
-        msgLocBinder.bindLocationService()
+        this.msgLocBinder = MessageLocationBinder(app.applicationContext)
+        this.msgLocBinder.bindLocationService()
 
         this.msgService = MessageService(
             this.storeService,
@@ -59,10 +58,15 @@ class HomeViewModel(
             encryptedStoreService
         )
 
-        /*
-        this.userActionRepo = UserActionRepo()
-        this.userActionService = UserActionService()
-         */
+        this.userActionRepo = UserActionRepo(
+            ApiTokenWrapper(encryptedStoreService),
+            navController
+        )
+        this.userActionService = UserActionService(
+            this.userActionRepo,
+            msgLocBinder,
+        )
+
     }
 
     fun startServices() {

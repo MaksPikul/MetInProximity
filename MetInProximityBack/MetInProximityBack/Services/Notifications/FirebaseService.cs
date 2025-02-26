@@ -58,7 +58,6 @@ namespace MetInProximityBack.Services.Notifications
 
         private FcmPayload CreateFcmPayload(string fcmToken, MessageResponse msgRes)
         {
-
             var payload = new FcmPayload(fcmToken, msgRes);
 
             return payload;

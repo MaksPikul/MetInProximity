@@ -35,13 +35,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.metinproximityfront.data.entities.message.MsgResObject
-import com.example.metinproximityfront.services.preference.EncryptedStoreService
+import com.example.metinproximityfront.data.entities.users.ChatUser
 import com.example.metinproximityfront.views.Home.HomeViewModel
 
 @Composable
 fun ChatView(
     homeVm: HomeViewModel,
-    privateUser : Boolean = false
+    chatUser: ChatUser?
 ) {
     val messages by homeVm.msgService.messages.collectAsState()
 
@@ -50,8 +50,8 @@ fun ChatView(
 
     val onMsgSend = {
         try {
-            Log.e("chat", "attemps messsage?")
-            homeVm.msgService.sendMessage(text)
+            Log.e("chat", "attempts messsage?")
+            homeVm.msgService.sendMessage(text, chatUser)
             text = ""
         }
         catch (ex : Throwable) {
@@ -65,7 +65,7 @@ fun ChatView(
             .fillMaxSize()
             .background(Color.Green, RoundedCornerShape(8.dp))
     ) {
-        ChatHeader(privateUser)
+        //ChatHeader(privateUser)
 
         LazyColumn(
             state = listState,
