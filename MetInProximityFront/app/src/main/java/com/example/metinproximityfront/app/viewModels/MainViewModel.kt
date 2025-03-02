@@ -1,16 +1,18 @@
-package com.example.metinproximityfront.views.Home
+package com.example.metinproximityfront.app.viewModels
 
 import android.app.Application
 import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.navigation.NavHostController
-import com.example.metinproximityfront.binders.MessageLocationBinder
+import com.example.metinproximityfront.binders.LocationBinder
 import com.example.metinproximityfront.config.Constants
 import com.example.metinproximityfront.data.remote.ApiTokenWrapper
+import com.example.metinproximityfront.data.repositories.MapRepository
 import com.example.metinproximityfront.data.repositories.MessageRepository
 import com.example.metinproximityfront.data.repositories.UserActionRepo
 import com.example.metinproximityfront.services.location.LocationService
+import com.example.metinproximityfront.services.map.MapService
 import com.example.metinproximityfront.services.message.MessageService
 import com.example.metinproximityfront.services.message.SignalRMsgReceiver
 import com.example.metinproximityfront.services.preference.EncryptedStoreService
@@ -28,7 +30,7 @@ class MainViewModel(
         Constants.MsgSharedStoreServiceFileName
     )
 
-    private val msgLocBinder : MessageLocationBinder = MessageLocationBinder(app.applicationContext)
+    private val locBinder : LocationBinder = LocationBinder(app.applicationContext)
 
     var navController : NavHostController = NavHostController(app.applicationContext)
 
@@ -40,7 +42,7 @@ class MainViewModel(
     val msgService : MessageService = MessageService(
         this.storeService,
         this.msgRepo,
-        msgLocBinder,
+        locBinder,
     )
 
     private val signalRMsgReceiver : SignalRMsgReceiver = SignalRMsgReceiver(
@@ -54,11 +56,17 @@ class MainViewModel(
     )
     val userActionService : UserActionService = UserActionService(
         this.userActionRepo,
-        msgLocBinder,
+        locBinder,
+    )
+
+    val mapService : MapService = MapService(
+        locBinder
     )
 
     init {
-        this.msgLocBinder.bindLocationService()
+        this.locBinder.bindLocationService()
+
+        this.locBinder.registerObserver(mapService)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             if (destination.route == "Login") {

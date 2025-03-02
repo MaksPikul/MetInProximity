@@ -71,6 +71,7 @@ dependencies {
     implementation("com.microsoft.signalr:signalr:9.0.1")
     implementation("com.auth0:java-jwt:4.4.0")
 
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.android.gms:play-services-location:20.0.0")
 
     implementation(libs.androidx.core.ktx)
@@ -83,6 +84,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.play.services.location)
+    implementation(libs.volley)
     //implementation(libs.androidx.security.crypto.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

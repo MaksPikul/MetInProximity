@@ -1,8 +1,7 @@
 package com.example.metinproximityfront.services.userAction
 
-import com.example.metinproximityfront.binders.MessageLocationBinder
+import com.example.metinproximityfront.binders.LocationBinder
 import com.example.metinproximityfront.data.entities.location.LocationObject
-import com.example.metinproximityfront.data.entities.message.MsgResObject
 import com.example.metinproximityfront.data.entities.users.ChatUser
 import com.example.metinproximityfront.data.repositories.UserActionRepo
 import kotlinx.coroutines.CoroutineScope
@@ -13,7 +12,7 @@ import kotlinx.coroutines.launch
 
 class UserActionService(
     private val userActionRepo: UserActionRepo,
-    private val msgLocBinder : MessageLocationBinder
+    private val msgLocBinder : LocationBinder
 ) {
     private var _visibility = MutableStateFlow(false)
     val visibility : StateFlow<Boolean> = _visibility

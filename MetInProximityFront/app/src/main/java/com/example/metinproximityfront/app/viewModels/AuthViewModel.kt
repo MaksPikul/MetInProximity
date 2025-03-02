@@ -1,17 +1,13 @@
-package com.example.metinproximityfront.app
+package com.example.metinproximityfront.app.viewModels
 
 import android.app.Application
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
-import androidx.navigation.NavController
 import com.example.metinproximityfront.data.repositories.AccountRepository
-import com.example.metinproximityfront.factories.OAuthProviderFactory
 import com.example.metinproximityfront.services.permissions.PermissionManager
 import com.example.metinproximityfront.services.auth.AuthService
 import com.example.metinproximityfront.services.auth.IAuthService
-import com.example.metinproximityfront.services.preference.IStoreService
-import com.example.metinproximityfront.views.Home.MainViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,7 +23,6 @@ class AuthViewModel(
 
     val accountRepo: AccountRepository
     val authService : IAuthService
-    val oAuthProviderFactory : OAuthProviderFactory
 
     // https://developer.android.com/kotlin/flow/stateflow-and-sharedflow
     private val _isLoading = MutableStateFlow(false)
@@ -46,7 +41,6 @@ class AuthViewModel(
             this.accountRepo
         )
 
-        this.oAuthProviderFactory = OAuthProviderFactory()
     }
 
     fun startLoadingView(){

@@ -1,7 +1,7 @@
 package com.example.metinproximityfront.services.message
 
 import android.util.Log
-import com.example.metinproximityfront.binders.MessageLocationBinder
+import com.example.metinproximityfront.binders.LocationBinder
 import com.example.metinproximityfront.config.Constants
 import com.example.metinproximityfront.data.entities.location.LocationObject
 import com.example.metinproximityfront.data.entities.message.MsgResObject
@@ -9,7 +9,6 @@ import com.example.metinproximityfront.data.entities.users.ChatUser
 import com.example.metinproximityfront.data.repositories.MessageRepository
 import com.example.metinproximityfront.factories.MessageFactory
 import com.example.metinproximityfront.services.preference.IStoreService
-import com.example.metinproximityfront.services.preference.SharedStoreService
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.CoroutineScope
@@ -21,23 +20,20 @@ import kotlinx.coroutines.launch
 class MessageService(
     private val sharedStore: IStoreService,
     private val msgRepo: MessageRepository? = null,
-    private val msgLocBinder : MessageLocationBinder,
+    private val msgLocBinder : LocationBinder,
 )
 {
     // Ik this class be using the observer method someone
     // Does it without the list of observers, signalR updater, message service observer
-    private val _messages = MutableStateFlow<List<MsgResObject>>( emptyList() ) // StateFlow for UI
+    private val _messages = MutableStateFlow<List<MsgResObject>>(emptyList()) // StateFlow for UI
     val messages: StateFlow<List<MsgResObject>> = _messages // Expose immutable StateFlow
 
-
-
-    fun storeMessage(msg : MsgResObject) : String{
+    fun storeMessage(msg: MsgResObject): String {
 
         var key = Constants.PUBLIC_CHAT_KEY/*-${msg.UserId}"*/
-        if (!msg.isPublic){
-            key = Constants.PRIVATE_CHAT_KEY(msg.UserId, msg.RecipientId)
+        if (!msg.isPublic) {
+            key = Constants.PRIVATE_CHAT_KEY(msg.userId, msg.recipientId)
         }
-
         val json = Gson().toJson(_messages.value + msg)
         sharedStore.saveIntoPref(key, json)
 
@@ -45,20 +41,20 @@ class MessageService(
     }
 
     fun retrieveMessages(
-        latestMsg : MsgResObject? = null,
-        passedkey : String? = null
-    ) : List<MsgResObject> {
+        latestMsg: MsgResObject? = null,
+        passedkey: String? = null
+    ): List<MsgResObject> {
         var key = passedkey
 
         if (key == null) {
-            key = if (latestMsg?.isPublic == true && latestMsg?.RecipientId != null) {
-                Constants.PRIVATE_CHAT_KEY(latestMsg.UserId, latestMsg.RecipientId)
+            key = if (latestMsg?.isPublic != true && latestMsg?.recipientId != null) {
+                Constants.PRIVATE_CHAT_KEY(latestMsg.userId, latestMsg.recipientId)
             } else {
                 Constants.PUBLIC_CHAT_KEY
             }
         }
-
         val json = sharedStore.getFromPref(key)
+        Log.i("Retrieve", json.toString())
         if (json.isNullOrEmpty()) {
             // Handle the case where json is null or empty
             _messages.value = emptyList() // You can return empty list as a fallback
@@ -73,36 +69,36 @@ class MessageService(
     }
 
     fun sendMessage(
-        textToSend : String,
-        chatUser : ChatUser? = null
+        textToSend: String,
+        chatUser: ChatUser? = null
     ) {
         try {
             CoroutineScope(Dispatchers.IO).launch {
 
-                val locObj : LocationObject = msgLocBinder.getCurrentLocation()
+                val locObj: LocationObject = msgLocBinder.getCurrentLocation()
 
-                var msgObj = MessageFactory.CreateMsg(
+                val msgObj = MessageFactory.CreateMsg(
                     textToSend,
-                    locObj.Longitude,
-                    locObj.Latitude,
+                    locObj.lon,
+                    locObj.lat,
                 )
-                var result: MsgResObject? = null
+
+                val result: MsgResObject?
                 if (chatUser == null) {
                     result = msgRepo?.SendPublicMessageRepo(msgObj)
-                }
-                else {
+                } else {
                     msgObj.recipientId = chatUser.Id
                     result = msgRepo?.SendPrivateMessageRepo(msgObj)
                 }
 
                 result?.let { msg ->
+                    Log.i("SendMessage", msg.body)
                     storeMessage(msg)
 
                     retrieveMessages(msg)
                 }
             }
-        }
-        catch (ex : Throwable) {
+        } catch (ex: Throwable) {
             Log.e("location error", ex.message.toString())
         }
     }

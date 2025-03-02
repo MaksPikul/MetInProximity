@@ -51,7 +51,7 @@ class PermissionManager {
         logPermissionsStatus(context)
     }
 
-    private fun logPermissionsStatus(context: Context) {
+     fun logPermissionsStatus(context: Context) {
         Log.e("Permissions", "Fine location granted: ${ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED}")
         Log.e("Permissions", "Coarse location granted: ${ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED}")
         Log.e("Permissions", "Background location granted: ${ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED}")

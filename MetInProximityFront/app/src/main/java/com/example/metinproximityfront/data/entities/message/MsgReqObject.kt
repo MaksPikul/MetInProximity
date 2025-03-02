@@ -1,8 +1,8 @@
 package com.example.metinproximityfront.data.entities.message
 
 data class MsgReqObject(
-    val Body : String,
-    val Longitude : Double,
-    val Latitude : Double,
+    val body : String,
+    val longitude : Double,
+    val latitude : Double,
     var recipientId : String?
 )

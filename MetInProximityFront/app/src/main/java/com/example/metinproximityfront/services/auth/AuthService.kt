@@ -132,7 +132,6 @@ class AuthService(
 
         this.loginAuthService?.dispose()
         this.loginAuthService = null
-
     }
 
     override fun Logout(
@@ -158,9 +157,9 @@ class AuthService(
         we could check here if the refresh token is expired, to save on resources, a design decision for later :D
     */
     override fun IsLoggedIn() : Boolean {
-        val accessToken = Constants.ACCESS_TOKEN_KEY
+        val accessTokenKey = Constants.ACCESS_TOKEN_KEY
 
-        val isEmpty = this.prefStore.getFromPref(accessToken) != ""
+        val isEmpty = this.prefStore.getFromPref(accessTokenKey) != ""
         //val isExpired = this
         return isEmpty
     }
@@ -186,8 +185,8 @@ class AuthService(
         withContext(Dispatchers.Main) {
             if (authResult.isSuccessful) {
 
-                Log.i("access", authResult.accessToken.toString(),)
-                Log.i("refresh", authResult.refreshToken.toString(),)
+                Log.i("access", authResult.accessToken.toString())
+                Log.i("refresh", authResult.refreshToken.toString())
                 // Saving tokens into Encrypted Shared Preferences
                 storeTokens(
                     authResult.accessToken.toString(),
@@ -229,7 +228,8 @@ class AuthService(
 
         return AuthorizationService(
             appContext,
-            appAuthConfiguration)
+            appAuthConfiguration
+        )
     }
 
     private fun storeTokens (

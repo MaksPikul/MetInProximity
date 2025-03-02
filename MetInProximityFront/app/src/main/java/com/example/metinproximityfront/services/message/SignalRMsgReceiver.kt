@@ -47,11 +47,12 @@ class SignalRMsgReceiver(
 
     private fun defineHubMethods() {
         hubConnection.on("ReceiveMessage", { msg: MsgResObject  ->
+            Log.i("SIGNALR_MSG", "GETS OBJECT")
             val key : String = msgService.storeMessage( msg )
 
             msgService.retrieveMessages( msg )
 
-        }, String::class.java)
+        }, MsgResObject::class.java)
 
         // TDOO : Place holder for now, Show UI error if user cannot connect
         hubConnection?.onClosed { exception ->

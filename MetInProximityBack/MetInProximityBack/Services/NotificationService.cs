@@ -54,6 +54,7 @@ namespace MetInProximityBack.Services
         {
             try
             {
+                Console.WriteLine("sumting wong" + userConnectionId + openToMessages);
                 if (userConnectionId != null && openToMessages)
                 {
                     await _srService.SendNotification(userConnectionId, msgRes);

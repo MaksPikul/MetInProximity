@@ -7,14 +7,19 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
+import android.util.Base64
 import androidx.core.app.NotificationCompat
 import com.example.metinproximityfront.config.Constants
-import com.example.metinproximityfront.data.remote.ApiTokenWrapper
+import com.example.metinproximityfront.data.entities.location.LocResObj
 import com.example.metinproximityfront.data.entities.location.LocationObject
+import com.example.metinproximityfront.data.remote.ApiTokenWrapper
 import com.example.metinproximityfront.data.repositories.LocationRepo
+import com.example.metinproximityfront.interfaces.LocObserver
 import com.example.metinproximityfront.services.preference.EncryptedStoreService
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.CoroutineScope
@@ -23,6 +28,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+
 
 class LocationService: Service() {
 
@@ -33,16 +39,17 @@ class LocationService: Service() {
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
+    // theres gonna be like one in this list
+    private val observers: MutableList<LocObserver> = ArrayList()
+
     override fun onCreate() {
         super.onCreate()
-
 
         locationRepo = LocationRepo(
             ApiTokenWrapper(
                 EncryptedStoreService(applicationContext)
             )
         )
-
 
         locationClient = LocationClient(
             applicationContext,
@@ -52,7 +59,6 @@ class LocationService: Service() {
 
     // This Changed, Looks Cleaner
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-
         when(intent?.action) {
             Constants.START_LOC_SERVICE -> start()
             Constants.STOP_LOC_SERVICE -> stopSelf()
@@ -71,7 +77,20 @@ class LocationService: Service() {
             .getLocationUpdates()
             .catch { e -> e.printStackTrace() }
             .onEach{ location ->
-                locationRepo.UpdateUserLocation(location)
+
+                // logic to check if i need to fetch more map data or not
+
+                val result : LocResObj? = locationRepo.UpdateUserLocationRepo(location)
+
+                result?.mapImage?.let { mapImage ->
+                    val mapImageBase64: String? = mapImage
+                    val decodedString: ByteArray = Base64.decode(mapImageBase64, Base64.DEFAULT)
+                    val mapBitmap : Bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+
+                    observers.forEach {
+                        it.updateLocation(mapBitmap)
+                    }
+                }
             }
             .launchIn(serviceScope)
 
@@ -83,6 +102,14 @@ class LocationService: Service() {
 
     override fun onBind(intent: Intent?): IBinder? {
         return binder
+    }
+
+    fun registerObserver(observer: LocObserver) {
+        observers.add(observer)
+    }
+
+    fun unregisterObserver(observer: LocObserver) {
+        observers.remove(observer)
     }
 
     suspend fun GetCurrentLocation() : LocationObject {

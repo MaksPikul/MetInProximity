@@ -9,11 +9,12 @@ import androidx.activity.viewModels
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.metinproximityfront.app.viewModels.AuthViewModel
+import com.example.metinproximityfront.app.viewModels.HomeViewModel
+import com.example.metinproximityfront.app.viewModels.MainViewModel
 import com.example.metinproximityfront.services.permissions.PermissionListener
 import com.example.metinproximityfront.ui.theme.MetInProximityFrontTheme
 import com.example.metinproximityfront.views.Home.HomeView
-import com.example.metinproximityfront.views.Home.HomeViewModel
-import com.example.metinproximityfront.views.Home.MainViewModel
 import com.example.metinproximityfront.views.loading.LoadingView
 import com.example.metinproximityfront.views.Login.LoginView
 
@@ -68,12 +69,13 @@ class MainActivity : ComponentActivity() {
         )
 
         this.homeVm = HomeViewModel(
-            application,
             mainVm.userActionService,
+            mainVm.mapService,
             mainVm.msgService
         )
 
         this.authVm.permissionManager.checkPermissions(this, permissionListener)
+        this.authVm.permissionManager.logPermissionsStatus(this)
 
         this.createViews()
 
@@ -89,12 +91,10 @@ class MainActivity : ComponentActivity() {
                 NavHost(
                     navController = nc,
                     // instead of this, check for tokens, if present, run InitAndMoveToHome
-                    startDestination = "Home"
+                    startDestination = "Loading"
                 ) {
-                    // TODO: Blank Composable? for when loading
                     composable("Login") {
                     LoginView(
-                        providers = this@MainActivity.authVm.oAuthProviderFactory.getProviders(),
                         // This looks hella complicated, but its very nice
                         // pass 1 parameter here, pass a second parameter in login view
                         StartLogin = { provider ->
@@ -114,7 +114,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                //this.CheckLoginStatus()
+                this.CheckLoginStatus()
             }
         }
     }

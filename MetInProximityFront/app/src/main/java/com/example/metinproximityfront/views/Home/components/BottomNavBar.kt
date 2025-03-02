@@ -14,10 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.example.metinproximityfront.data.entities.users.ChatUser
 import com.example.metinproximityfront.data.enums.ScreenState
-import com.example.metinproximityfront.views.Home.HomeViewModel
-import com.example.metinproximityfront.views.Home.HomeVmState
+import com.example.metinproximityfront.app.viewModels.HomeViewModel
 
 @Composable
 fun BottomNavBar(

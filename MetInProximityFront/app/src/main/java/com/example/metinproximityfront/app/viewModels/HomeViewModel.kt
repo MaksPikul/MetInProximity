@@ -1,4 +1,4 @@
-package com.example.metinproximityfront.views.Home
+package com.example.metinproximityfront.app.viewModels
 
 import android.app.Application
 import androidx.lifecycle.ViewModel
@@ -11,15 +11,22 @@ import com.example.metinproximityfront.config.Constants
 import com.example.metinproximityfront.data.entities.users.ChatUser
 import com.example.metinproximityfront.data.enums.LoadingState
 import com.example.metinproximityfront.data.enums.ScreenState
+import com.example.metinproximityfront.services.map.MapService
 import com.example.metinproximityfront.services.message.MessageService
 import com.example.metinproximityfront.services.userAction.UserActionService
-import org.mockito.Mockito.*
-import org.mockito.Mockito.mock
 
+
+data class HomeVmState (
+    val currentScreen: ScreenState = ScreenState.MAP,
+    val botSheetVisible: Boolean = false,
+    val loadingState: LoadingState = LoadingState.READY,
+    val currentChatUser: ChatUser? = null,
+    val drawerState: DrawerState = DrawerState(DrawerValue.Closed),
+)
 
 class HomeViewModel(
-    private val app: Application,
     val userActionService : UserActionService,
+    val mapService: MapService,
     val msgService: MessageService
 ) : ViewModel() {
     private val _uiState = mutableStateOf(HomeVmState())
@@ -55,11 +62,3 @@ class HomeViewModel(
     }
 
 }
-
-data class HomeVmState (
-    val currentScreen: ScreenState = ScreenState.MAP,
-    val botSheetVisible: Boolean = false,
-    val loadingState: LoadingState = LoadingState.READY,
-    val currentChatUser: ChatUser? = null,
-    val drawerState: DrawerState = DrawerState(DrawerValue.Closed),
-)

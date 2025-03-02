@@ -1,15 +1,16 @@
 ﻿using MetInProximityBack.Constants;
 using MetInProximityBack.Extensions;
 using MetInProximityBack.Interfaces.IRepos;
+using MetInProximityBack.Repositories;
 using Microsoft.AspNetCore.SignalR;
 
 namespace MetInProximityBack.Hubs
 {
     public class ChatHub(
-        ICacheRepo cache
-        ) : Hub
+        RedisCacheRepo cache
+    ) : Hub
     {
-        private readonly ICacheRepo _cacheService = cache;
+        private readonly RedisCacheRepo _cacheService = cache;
 
         public override async Task OnConnectedAsync()
         {

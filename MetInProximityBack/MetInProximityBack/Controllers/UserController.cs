@@ -12,7 +12,7 @@ namespace MetInProximityBack.Controllers
 {
     [Route("api/user")]
     [ApiController]
-    public class UserActionController(
+    public class UserController(
         MessageService locService,
         AuthTokenService authTokenService,
         AppDbContext appDbContext
@@ -25,7 +25,7 @@ namespace MetInProximityBack.Controllers
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> GetAvailableForPrivateUserMsg(
-            [FromBody] LongLatObject locObj
+            [FromBody] LonLatObject locObj
         ) {
             List<NearbyUser> nearbyUsers = await _locService.GetNearbyUsersAsync(locObj.longitude, locObj.latitude, User.GetId());
 

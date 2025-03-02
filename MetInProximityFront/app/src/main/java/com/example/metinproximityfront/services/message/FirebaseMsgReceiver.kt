@@ -58,11 +58,11 @@ class FirebaseMsgReceiver : FirebaseMessagingService() {
     ) : MsgResObject{
 
         return MsgResObject(
-            Body = message.data.get("Body") ?: "",
-            UserId = message.data.get("UserId") ?: "", // owner of message
+            body = message.data.get("Body") ?: "",
+            userId = message.data.get("UserId") ?: "", // owner of message
             isPublic = message.data.get("isPublic").toBoolean(),
-            RecipientId = message.data.get("RecipientId"),
-            Timestamp = Date() // Parse Date From String
+            recipientId = message.data.get("RecipientId"),
+            timestamp = Date() // Parse Date From String
         )
     }
 

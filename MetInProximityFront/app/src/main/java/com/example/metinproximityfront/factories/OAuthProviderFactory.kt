@@ -4,7 +4,7 @@ import com.example.metinproximityfront.config.oauth.GoogleOAuthConfig
 import com.example.metinproximityfront.config.oauth.MicrosoftOAuthConfig
 import com.example.metinproximityfront.config.oauth.OAuthConfig
 
-class OAuthProviderFactory {
+object OAuthProviderFactory {
 
     private val providers: List<OAuthConfig>
 

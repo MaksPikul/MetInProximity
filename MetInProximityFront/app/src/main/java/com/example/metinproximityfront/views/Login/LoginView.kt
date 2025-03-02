@@ -20,11 +20,11 @@ import androidx.compose.ui.unit.dp
 import com.example.metinproximityfront.config.oauth.GoogleOAuthConfig
 import com.example.metinproximityfront.config.oauth.MicrosoftOAuthConfig
 import com.example.metinproximityfront.config.oauth.OAuthConfig
+import com.example.metinproximityfront.factories.OAuthProviderFactory
 
 
 @Composable
 fun LoginView(
-    providers : List<OAuthConfig>,
     StartLogin: (provider: OAuthConfig) -> Unit,
 ){
     Box(
@@ -32,13 +32,8 @@ fun LoginView(
             .fillMaxWidth()
             .fillMaxHeight()
             .background(
-                Brush.linearGradient(
-                    colors = listOf(Color.White, Color.Black),
-                    start = androidx.compose.ui.geometry.Offset(0f, 0f), // Top-left corner
-                    end = androidx.compose.ui.geometry.Offset(
-                        1500F,//Float.POSITIVE_INFINITY,
-                        1500F//Float.POSITIVE_INFINITY
-                    ) // Bottom-right
+                Brush.verticalGradient(
+                    colors = listOf(Color.White, Color.Black) // Gradient from Red to Blue
                 )
             )
     ) {
@@ -50,7 +45,7 @@ fun LoginView(
             verticalArrangement = Arrangement.Center
         ) {
 
-            providers.forEach { provider ->
+            OAuthProviderFactory.getProviders().forEach { provider ->
                 Button(
                     onClick = { StartLogin(provider) },
                 ) {
@@ -70,6 +65,6 @@ fun SimpleComposablePreview() {
         MicrosoftOAuthConfig()
     )
 
-    LoginView (providers = list, {})
+    LoginView ({})
 }
 

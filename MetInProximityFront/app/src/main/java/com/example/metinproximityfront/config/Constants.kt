@@ -19,7 +19,7 @@ object Constants {
         userId : String,
         recipientId: String?
     ) : String {
-        return "private-${userId}-${recipientId}"
+        return "private-${recipientId}"
     }
 
 }

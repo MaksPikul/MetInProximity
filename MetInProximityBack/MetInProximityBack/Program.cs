@@ -148,12 +148,14 @@ builder.Services.AddScoped<IOAuthService, OAuthService>();
 builder.Services.AddScoped<AuthTokenService>();
 
 builder.Services.AddScoped<IMessageService, MessageService>();
-builder.Services.AddScoped<ICacheRepo, RedisCacheRepo>();
+builder.Services.AddScoped<RedisCacheRepo>();
 builder.Services.AddScoped<CosmoLocationRepo>();
 
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<FirebaseService>();
 builder.Services.AddScoped<SignalRService>();
+
+builder.Services.AddScoped<MapService>();
 
 builder.Services.AddTransient<OAuthProviderFactory>();
 builder.Services.AddTransient<IOAuthProvider, GoogleOAuthProvider>();

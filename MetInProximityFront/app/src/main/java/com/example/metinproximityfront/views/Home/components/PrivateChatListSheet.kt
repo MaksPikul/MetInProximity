@@ -19,10 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.metinproximityfront.data.entities.users.ChatUser
-import com.example.metinproximityfront.data.enums.LoadingState
 import com.example.metinproximityfront.data.enums.ScreenState
-import com.example.metinproximityfront.views.Home.HomeViewModel
-import com.example.metinproximityfront.views.Home.MainViewModel
+import com.example.metinproximityfront.app.viewModels.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

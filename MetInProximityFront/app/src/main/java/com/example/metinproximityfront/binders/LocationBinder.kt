@@ -7,13 +7,14 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
 import com.example.metinproximityfront.data.entities.location.LocationObject
+import com.example.metinproximityfront.interfaces.LocObserver
 import com.example.metinproximityfront.services.location.LocationService
 
 
 /*
     https://developer.android.com/develop/background-work/services/bound-services
  */
-class MessageLocationBinder (private val context: Context) {
+class LocationBinder (private val context: Context) {
 
     private var locationService: LocationService? = null
     private var isBound = false
@@ -47,4 +48,10 @@ class MessageLocationBinder (private val context: Context) {
     suspend fun getCurrentLocation(): LocationObject {
         return locationService?.GetCurrentLocation()!!
     }
+
+    fun registerObserver(locObserver: LocObserver) {
+        locationService?.registerObserver(locObserver)
+    }
+
+
 }
