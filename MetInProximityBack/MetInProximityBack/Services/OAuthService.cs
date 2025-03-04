@@ -5,6 +5,8 @@ using MetInProximityBack.Interfaces.IServices;
 
 namespace MetInProximityBack.Services
 {
+    [Obsolete("Class is unneccassry, this functionality is fufilled in the android app")]
+    // Put alot of work and thought into this, feel bad deleting 
     public class OAuthService : IOAuthService
     {
         private readonly HttpClient _httpClient;
@@ -36,9 +38,7 @@ namespace MetInProximityBack.Services
 
             return tokens;
         }
-
-        /*
-         * This may be neccessary later, not now tho cause we get user from Id_Token, Not through api resource call
+       
         public async Task<HttpResponseMessage> GetUserAsResponse(
             string url,
             string accessToken
@@ -58,6 +58,5 @@ namespace MetInProximityBack.Services
 
             return response;
         }
-        */
     }
 }

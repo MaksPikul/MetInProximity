@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using MetInProximityBack.Types.Location;
 using System.Net;
 using Newtonsoft.Json;
+using Metin.IntergrationTests.SetupFiles;
 
 
 // https://learn.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-9.0
@@ -11,7 +12,7 @@ namespace MetInProximityBack.Tests.ControllerTests
 { 
 
     // IN PRODUCTION, WILL NEED TO USE A CUSTOM TEST SERVER, 
-    public class LocationTEST : IClassFixture<WebApplicationFactory<Program>>
+    public class LocationTEST : IClassFixture<CustomWebAppFactory>
     {
 
         private readonly HttpClient _client;
@@ -20,7 +21,7 @@ namespace MetInProximityBack.Tests.ControllerTests
         private bool open;
         private string userId;
 
-        public LocationTEST(WebApplicationFactory<Program> factory)
+        public LocationTEST(CustomWebAppFactory factory)
         {
 
             _client = factory.CreateClient();
@@ -28,6 +29,15 @@ namespace MetInProximityBack.Tests.ControllerTests
             userId = "DOG-id-123";
 
         }
+
+
+
+
+
+
+
+
+
 
         [Fact]
         public async Task TEST_PutUserLocation_ShouldSucceed()

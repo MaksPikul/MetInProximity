@@ -42,13 +42,4 @@ class AccountRepository {
             AuthResult.error("400", "Network error: ${e.message}")
         }
     }
-
-    suspend fun Logout() {
-        try {
-            accountApi.Logout()
-        } catch (e: Exception) {
-            throw e
-        }
-    }
-
 }

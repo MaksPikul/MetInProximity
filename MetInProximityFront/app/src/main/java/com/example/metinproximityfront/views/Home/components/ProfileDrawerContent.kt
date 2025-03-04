@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.metinproximityfront.data.entities.account.User
 
 @Composable
 fun ProfileDrawerContent (
@@ -40,8 +41,8 @@ fun ProfileDrawerContent (
             horizontalAlignment = Alignment.CenterHorizontally
         ){
 
-            Text("Username", fontSize = 22.sp)
-            Text("email", fontSize = 14.sp)
+            Text(User.userData?.username.toString(), fontSize = 22.sp)
+            Text(User.userData?.email.toString(), fontSize = 14.sp)
 
             HorizontalDivider(modifier = Modifier.padding(0.dp, 10.dp))
             NavigationDrawerItem(

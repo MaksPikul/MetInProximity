@@ -1,5 +1,6 @@
 package com.example.metinproximityfront.services.message
 
+import android.annotation.SuppressLint
 import android.util.Log
 import com.example.metinproximityfront.config.Constants
 import com.example.metinproximityfront.data.entities.message.MsgResObject
@@ -20,8 +21,8 @@ class SignalRMsgReceiver(
 
     private lateinit var hubConnection: HubConnection;
 
+    @SuppressLint("CheckResult")
     fun startConnection() {
-
         val accessToken = encryptedStoreService.getFromPref(Constants.ACCESS_TOKEN_KEY)
         Log.i("SignalR", accessToken.toString())
 
@@ -38,11 +39,22 @@ class SignalRMsgReceiver(
             { Log.d("SignalR", "Connection Successful!") },
             { error -> Log.e("SignalR", "Connection Failed: ${error.message} + ${error.localizedMessage}") }
         )
-
     }
 
+    @SuppressLint("CheckResult")
     fun stopConnection(){
-        this.hubConnection.stop().subscribe()
+        if (::hubConnection.isInitialized && hubConnection.connectionState == HubConnectionState.CONNECTED) {
+            hubConnection.stop().subscribe(
+                {
+                    Log.d("SignalR", "Connection Successful!")
+                },
+                { error ->
+                    Log.e("SignalR", "Disconnection Failed: ${error.message} + ${error.localizedMessage}")
+                }
+            )
+        } else {
+            Log.w("SignalR", "No active connection to stop.")
+        }
     }
 
     private fun defineHubMethods() {

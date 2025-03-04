@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-
 class LocationService: Service() {
 
     private lateinit var locationClient: LocationClient
@@ -40,7 +39,7 @@ class LocationService: Service() {
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     // theres gonna be like one in this list
-    private val observers: MutableList<LocObserver> = ArrayList()
+    private val locObsMan = LocObserverManager()
 
     override fun onCreate() {
         super.onCreate()
@@ -87,9 +86,7 @@ class LocationService: Service() {
                     val decodedString: ByteArray = Base64.decode(mapImageBase64, Base64.DEFAULT)
                     val mapBitmap : Bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
 
-                    observers.forEach {
-                        it.updateLocation(mapBitmap)
-                    }
+                    locObsMan.notifyObservers(mapBitmap)
                 }
             }
             .launchIn(serviceScope)
@@ -97,7 +94,6 @@ class LocationService: Service() {
         val notification = this.CreateNotification() // Create Notification Service?
 
         startForeground(4523, notification)
-
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -105,11 +101,11 @@ class LocationService: Service() {
     }
 
     fun registerObserver(observer: LocObserver) {
-        observers.add(observer)
+        locObsMan.registerObserver(observer)
     }
 
     fun unregisterObserver(observer: LocObserver) {
-        observers.remove(observer)
+        locObsMan.unregisterObserver(observer)
     }
 
     suspend fun GetCurrentLocation() : LocationObject {
@@ -119,6 +115,12 @@ class LocationService: Service() {
     inner class LocationServiceBinder(private val service: LocationService) : Binder() {
         fun getService(): LocationService = service
     }
+
+
+
+
+
+
 
     private fun CreateNotification(): Notification {
         //https://stackoverflow.com/questions/20857120/what-is-the-proper-way-to-stop-a-service-running-as-foreground

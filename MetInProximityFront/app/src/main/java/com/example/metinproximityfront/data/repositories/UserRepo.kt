@@ -2,19 +2,19 @@ package com.example.metinproximityfront.data.repositories
 
 import android.util.Log
 import androidx.navigation.NavController
-import com.example.metinproximityfront.data.api.UserActionApi
+import com.example.metinproximityfront.data.api.UserApi
 import com.example.metinproximityfront.data.entities.location.LocationObject
 import com.example.metinproximityfront.data.entities.users.ChatUser
 import com.example.metinproximityfront.data.remote.ApiServiceFactory
 import com.example.metinproximityfront.data.remote.ApiTokenWrapper
 import com.example.metinproximityfront.data.remote.PublicHttpClient.publicRetrofit
 
-class UserActionRepo (
+class UserRepo (
     private val apiTokenWrapper: ApiTokenWrapper,
     private val navController: NavController
 ) {
 
-    private val userActionApi: UserActionApi by lazy {
+    private val userActionApi: UserApi by lazy {
         ApiServiceFactory(publicRetrofit)
     }
 

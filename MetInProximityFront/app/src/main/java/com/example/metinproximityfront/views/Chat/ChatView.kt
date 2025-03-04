@@ -1,9 +1,9 @@
 package com.example.metinproximityfront.views.Chat
 
-import android.app.Application
-import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -22,28 +22,35 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.metinproximityfront.data.entities.message.MsgResObject
 import com.example.metinproximityfront.data.entities.users.ChatUser
 import com.example.metinproximityfront.app.viewModels.HomeViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.Date
 
 
@@ -53,20 +60,20 @@ fun ChatView(
     chatUser: ChatUser?
 ) {
     val messages by homeVm.msgService.messages.collectAsState()
+    var errorState by remember { mutableStateOf(false) }
 
     val listState = rememberLazyListState()
     var text by remember { mutableStateOf("") }
 
-    val onMsgSend = {
-        try {
-            Log.e("chat", "attempts messsage?")
-            homeVm.msgService.sendMessage(text, chatUser)
-            text = ""
+    val onMsgSend: suspend () -> Unit = {
+        val error: String? = homeVm.msgService.sendMessage(text, chatUser)
+
+        error?.let { str ->
+            errorState = true
+            delay(1000)
+        } ?: run {
+            errorState = false
         }
-        catch (ex : Throwable) {
-            Log.e("chat error", ex.message.toString())
-        }
-        Unit
     }
 
     Column(
@@ -91,8 +98,14 @@ fun ChatView(
         InputBar(
             onMsgSend ,
             text,
-            onTextChange = { text = it }
+            onTextChange = {
+                text = it
+                errorState = false
+            },
+            errorState
         )
+        CustomErrorToast(errorState)
+
     }
 }
 
@@ -142,11 +155,13 @@ fun MessageBubble(msgObj: MsgResObject, isUser: Boolean) {
 
 @Composable
 fun InputBar (
-    onMsgSend : () -> Unit,
+    onMsgSend : suspend () -> Unit,
     text : String,
     onTextChange: (String) -> Unit,
+    error: Boolean
 ) {
     val scrollState = rememberScrollState()
+    val coroutineScope = rememberCoroutineScope()
 
     Row(
         modifier = Modifier
@@ -161,6 +176,12 @@ fun InputBar (
             shape = RoundedCornerShape(8.dp),
             value = text,
             maxLines = 2,
+            isError = error,
+            colors = TextFieldDefaults.colors(
+                focusedIndicatorColor = if (error) Color.Red else Color.Blue,  // Border color
+                unfocusedIndicatorColor = if (error) Color.Red else Color.Gray,
+                cursorColor = if (error) Color.Red else Color.Black
+            ),
             onValueChange = onTextChange,
             modifier = Modifier
                 .weight(1f)
@@ -173,7 +194,11 @@ fun InputBar (
 
         if (text != "") {
             Button(
-                onClick = onMsgSend,
+                onClick = {
+                    coroutineScope.launch {
+                        onMsgSend()
+                    }
+                },
                 modifier = Modifier.height(60.dp),
                 shape = RoundedCornerShape(8.dp)
             ) {
@@ -238,8 +263,43 @@ fun ChatViewPreview() {
         {  },
         "s",
         { } ,
+        false
     )
 
+}
+@Composable
+fun CustomErrorToast(
+    showToast: Boolean
+) {
+    if (showToast) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .wrapContentSize(Alignment.BottomCenter)
+                .padding(bottom = 200.dp)
+        ) {
+            Surface(
+                modifier = Modifier,
+                shape = RoundedCornerShape(8.dp),
+                color = Color.Red.copy(alpha = 0.8f),
+                contentColor = Color.White
+            ) {
+                Row(
+                    modifier = Modifier.padding(vertical = 12.dp, horizontal = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(20.dp),
+
+                ) {
+                    Icon(Icons.Default.Warning, contentDescription = "Send")
+
+                    Text(
+                        text = "An Error Has occurred",
+                        fontSize = 16.sp
+                    )
+                }
+            }
+        }
+    }
 }
 
 @Preview
@@ -250,6 +310,7 @@ fun ChatHeaderPreview() {
         "tester"
     )
     ChatHeader (testUser)
+    CustomErrorToast( true)
 }
 
 @Preview

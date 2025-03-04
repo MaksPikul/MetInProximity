@@ -1,4 +1,4 @@
-package com.example.metinproximityfront.binders
+package com.example.metinproximityfront.services.location
 
 import android.content.ComponentName
 import android.content.Context
@@ -8,13 +8,12 @@ import android.os.IBinder
 import android.util.Log
 import com.example.metinproximityfront.data.entities.location.LocationObject
 import com.example.metinproximityfront.interfaces.LocObserver
-import com.example.metinproximityfront.services.location.LocationService
 
 
 /*
     https://developer.android.com/develop/background-work/services/bound-services
  */
-class LocationBinder (private val context: Context) {
+class LocationServiceBinder (private val context: Context) {
 
     private var locationService: LocationService? = null
     private var isBound = false

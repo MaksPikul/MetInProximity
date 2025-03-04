@@ -13,7 +13,6 @@ interface LocationApi{
 
     @PUT("location")
     suspend fun PutUserLocation(
-        // THIS NEEDS CHANGING TO A BODY
         @Body locObj : LocationObject,
         @Header("Authorization") authHeader: String
     ) : Response<LocResObj>

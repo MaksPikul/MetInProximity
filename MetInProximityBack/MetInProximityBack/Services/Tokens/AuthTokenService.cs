@@ -28,7 +28,7 @@ namespace MetInProximityBack.Services.Tokens
 
             return accessToken;
         }
-
+        
         public string CreateAccessToken(AppUser User, bool openToPrivate = false)
         {
             List<Claim> accessTokenClaims = new ClaimsBuilder()

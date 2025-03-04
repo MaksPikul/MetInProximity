@@ -1,7 +1,9 @@
 package com.example.metinproximityfront.services.message
 
+import android.app.Application
 import android.util.Log
-import com.example.metinproximityfront.binders.LocationBinder
+import android.widget.Toast
+import com.example.metinproximityfront.services.location.LocationServiceBinder
 import com.example.metinproximityfront.config.Constants
 import com.example.metinproximityfront.data.entities.location.LocationObject
 import com.example.metinproximityfront.data.entities.message.MsgResObject
@@ -20,7 +22,7 @@ import kotlinx.coroutines.launch
 class MessageService(
     private val sharedStore: IStoreService,
     private val msgRepo: MessageRepository? = null,
-    private val msgLocBinder : LocationBinder,
+    private val msgLocBinder : LocationServiceBinder,
 )
 {
     // Ik this class be using the observer method someone
@@ -71,8 +73,8 @@ class MessageService(
     fun sendMessage(
         textToSend: String,
         chatUser: ChatUser? = null
-    ) {
-        try {
+    ) : String? {
+        return try {
             CoroutineScope(Dispatchers.IO).launch {
 
                 val locObj: LocationObject = msgLocBinder.getCurrentLocation()
@@ -98,8 +100,9 @@ class MessageService(
                     retrieveMessages(msg)
                 }
             }
+            null
         } catch (ex: Throwable) {
-            Log.e("location error", ex.message.toString())
+            "ERROR"
         }
     }
 }

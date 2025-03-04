@@ -8,11 +8,13 @@ using MetInProximityBack.Factories;
 using MetInProximityBack.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using MetInProximityBack.Interfaces.IServices;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace MetInProximityBack.Controllers
 {
     [Route("api/message")]
     [ApiController]
+
     public class MessageController(
         IMessageService msgService,
         INotificationService notificationService
@@ -24,6 +26,7 @@ namespace MetInProximityBack.Controllers
 
         [HttpPost("public")]
         [Authorize]
+        [EnableRateLimiting("chat")]
         public async Task<IActionResult> PublicReceiveMessageAndNotify(
             [FromBody] MessageRequest msgReq
         ) {
@@ -45,6 +48,7 @@ namespace MetInProximityBack.Controllers
 
         [HttpPost("private")]
         [Authorize]
+        [EnableRateLimiting("chat")]
         public async Task<IActionResult> PrivateReceiveMessageAndNotify(
             [FromBody] PrivateMessageRequest msgReq
         ) {

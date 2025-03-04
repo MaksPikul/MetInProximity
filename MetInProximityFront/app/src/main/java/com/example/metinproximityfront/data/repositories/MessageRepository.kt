@@ -33,7 +33,7 @@ class MessageRepository(
         }
         catch (e: Exception) {
             Log.e("Api Call Error", e.message.toString())
-            null
+            throw e
         }
     }
 
@@ -52,7 +52,7 @@ class MessageRepository(
         }
         catch (e: Exception) {
             Log.e("Api Call Error", e.message.toString())
-            null
+            throw e
         }
     }
 }

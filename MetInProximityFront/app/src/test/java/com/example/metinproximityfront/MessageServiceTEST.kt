@@ -1,6 +1,6 @@
 package com.example.metinproximityfront
 
-import com.example.metinproximityfront.binders.LocationBinder
+import com.example.metinproximityfront.services.location.LocationServiceBinder
 import com.example.metinproximityfront.data.repositories.MessageRepository
 import com.example.metinproximityfront.services.message.MessageService
 import com.example.metinproximityfront.services.preference.IStoreService
@@ -14,7 +14,7 @@ class MessageServiceTEST {
 
     private val mockStore: IStoreService = mock()
     private val mockMsgRepo: MessageRepository = mock()
-    private val mockMsgLocBinder: LocationBinder = mock()
+    private val mockMsgLocBinder: LocationServiceBinder = mock()
 
     private lateinit var msgService: MessageService
 

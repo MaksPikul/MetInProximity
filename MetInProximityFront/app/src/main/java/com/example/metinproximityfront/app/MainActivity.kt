@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
                 this.authVm.onFailLogin
             )
 
-            /*
+        /*
             FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
                     Log.w("FCM", "Fetching FCM token failed :(", task.exception)
@@ -50,10 +50,15 @@ class MainActivity : ComponentActivity() {
                 }
 
                 val fcmToken = task.result
-                // This should return errors if any and update UI in Login page, custom toast that lasts long and is large??
-                mainVm.authService.FinishLogin(result.data!!, onSuccessfulLogin, fcmToken)
+                this.authVm.startLoadingView()
+                this.authVm.authService.FinishLogin(
+                    result.data!!,
+                    fcmToken,
+                    this.authVm.onSuccLogin,
+                    this.authVm.onFailLogin
+                )
             }
-             */
+        */
         }
     }
 
@@ -114,20 +119,10 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                this.CheckLoginStatus()
+                this.authVm.CheckLoginStatus()
             }
         }
     }
-
-    private fun CheckLoginStatus() {
-        if (authVm.authService.IsLoggedIn()){
-            authVm.onSuccLogin()
-        }
-        else {
-            authVm.stopLoadingView("Login")
-        }
-    }
-
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -139,27 +134,22 @@ class MainActivity : ComponentActivity() {
         this.authVm.permissionManager.handlePermissionsResult(this, requestCode, grantResults, permissionListener)
     }
 
+
     override fun onPause() {
         super.onPause()
-        // todo: if (!userWantsBackground location and messages)
-        //this.mainVM.homeVm.stopLocationService()
+        this.mainVm.stopServices()
     }
-
     override fun onResume() {
         super.onResume()
-        /*
-        Log.i("correct", this.mainVm.authService.IsLoggedIn().toString())
-        if (this.mainVm.authService.IsLoggedIn() /* TODO HOMEVM && Check if initialized */) {
-            this.mainVm.homeVm.startServices()
+        if (this.authVm.authService.IsLoggedIn() /* TODO HOMEVM && Check if initialized */) {
+            this.mainVm.startServices()
+
         }
-         */
     }
-
     override fun onDestroy() {
+        this.mainVm.stopServices()
         super.onDestroy()
-        //this.mainVM.homeVm.stopLocationService()
     }
-
 }
 
 

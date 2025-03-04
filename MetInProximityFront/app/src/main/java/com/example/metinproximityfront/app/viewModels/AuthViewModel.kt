@@ -55,6 +55,15 @@ class AuthViewModel(
         mainVm.navController.navigate(nextScreen)
     }
 
+    fun CheckLoginStatus() {
+        if (authService.IsLoggedIn()){
+            onSuccLogin()
+        }
+        else {
+            stopLoadingView("Login")
+        }
+    }
+
     val onSuccLogin = {
         this.stopLoadingView("Home")
         mainVm.startServices()

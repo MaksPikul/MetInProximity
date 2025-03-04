@@ -12,7 +12,9 @@ namespace MetInProximityBack.Providers
     {
         private readonly IConfiguration _configuration;
         public string ProviderName => "microsoft";
+        [Obsolete("Function fufilled on client side")]
         public string TokenUrl => "https://login.microsoftonline.com/common/oauth2/v2.0/token";
+        [Obsolete("Function fufilled on client side")]
         public string UserUrl => "https://graph.microsoft.com/v1.0/me";
 
         public MicrosoftOAuthProvider(
@@ -22,6 +24,7 @@ namespace MetInProximityBack.Providers
             _configuration = configuration;
         }
 
+        [Obsolete("Function fufilled on client side")]
         public Dictionary<string, string> GetReqValues(string authCode, string codeVerifier)
         { 
             var req = new Dictionary<string, string>

@@ -3,32 +3,31 @@
   "WorkspaceRootPath": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metinproximityback\\metinproximityback\\services\\mapservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|solutionrelative:metinproximityback\\services\\mapservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metinproximityback\\metinproximityback\\services\\tokens\\authtokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|solutionrelative:metinproximityback\\services\\tokens\\authtokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0AF5C350-8608-4E4A-8589-DA895CB53587}|..\\Metin.IntergrationTests\\Metin.IntergrationTests.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metin.intergrationtests\\repotests\\cosmolocationtest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metinproximityback\\metinproximityback\\constants\\appconstants.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|solutionrelative:metinproximityback\\constants\\appconstants.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3D490E1B-C269-4F7B-8052-6FF60F29FD19}|docker-compose.dcproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metinproximityback\\docker-compose.yml||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{3D490E1B-C269-4F7B-8052-6FF60F29FD19}|docker-compose.dcproj|solutionrelative:docker-compose.yml||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metinproximityback\\metinproximityback\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|solutionrelative:metinproximityback\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metinproximityback\\metinproximityback\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|solutionrelative:metinproximityback\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metinproximityback\\metinproximityback\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|solutionrelative:metinproximityback\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metinproximityback\\metinproximityback\\interfaces\\iservices\\imapservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|solutionrelative:metinproximityback\\interfaces\\iservices\\imapservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metinproximityback\\metinproximityback\\controllers\\mapcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|solutionrelative:metinproximityback\\controllers\\mapcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metinproximityback\\metinproximityback\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|solutionrelative:metinproximityback\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metinproximityback\\metinproximityback\\services\\notifications\\firebaseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|solutionrelative:metinproximityback\\services\\notifications\\firebaseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -38,97 +37,95 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Program.cs",
-              "RelativeDocumentMoniker": "MetInProximityBack\\Program.cs",
-              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Program.cs",
-              "RelativeToolTip": "MetInProximityBack\\Program.cs",
-              "ViewState": "AQIAAIcAAAAAAAAAAAAAAJsAAAAtAAAA",
+              "DocumentIndex": 0,
+              "Title": "AuthTokenService.cs",
+              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Services\\Tokens\\AuthTokenService.cs",
+              "RelativeDocumentMoniker": "MetInProximityBack\\Services\\Tokens\\AuthTokenService.cs",
+              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Services\\Tokens\\AuthTokenService.cs",
+              "RelativeToolTip": "MetInProximityBack\\Services\\Tokens\\AuthTokenService.cs",
+              "ViewState": "AQIAAAsAAAAAAAAAAAAQwCQAAAA9AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-02T11:46:19.291Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "FirebaseService.cs",
-              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Services\\Notifications\\FirebaseService.cs",
-              "RelativeDocumentMoniker": "MetInProximityBack\\Services\\Notifications\\FirebaseService.cs",
-              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Services\\Notifications\\FirebaseService.cs",
-              "RelativeToolTip": "MetInProximityBack\\Services\\Notifications\\FirebaseService.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABMAAAAIAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-28T15:33:08.063Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\appsettings.json",
-              "RelativeDocumentMoniker": "MetInProximityBack\\appsettings.json",
-              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\appsettings.json",
-              "RelativeToolTip": "MetInProximityBack\\appsettings.json",
-              "ViewState": "AQIAAAkAAAAAAAAAAAAAACAAAAAkAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-02-28T15:21:26.677Z",
+              "WhenOpened": "2025-03-04T11:36:09.485Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "AccountController.cs",
-              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Controllers\\AccountController.cs",
-              "RelativeDocumentMoniker": "MetInProximityBack\\Controllers\\AccountController.cs",
-              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Controllers\\AccountController.cs",
-              "RelativeToolTip": "MetInProximityBack\\Controllers\\AccountController.cs",
-              "ViewState": "AQIAABQAAAAAAAAAAAAxwC8AAAALAAAA",
+              "Title": "AppConstants.cs",
+              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Constants\\AppConstants.cs",
+              "RelativeDocumentMoniker": "MetInProximityBack\\Constants\\AppConstants.cs",
+              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Constants\\AppConstants.cs",
+              "RelativeToolTip": "MetInProximityBack\\Constants\\AppConstants.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAoAAAAuAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-28T15:08:58.077Z",
+              "WhenOpened": "2025-03-04T10:44:21.377Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "IMapService.cs",
-              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Interfaces\\IServices\\IMapService.cs",
-              "RelativeDocumentMoniker": "MetInProximityBack\\Interfaces\\IServices\\IMapService.cs",
-              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Interfaces\\IServices\\IMapService.cs",
-              "RelativeToolTip": "MetInProximityBack\\Interfaces\\IServices\\IMapService.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAYAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-28T15:04:26.922Z",
+              "Title": "docker-compose.yml",
+              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\docker-compose.yml",
+              "RelativeDocumentMoniker": "docker-compose.yml",
+              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\docker-compose.yml",
+              "RelativeToolTip": "docker-compose.yml",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABUAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003775|",
+              "WhenOpened": "2025-03-04T10:37:36.859Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "MapService.cs",
-              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Services\\MapService.cs",
-              "RelativeDocumentMoniker": "MetInProximityBack\\Services\\MapService.cs",
-              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Services\\MapService.cs",
-              "RelativeToolTip": "MetInProximityBack\\Services\\MapService.cs",
-              "ViewState": "AQIAABEAAAAAAAAAAAAowCEAAABfAAAA",
+              "DocumentIndex": 1,
+              "Title": "CosmoLocationTEST.cs",
+              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\Metin.IntergrationTests\\RepoTests\\CosmoLocationTEST.cs",
+              "RelativeDocumentMoniker": "..\\Metin.IntergrationTests\\RepoTests\\CosmoLocationTEST.cs",
+              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\Metin.IntergrationTests\\RepoTests\\CosmoLocationTEST.cs",
+              "RelativeToolTip": "..\\Metin.IntergrationTests\\RepoTests\\CosmoLocationTEST.cs",
+              "ViewState": "AQIAACIAAAAAAAAAAAAgwDkAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-28T15:04:00.294Z",
+              "WhenOpened": "2025-03-04T10:28:05.616Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\appsettings.json",
+              "RelativeDocumentMoniker": "MetInProximityBack\\appsettings.json",
+              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\appsettings.json",
+              "RelativeToolTip": "MetInProximityBack\\appsettings.json",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-03-04T10:25:21.223Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Program.cs",
+              "RelativeDocumentMoniker": "MetInProximityBack\\Program.cs",
+              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Program.cs",
+              "RelativeToolTip": "MetInProximityBack\\Program.cs",
+              "ViewState": "AQIAAEIAAAAAAAAAAAAAAFIAAAACAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-04T10:24:40.762Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
-              "Title": "MapController.cs",
-              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Controllers\\MapController.cs",
-              "RelativeDocumentMoniker": "MetInProximityBack\\Controllers\\MapController.cs",
-              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Controllers\\MapController.cs",
-              "RelativeToolTip": "MetInProximityBack\\Controllers\\MapController.cs",
-              "ViewState": "AQIAAAYAAAAAAAAAAAAAABkAAAAkAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-28T15:03:35.579Z",
+              "Title": "appsettings.Development.json",
+              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\appsettings.Development.json",
+              "RelativeDocumentMoniker": "MetInProximityBack\\appsettings.Development.json",
+              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\appsettings.Development.json",
+              "RelativeToolTip": "MetInProximityBack\\appsettings.Development.json",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAcAAAAPAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-03-03T17:08:04.567Z",
               "EditorCaption": ""
             }
           ]

@@ -15,8 +15,4 @@ interface AccountApi  {
         @Path("provider") provider: String, // Whether to handle google, microsoft, etc
         @Body() authRequest: AuthRequest
     ): Response<AuthResponse>
-
-    @POST("account/logout")
-    suspend fun Logout()
-
 }

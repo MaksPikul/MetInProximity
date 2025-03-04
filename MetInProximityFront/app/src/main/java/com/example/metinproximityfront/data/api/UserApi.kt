@@ -7,10 +7,8 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.PATCH
-import retrofit2.http.Path
-import retrofit2.http.Query
 
-interface UserActionApi {
+interface UserApi {
 
     @GET("user")
     suspend fun GetPrivateUserApi(
@@ -22,12 +20,5 @@ interface UserActionApi {
     suspend fun ChangeVisibilityApi(
         @Header("Authorization") accessToken: String
     ): Response<String>
-
-    @PATCH("user/fcm/token")
-    suspend fun UpdateUserFcm(
-        @Query("token") token : String,
-        @Header("Authorization") accessToken: String
-    ): Response<Unit>
-
 
 }

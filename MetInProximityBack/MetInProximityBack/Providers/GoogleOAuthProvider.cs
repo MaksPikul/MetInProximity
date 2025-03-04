@@ -15,7 +15,9 @@ namespace MetInProximityBack.Providers
 
         private readonly IConfiguration _configuration;
         public string ProviderName => "google";
+        [Obsolete("Function fufilled on client side")]
         public string TokenUrl => "https://oauth2.googleapis.com/token";
+        [Obsolete("Function fufilled on client side")]
         public string UserUrl => "https://www.googleapis.com/oauthv2/v1/userinfo";
 
         public GoogleOAuthProvider(
@@ -25,6 +27,7 @@ namespace MetInProximityBack.Providers
             _configuration = configuration;
         }
 
+        [Obsolete("Function fufilled on client side")]
         public Dictionary<string, string> GetReqValues(string authCode, string codeVerifier)
         {
             var body = new Dictionary<string, string>
@@ -51,7 +54,6 @@ namespace MetInProximityBack.Providers
                 UserEmail = userEmail,
                 IsEmailVerified = userEmail == null ? false : true,
             };
-
         }
     }
 }

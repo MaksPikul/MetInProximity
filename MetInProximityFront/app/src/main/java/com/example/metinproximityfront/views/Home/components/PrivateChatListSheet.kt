@@ -14,6 +14,8 @@ import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -21,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.example.metinproximityfront.data.entities.users.ChatUser
 import com.example.metinproximityfront.data.enums.ScreenState
 import com.example.metinproximityfront.app.viewModels.HomeViewModel
+import com.example.metinproximityfront.data.entities.account.User
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,7 +33,7 @@ fun PrivateChatListSheet (
 ) {
     // function to make publicly available
     val chatUsers by homeVm.userActionService.chatUsers.collectAsState()
-    val visibility by homeVm.userActionService.visibility.collectAsState()
+    val visibility by remember { mutableStateOf(User.userData?.openToPrivate) }
 
     if (homeVm.uiState.value.botSheetVisible) {
         ModalBottomSheet(
@@ -56,10 +59,14 @@ fun PrivateChatListSheet (
                             homeVm.userActionService.changeVisibility()
                         }
                     ) {
-
+                        Text(
+                            text = "Change visibility Status",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
-                // TODO : crreate screen manager, too much nesting, looks ugly
+                // TODO : create screen manager, too much nesting, looks ugly
                 //when (homeVm.uiState.value.loadingState) {
                     //LoadingState.LOADING -> null
 

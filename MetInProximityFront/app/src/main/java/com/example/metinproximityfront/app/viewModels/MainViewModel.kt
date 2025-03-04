@@ -5,12 +5,11 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.navigation.NavHostController
-import com.example.metinproximityfront.binders.LocationBinder
+import com.example.metinproximityfront.services.location.LocationServiceBinder
 import com.example.metinproximityfront.config.Constants
 import com.example.metinproximityfront.data.remote.ApiTokenWrapper
-import com.example.metinproximityfront.data.repositories.MapRepository
 import com.example.metinproximityfront.data.repositories.MessageRepository
-import com.example.metinproximityfront.data.repositories.UserActionRepo
+import com.example.metinproximityfront.data.repositories.UserRepo
 import com.example.metinproximityfront.services.location.LocationService
 import com.example.metinproximityfront.services.map.MapService
 import com.example.metinproximityfront.services.message.MessageService
@@ -30,7 +29,7 @@ class MainViewModel(
         Constants.MsgSharedStoreServiceFileName
     )
 
-    private val locBinder : LocationBinder = LocationBinder(app.applicationContext)
+    private val locBinder : LocationServiceBinder = LocationServiceBinder(app.applicationContext)
 
     var navController : NavHostController = NavHostController(app.applicationContext)
 
@@ -50,7 +49,7 @@ class MainViewModel(
         encryptedStoreService
     )
 
-    private val userActionRepo : UserActionRepo = UserActionRepo(
+    private val userActionRepo : UserRepo = UserRepo(
         ApiTokenWrapper(encryptedStoreService),
         navController
     )
@@ -59,9 +58,7 @@ class MainViewModel(
         locBinder,
     )
 
-    val mapService : MapService = MapService(
-        locBinder
-    )
+    val mapService : MapService = MapService()
 
     init {
         this.locBinder.bindLocationService()
@@ -78,21 +75,30 @@ class MainViewModel(
     fun startServices() {
         Log.e("Starting Services", "starting")
 
-        // Starts Location Service
+        // Location Service
         Intent(app.applicationContext, LocationService::class.java).apply {
             action = Constants.START_LOC_SERVICE
             app.startService(this)
         }
 
+        // SignalR
         this.signalRMsgReceiver.startConnection()
-        // this.msgStoreListener.startListening()
+
+        // Firebase
+
     }
 
     fun stopServices() {
-        val serviceIntent = Intent(app.applicationContext, LocationService::class.java)
-        serviceIntent.setAction( "STOP_SERVICE" )
-        app.applicationContext.stopService(serviceIntent)
-        this.signalRMsgReceiver.stopConnection()
-    }
+        // Location Service
+        Intent(app.applicationContext, LocationService::class.java).apply {
+            action = Constants.STOP_LOC_SERVICE
+            app.startService(this)
+        }
 
+        // SignalR
+        this.signalRMsgReceiver.stopConnection()
+
+        // Firebase
+
+    }
 }

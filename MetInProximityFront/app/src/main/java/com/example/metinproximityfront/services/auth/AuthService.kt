@@ -9,6 +9,7 @@ import com.example.metinproximityfront.config.Constants
 import com.example.metinproximityfront.config.oauth.OAuthConfig
 import com.example.metinproximityfront.data.entities.account.AuthRequest
 import com.example.metinproximityfront.data.entities.account.AuthResult
+import com.example.metinproximityfront.data.entities.account.User
 import com.example.metinproximityfront.data.repositories.AccountRepository
 import com.example.metinproximityfront.services.preference.IStoreService
 import kotlinx.coroutines.CoroutineScope
@@ -48,90 +49,44 @@ class AuthService(
     override fun StartLogin(
         provider: OAuthConfig,
         launchAction: (i: Intent) -> Unit
-    ){
-        // Creating client which handles OAuth (AppAuth Dependency)
+    ) {
         val authService = initLoginAuthService()
         this.loginAuthService = authService
 
-        // Using provider class to configure service with Authentication server URL and
-        // Resource Server URL which holds User ID tokens
-        // tokenUri configured here, but not used, called in server backend
-        val config = AuthorizationServiceConfiguration(provider.oauthUrl,provider.tokenUri)
-
-        // Create a pair class which holds Verifier and Challenge for extra security
-        // Following PKCE OAuth Flow) - maybe not -
+        val config = AuthorizationServiceConfiguration(provider.oauthUrl, provider.tokenUri)
         val codePair = createVerifierAndChallenge()
 
-        // Request intent is built
-        val request = AuthorizationRequest
-            .Builder(config, provider.clientId, ResponseTypeValues.CODE, provider.redirectUri)
-            .setScopes("profile email")
-            .setCodeVerifier(
-                codePair.first,
-                codePair.second,
-                "S256")
-            .build()
+        val request = createAuthorizationRequest(config, provider, codePair)
+
         Log.d("verifier", codePair.first)
 
-        // Provider added to intent
-        // helps handle the correct third party auth provider when finishing login
         val authIntent = authService.getAuthorizationRequestIntent(request)
         this.curProvider = provider.name
 
-        // Intent is launched which opens up chrome
         launchAction(authIntent)
     }
 
     override fun FinishLogin(
         responseIntent: Intent,
-        fcmToken : String,
-        onSuccessfulLogin : ()-> Unit,
-        onFailedLogin : (errorMsg : String?, errorCode : String?)-> Unit
-    ){
-        // After redirect back to Mobile App login screen,
-        // Response Object and Code extracted
-        val authResponse : AuthorizationResponse? = AuthorizationResponse.fromIntent(responseIntent)
+        fcmToken: String,
+        onSuccessfulLogin: () -> Unit,
+        onFailedLogin: (errorMsg: String?, errorCode: String?) -> Unit
+    ) {
+        val authResponse: AuthorizationResponse? = AuthorizationResponse.fromIntent(responseIntent)
         val error = AuthorizationException.fromIntent(responseIntent)
 
-        // Checking for errors or missing response object
-        if (error != null){
-            onFailedLogin(error.errorDescription, error.code.toString())
-        }
-        if (authResponse == null){
-            onFailedLogin("Authentication Result is Missing", "300")
-        }
-        val provider = curProvider.toString()
-
-        // This Looks so ugly but idk how else to clean it,
-        // Cant lie i dont understand much of the AppAuth Documentation
-        // My ass gotta add a loading screen here too ;-;
-        authResponse?.createTokenExchangeRequest()?.let {
-            loginAuthService?.performTokenRequest(
-                it,
-                object : TokenResponseCallback {
-                    override fun onTokenRequestCompleted(resp: TokenResponse?, ex: AuthorizationException?) {
-                        if (resp != null) {
-
-                            CoroutineScope(Dispatchers.IO).launch {
-                                AuthenticateWithWebServer(
-                                    provider,
-                                    onSuccessfulLogin,
-                                    onFailedLogin,
-                                    resp
-                                )
-                            }
-
-                        } else {
-                            // Authorization failed, check 'ex' for more details
-                            onFailedLogin(ex?.localizedMessage ?: "Unknown error", ex?.code.toString())
-                        }
-                    }
-                }
-            )
+        when {
+            error != null -> onFailedLogin(error.errorDescription, error.code.toString())
+            authResponse == null -> onFailedLogin("Authentication Result is Missing", "300")
+            else -> startTokenRequest(
+                        authResponse,
+                        onSuccessfulLogin,
+                        onFailedLogin
+                    )
         }
 
-        this.loginAuthService?.dispose()
-        this.loginAuthService = null
+        loginAuthService?.dispose()
+        loginAuthService = null
     }
 
     override fun Logout(
@@ -142,6 +97,7 @@ class AuthService(
                 //accountRepo.Logout()
                 removeTokens()
                 withContext(Dispatchers.Main) {
+                    User.delete()
                     successRedirect()
                 }
             } catch (e: Exception) {
@@ -149,13 +105,7 @@ class AuthService(
             }
         }
     }
-    /*
-        this is fine even if the token is expired, because refresh token would revalidate access
-        client will make api request with expired token,
-        client revalidates with refresh,
-        client still logged in,
-        we could check here if the refresh token is expired, to save on resources, a design decision for later :D
-    */
+
     override fun IsLoggedIn() : Boolean {
         val accessTokenKey = Constants.ACCESS_TOKEN_KEY
 
@@ -165,41 +115,14 @@ class AuthService(
     }
 
     /*
-        Helper Functions
+        Start Login Helper Functions
     */
-    private suspend fun AuthenticateWithWebServer(
-        provider: String,
-        onSuccessfulLogin : ()-> Unit,
-        onFailedLogin : (errorMsg : String?, errorCode : String?)-> Unit,
-        resp : TokenResponse
-    ){
 
-        val authResult: AuthResult =
-            accountRepo.Authenticate(
-                provider,
-                AuthRequest(
-                    resp.idToken.toString()
-                )
-            )
-
-        withContext(Dispatchers.Main) {
-            if (authResult.isSuccessful) {
-
-                Log.i("access", authResult.accessToken.toString())
-                Log.i("refresh", authResult.refreshToken.toString())
-                // Saving tokens into Encrypted Shared Preferences
-                storeTokens(
-                    authResult.accessToken.toString(),
-                    authResult.refreshToken.toString()
-                )
-                //storeUser(/* object that comes with login */)
-                // Function passed from MainActivity which redirects user to home view
-                onSuccessfulLogin()
-            } else {
-                // Shows error on Login View
-                onFailedLogin(authResult.error, "400")
-            }
-        }
+    private fun createAuthorizationRequest(config: AuthorizationServiceConfiguration, provider: OAuthConfig, codePair: Pair<String, String>): AuthorizationRequest {
+        return AuthorizationRequest.Builder(config, provider.clientId, ResponseTypeValues.CODE, provider.redirectUri)
+            .setScopes("profile email")
+            .setCodeVerifier(codePair.first, codePair.second, "S256")
+            .build()
     }
 
     private fun createVerifierAndChallenge (): Pair<String, String> {
@@ -215,6 +138,72 @@ class AuthService(
         val codeChallenge = Base64.encodeToString(hash, encoding)
 
         return Pair(codeVerifier, codeChallenge)
+    }
+
+    /*
+        Finish Login Helper Functions
+    */
+    private fun startTokenRequest(
+        authResponse: AuthorizationResponse,
+        onSuccessfulLogin: () -> Unit,
+        onFailedLogin: (errorMsg: String?, errorCode: String?) -> Unit
+    ) {
+        authResponse.createTokenExchangeRequest()?.let {
+            loginAuthService?.performTokenRequest(it, object : TokenResponseCallback {
+                override fun onTokenRequestCompleted(resp: TokenResponse?, ex: AuthorizationException?) {
+                    if (resp != null) {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            authenticateWithWebServer(
+                                resp,
+                                onSuccessfulLogin,
+                                onFailedLogin
+                            )
+                        }
+                    } else {
+                        onFailedLogin(ex?.localizedMessage ?: "Unknown error", ex?.code.toString())
+                    }
+                }
+            })
+        }
+    }
+
+
+
+    private suspend fun authenticateWithWebServer(
+        resp: TokenResponse,
+        onSuccessfulLogin: () -> Unit,
+        onFailedLogin: (errorMsg: String?, errorCode: String?) -> Unit
+    ) {
+        val authResult: AuthResult = accountRepo.Authenticate(
+            provider = curProvider.toString(),
+            authRequest = AuthRequest(resp.idToken.toString())
+        )
+
+        withContext(Dispatchers.Main) {
+            handleAuthResult(
+                authResult,
+                onSuccessfulLogin,
+                onFailedLogin
+            )
+        }
+    }
+
+    private fun handleAuthResult(
+        authResult: AuthResult,
+        onSuccessfulLogin: () -> Unit,
+        onFailedLogin: (errorMsg: String?, errorCode: String?) -> Unit
+    ) {
+
+        Log.i("Access", authResult.accessToken.toString())
+        Log.i("Refresh", authResult.refreshToken.toString())
+
+        if (authResult.isSuccessful) {
+            storeTokens(authResult)
+            User.create(authResult.accessToken.toString())
+            onSuccessfulLogin()
+        } else {
+            onFailedLogin(authResult.error, "400")
+        }
     }
 
     private fun initLoginAuthService(): AuthorizationService {
@@ -233,11 +222,10 @@ class AuthService(
     }
 
     private fun storeTokens (
-        accessToken : String,
-        refreshToken : String
+        authResult: AuthResult
     ){
-        this.prefStore.saveIntoPref(Constants.ACCESS_TOKEN_KEY, accessToken)
-        this.prefStore.saveIntoPref(Constants.REFRESH_TOKEN_KEY, refreshToken)
+        this.prefStore.saveIntoPref(Constants.ACCESS_TOKEN_KEY, authResult.accessToken.toString())
+        this.prefStore.saveIntoPref(Constants.REFRESH_TOKEN_KEY, authResult.refreshToken.toString())
     }
 
     private fun removeTokens() {

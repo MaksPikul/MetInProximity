@@ -8,6 +8,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.navigation.NavHostController
 import com.example.metinproximityfront.config.Constants
+import com.example.metinproximityfront.data.entities.account.User
 import com.example.metinproximityfront.data.entities.users.ChatUser
 import com.example.metinproximityfront.data.enums.LoadingState
 import com.example.metinproximityfront.data.enums.ScreenState
@@ -37,7 +38,7 @@ class HomeViewModel(
     fun toggleBottomSheet() {
         if (!_uiState.value.botSheetVisible) {
             _uiState.value = _uiState.value.copy(loadingState = LoadingState.LOADING)
-            //userActionService.getPrivateUsers()
+            userActionService.getPrivateUsers()
             _uiState.value = _uiState.value.copy(loadingState = LoadingState.READY)
         }
 

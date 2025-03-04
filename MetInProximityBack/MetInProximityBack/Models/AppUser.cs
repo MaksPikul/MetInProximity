@@ -6,6 +6,5 @@ namespace MetInProximityBack.Models
     {
         //public string FcmToken { get; set; }
 
-        public List<AppUser_Event> AppUserEvents { get; set; } = new List<AppUser_Event>();
     }
 }

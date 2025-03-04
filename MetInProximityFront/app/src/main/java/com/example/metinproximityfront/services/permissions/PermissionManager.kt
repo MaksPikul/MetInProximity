@@ -12,7 +12,8 @@ class PermissionManager {
 
     private val permissions = arrayOf(
         Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.FOREGROUND_SERVICE_LOCATION
+        Manifest.permission.FOREGROUND_SERVICE_LOCATION,
+        Manifest.permission.POST_NOTIFICATIONS
     )
 
     fun checkPermissions(context: Context, listener: PermissionListener) {

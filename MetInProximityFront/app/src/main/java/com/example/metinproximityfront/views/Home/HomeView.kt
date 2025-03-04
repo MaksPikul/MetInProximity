@@ -70,7 +70,7 @@ fun HomeView(
 
                         NavHost(navController = nc, startDestination = ScreenState.MAP.toString()) {
                             composable( ScreenState.MAP.toString() ) {
-                                MapView()
+                                MapView(homeVm)
                             }
                             composable(ScreenState.PUBLIC.toString()) {
                                 ChatView(homeVm, null)

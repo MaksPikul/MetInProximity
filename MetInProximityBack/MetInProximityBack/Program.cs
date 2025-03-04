@@ -17,6 +17,9 @@ using MetInProximityBack.Repositories;
 using MetInProximityBack.Interfaces.IRepos;
 using MetInProximityBack.Interfaces.IServices;
 using MetInProximityBack.Services.Notifications;
+using Docker.DotNet.Models;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,6 +59,7 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
+/* REMOVE THIS IN PRODUCTION */
 CosmosClientOptions options = new()
 {
     HttpClientFactory = () => new HttpClient(new HttpClientHandler()
@@ -64,7 +68,6 @@ CosmosClientOptions options = new()
     }),
     ConnectionMode = ConnectionMode.Gateway,
 };
-
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -84,11 +87,13 @@ builder.Services.AddSingleton<CosmoLocationRepo>(sp =>
     )
 );
 
+/* Dont need this high lvl abstraction if using IDatabase
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = builder.Configuration.GetConnectionString("RedisConnectionString");
     options.InstanceName = "MetinInstance";
 });
+*/
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
@@ -117,8 +122,21 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
     options.Lockout.AllowedForNewUsers = true;
     options.Lockout.MaxFailedAccessAttempts = 3;
-})
-.AddEntityFrameworkStores<AppDbContext>();
+}).AddEntityFrameworkStores<AppDbContext>();
+
+builder.Services.AddSignalR();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAndroidApp",
+        policy =>
+        {
+            policy.AllowAnyMethod()
+                  .WithOrigins("http://localhost", "https://MetinProximity.com")
+                  .AllowAnyHeader()
+                  .AllowCredentials();
+        });
+});
 
 builder.Services.AddAuthentication(options =>
 {
@@ -143,6 +161,33 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddTokenBucketLimiter("chat", limiterOptions =>
+    {
+        limiterOptions.TokenLimit = 10; 
+        limiterOptions.TokensPerPeriod = 5; 
+        limiterOptions.ReplenishmentPeriod = TimeSpan.FromMinutes(1);
+        limiterOptions.AutoReplenishment = true;
+    });
+
+    options.AddConcurrencyLimiter("signalr", limiterOptions =>
+    {
+        limiterOptions.PermitLimit = 25; 
+        limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        limiterOptions.QueueLimit = 5; 
+    });
+
+});
+
+/* Configure this
+builder.Services.AddHealthChecks()
+    .AddRedis(config.GetConnectionString("Redis"))
+    .AddAzureCosmosDb(config.GetConnectionString("CosmosDb"));
+
+app.MapHealthChecks("/health");
+*/
+
 /* dependency injections*/
 builder.Services.AddScoped<IOAuthService, OAuthService>();
 builder.Services.AddScoped<AuthTokenService>();
@@ -161,17 +206,11 @@ builder.Services.AddTransient<OAuthProviderFactory>();
 builder.Services.AddTransient<IOAuthProvider, GoogleOAuthProvider>();
 builder.Services.AddTransient<IOAuthProvider, MicrosoftOAuthProvider>();
 
-
-
 /*
  following
 https://learn.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests
  */
 builder.Services.AddHttpClient<IOAuthService, OAuthService>();
-builder.Services.AddSignalR();
-
-
-
 
 var app = builder.Build();
 
@@ -186,16 +225,13 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.UseCors(x => x
-     .AllowAnyMethod()
-     .AllowAnyHeader()
-     .AllowCredentials()
-     //.WithOrigins("http://10.0.2.2", "https://localhost:5173")
-     .SetIsOriginAllowed(origin => true));
+app.UseCors("AllowAndroidApp");
 
-app.MapHub<ChatHub>("/chathub");
+app.MapHub<ChatHub>("/chathub").RequireRateLimiting("signalr");
 
 app.MapControllers();
+
+app.UseRateLimiter();
 
 app.Run();
 

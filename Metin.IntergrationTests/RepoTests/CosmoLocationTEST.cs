@@ -40,7 +40,6 @@ namespace MetInProximityBack.Tests.ServiceTests
         public async Task TEST_AddOrUpdateLocation_GetLocationByUserId_RemoveLocation()
         {
 
-
             var locObj_0 = LocationFactory.CreateLocObj("1234", 0.0, 0.0, false);
 
             ItemResponse<LocationObject> response_0 = await _cosmoRepo.AddOrUpdateLocation( locObj_0 );
@@ -62,7 +61,7 @@ namespace MetInProximityBack.Tests.ServiceTests
 
             await _cosmoRepo.RemoveLocation( locObj_1 );
 
-            LocationObject? locObj = await _cosmoRepo.GetLocationByUserId( locObj_1.UserId );
+            LocationObject? locObj = await _cosmoRepo.GetLocationByUserId( "1234" );
 
             // Removed Should not be in db to be fetched
             Assert.Null( locObj );
@@ -87,7 +86,7 @@ namespace MetInProximityBack.Tests.ServiceTests
             ItemResponse<LocationObject> response_0 = await _cosmoRepo.AddOrUpdateLocation(locObj_0);
             ItemResponse<LocationObject> response_1 = await _cosmoRepo.AddOrUpdateLocation(locObj_1);
 
-            LocationObject latestLocObj = await _cosmoRepo.GetLocationByUserId("1234");
+            LocationObject? latestLocObj = await _cosmoRepo.GetLocationByUserId("1234");
 
             // Assert
             Assert.Equal(latestLocObj, locObj_1);

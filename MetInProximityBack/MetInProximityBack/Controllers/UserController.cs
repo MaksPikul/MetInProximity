@@ -18,7 +18,7 @@ namespace MetInProximityBack.Controllers
         AppDbContext appDbContext
     ) : Controller
     {
-        private readonly MessageService _locService = locService;
+        private readonly MessageService _msgService = locService;
         private readonly AuthTokenService _authTokenService = authTokenService;
         private readonly AppDbContext _appDbContext = appDbContext;
 
@@ -27,7 +27,7 @@ namespace MetInProximityBack.Controllers
         public async Task<IActionResult> GetAvailableForPrivateUserMsg(
             [FromBody] LonLatObject locObj
         ) {
-            List<NearbyUser> nearbyUsers = await _locService.GetNearbyUsersAsync(locObj.longitude, locObj.latitude, User.GetId());
+            List<NearbyUser> nearbyUsers = await _msgService.GetNearbyUsersAsync(locObj.lon, locObj.lat, User.GetId());
 
             IEnumerable<NearbyUser> usersOpenToPrivate = nearbyUsers.Where(x => x.openToMessages == true);
 
@@ -51,9 +51,9 @@ namespace MetInProximityBack.Controllers
                 openToPrivateBool = false;
             }
 
-            LocationObject locObj = await _locService.GetLatestLocationAsync( User.GetId() );
+            LocationObject? locObj = await _msgService.GetLatestLocationAsync( User.GetId() );
 
-            _locService.UpdateLocation(locObj, "openToPrivate", openToPrivate);
+            await _msgService.UpdateLocation(locObj, "openToPrivate", openToPrivate);
 
             string newAccessToken = _authTokenService.CreateAccessToken(User, openToPrivateBool); 
 
