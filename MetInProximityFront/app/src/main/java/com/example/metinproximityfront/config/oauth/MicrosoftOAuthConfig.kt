@@ -5,9 +5,9 @@ import android.net.Uri
 class MicrosoftOAuthConfig : OAuthConfig{
 
     override val name = "microsoft"
-    override val clientId = "d166e25b-6612-4fb0-bf6a-d3ba9d6c393c"
-    override val redirectUri = Uri.parse("com.example.metinproximityfront:/oauth2callback")
+    override val clientId = "05563ea0-87fd-473a-b618-fc212d0c3b89"
+    override val redirectUri = Uri.parse("msauth://com.example.metinproximityfront/1YFTn7Qa8LnCCXvPGHvKCg3YvXI%3D")
     override val tokenUri = Uri.parse("https://login.microsoftonline.com/common/oauth2/v2.0/token")
-    override val oauthUrl = Uri.parse("https://graph.microsoft.com/v1.0/me")
+    override val oauthUrl = Uri.parse("https://login.microsoftonline.com/common/oauth2/v2.0/authorize")
 
 }

@@ -17,9 +17,9 @@ using MetInProximityBack.Repositories;
 using MetInProximityBack.Interfaces.IRepos;
 using MetInProximityBack.Interfaces.IServices;
 using MetInProximityBack.Services.Notifications;
-using Docker.DotNet.Models;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
+using MetInProximityBack.Types;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -76,7 +76,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddSingleton<CosmosClient>(sp =>
     new CosmosClient(
-        builder.Configuration["CosmosDb:AccountEndpoint"],
+        builder.Configuration.GetConnectionString("CosmosAccountEndpoint"),
         builder.Configuration["CosmosDb:AuthKey"],
         clientOptions: options
     )
@@ -125,6 +125,8 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 }).AddEntityFrameworkStores<AppDbContext>();
 
 builder.Services.AddSignalR();
+builder.Services.Configure<FirebaseConfig>(builder.Configuration.GetSection("FirebaseCM"));
+
 
 builder.Services.AddCors(options =>
 {
@@ -179,6 +181,7 @@ builder.Services.AddRateLimiter(options =>
     });
 
 });
+
 
 /* Configure this
 builder.Services.AddHealthChecks()

@@ -41,7 +41,7 @@ namespace MetInProximityBack.Services
                 }
                 else
                 {
-                    await _fbService.SendPushNotification(msgRes.RecipientId, msgRes);
+                    await _fbService.SendPushNotification(msgRes);
                 }
             }
             catch (Exception ex)
@@ -61,7 +61,7 @@ namespace MetInProximityBack.Services
                 }
                 else if (openToMessages)
                 {
-                    await _fbService.SendPushNotification(msgRes.UserId, msgRes);
+                    await _fbService.SendPushNotification(msgRes);
                 }
             }
             catch (Exception ex)

@@ -4,6 +4,8 @@ import android.app.Application
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
+import com.example.metinproximityfront.config.Constants
+import com.example.metinproximityfront.data.entities.account.User
 import com.example.metinproximityfront.data.repositories.AccountRepository
 import com.example.metinproximityfront.services.permissions.PermissionManager
 import com.example.metinproximityfront.services.auth.AuthService
@@ -67,6 +69,7 @@ class AuthViewModel(
     val onSuccLogin = {
         this.stopLoadingView("Home")
         mainVm.startServices()
+        User.create(mainVm.encryptedStoreService.getFromPref(Constants.ACCESS_TOKEN_KEY).toString())
         authService.curProvider = null
     }
 

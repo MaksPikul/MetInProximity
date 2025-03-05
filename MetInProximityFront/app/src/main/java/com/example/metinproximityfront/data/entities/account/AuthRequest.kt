@@ -1,5 +1,6 @@
 package com.example.metinproximityfront.data.entities.account
 
 data class AuthRequest (
-    val IdToken : String
+    val IdToken : String,
+    val FcmToken : String
 )

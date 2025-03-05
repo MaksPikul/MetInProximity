@@ -95,6 +95,7 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
 
     implementation("org.mockito:mockito-core:5.4.0")
     implementation("org.mockito.kotlin:mockito-kotlin:5.1.0")

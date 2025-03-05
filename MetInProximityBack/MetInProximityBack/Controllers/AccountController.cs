@@ -82,11 +82,11 @@ namespace MetInProximityBack.Controllers
                 AppUser appUser = await _userManager.FindByEmailAsync(user.UserEmail); 
 
                 if (appUser == null) {
-                    appUser = await this.CreateAppUser(user.UserName, user.UserEmail, "fcmToken");
+                    appUser = await this.CreateAppUser(user.UserName, user.UserEmail, authRequest.FcmToken);
                 }
                 else
                 {
-                    //appUser.FcmToken = fcmToken;
+                    appUser.FcmToken = authRequest.FcmToken;
                     await _userManager.UpdateAsync(appUser);
                 }
 
@@ -105,13 +105,6 @@ namespace MetInProximityBack.Controllers
             {
                 return BadRequest("Login Failure: " + ex.Message );
             }
-        }
-
-        [HttpPost("logout")]
-        public async Task Logout()
-        {
-            // Clear refresh token from DB
-            await _signInManager.SignOutAsync();
         }
 
         [HttpPost("refresh")]
@@ -152,7 +145,7 @@ namespace MetInProximityBack.Controllers
         //CLASS METHOD FOR NOW, WILL MOVE LATER, IF NECESSARY
         private async Task<AppUser> CreateAppUser(string UserName, string Email, string fcmToken)
         {
-            AppUser appUser = new AppUser {UserName = UserName, Email = Email/*, FcmToken = fcmToken*/ };
+            AppUser appUser = new AppUser {UserName = UserName, Email = Email, FcmToken = fcmToken};
             await _userManager.CreateAsync(appUser);
             //await _userManager.AddToRoleAsync(appUser, "User");
             return appUser;

@@ -4,7 +4,6 @@ namespace MetInProximityBack.Models
 {
     public class AppUser : IdentityUser
     {
-        //public string FcmToken { get; set; }
-
+        public string FcmToken { get; set; }
     }
 }

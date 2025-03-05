@@ -11,8 +11,10 @@
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
     <PackageReference Include="GeoCoordinate" Version="2.0.1" />
     <PackageReference Include="geohash-dotnet" Version="2.2.0" />
+    <PackageReference Include="Google.Apis.FirebaseCloudMessaging.v1" Version="1.69.0.3702" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.12" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.12" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.7" />
     <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.46.1" />
     <PackageReference Include="Microsoft.Azure.StackExchangeRedis" Version="3.2.1" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.13" />
@@ -25,6 +27,8 @@
 	<PackageReference Include="Testcontainers.Redis" Version="3.9.0" />
 	<PackageReference Include="Testcontainers.CosmosDb" Version="3.9.0" />
 	<PackageReference Include="Testcontainers.SqlEdge" Version="3.9.0" />
+	  
+	  <PackageReference Include="Respawn" Version="6.2.1" />
 	  
 	  <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.0.0">
@@ -39,10 +43,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MetInProximityBack\MetInProximityBack\MetInProximityBack.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="HubTests\" />
   </ItemGroup>
 
 </Project>

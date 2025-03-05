@@ -12,11 +12,18 @@ namespace MetInProximityBack.Hubs
     {
         private readonly RedisCacheRepo _cacheService = cache;
 
+
         public override async Task OnConnectedAsync()
         {
             try
             {
                 var userId = Context.User.GetId();
+
+                if (userId == null)
+                {
+                    await base.OnConnectedAsync();
+                    return;
+                }
 
                 Console.WriteLine(userId);
                 Console.WriteLine(Context.ConnectionId.ToString());
@@ -47,7 +54,13 @@ namespace MetInProximityBack.Hubs
         {
             var userId = Context.User.GetId();
 
-            string connectionKey = Constants.AppConstants.ConnIdCacheKey(userId);
+            if (userId == null)
+            {
+                await base.OnDisconnectedAsync(exception);
+                return;
+            }
+
+            string connectionKey = AppConstants.ConnIdCacheKey(userId);
             string connectionId = await _cacheService.GetFromCacheAsync(connectionKey);
 
             _cacheService.RemoveFromCacheAsync(connectionKey);

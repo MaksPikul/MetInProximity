@@ -9,15 +9,16 @@ object User {
     fun create(accessToken : String) {
 
         val claims = TokenService.decodeJWT(accessToken)
+        val username = claims.get("unique_name") as String
+        val email = claims.get("email") as String
+        val openToPrivate = claims.get("OpenToPrivate") as String
 
-        val username = claims["unique_name"] as String
-        val email = claims["email"] as String
-        val openToPrivate = claims["OpenToPrivate"] as Boolean
+
 
         userData = UserData(
             username = username,
             email = email,
-            openToPrivate = openToPrivate
+            openToPrivate = if (openToPrivate == "true") true else false
         )
     }
 

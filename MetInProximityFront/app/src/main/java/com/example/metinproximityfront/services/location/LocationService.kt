@@ -13,6 +13,7 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.util.Base64
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.metinproximityfront.config.Constants
 import com.example.metinproximityfront.data.entities.location.LocResObj
@@ -76,15 +77,15 @@ class LocationService: Service() {
             .getLocationUpdates()
             .catch { e -> e.printStackTrace() }
             .onEach{ location ->
-
                 // logic to check if i need to fetch more map data or not
-
                 val result : LocResObj? = locationRepo.UpdateUserLocationRepo(location)
 
                 result?.mapImage?.let { mapImage ->
                     val mapImageBase64: String? = mapImage
                     val decodedString: ByteArray = Base64.decode(mapImageBase64, Base64.DEFAULT)
                     val mapBitmap : Bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+
+                    Log.i("Bitmap", mapBitmap.toString())
 
                     locObsMan.notifyObservers(mapBitmap)
                 }
@@ -115,10 +116,6 @@ class LocationService: Service() {
     inner class LocationServiceBinder(private val service: LocationService) : Binder() {
         fun getService(): LocationService = service
     }
-
-
-
-
 
 
 

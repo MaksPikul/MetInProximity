@@ -194,8 +194,8 @@ namespace Metin.UnitTests.ServiceTests
                 MsgReq = new PrivateMessageRequest
                 {
                     MsgRecipientId = "CAT-id-456",
-                    Latitude = 20.0,
-                    Longitude = 20.0,
+                    lat = 20.0,
+                    lon = 20.0,
                     Body = "TEST MESSAGE BODY"
                 };
 

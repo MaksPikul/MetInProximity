@@ -29,7 +29,7 @@ namespace MetInProximityBack.Controllers
         ) {
             List<NearbyUser> nearbyUsers = await _msgService.GetNearbyUsersAsync(locObj.lon, locObj.lat, User.GetId());
 
-            IEnumerable<NearbyUser> usersOpenToPrivate = nearbyUsers.Where(x => x.openToMessages == true);
+            IEnumerable<NearbyUser> usersOpenToPrivate = nearbyUsers.Where(x => x.openToPrivate == true);
 
             return Ok(usersOpenToPrivate);
         }

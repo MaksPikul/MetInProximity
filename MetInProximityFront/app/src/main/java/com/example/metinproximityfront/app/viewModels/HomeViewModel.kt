@@ -38,7 +38,7 @@ class HomeViewModel(
     fun toggleBottomSheet() {
         if (!_uiState.value.botSheetVisible) {
             _uiState.value = _uiState.value.copy(loadingState = LoadingState.LOADING)
-            userActionService.getPrivateUsers()
+            //userActionService.getPrivateUsers()
             _uiState.value = _uiState.value.copy(loadingState = LoadingState.READY)
         }
 

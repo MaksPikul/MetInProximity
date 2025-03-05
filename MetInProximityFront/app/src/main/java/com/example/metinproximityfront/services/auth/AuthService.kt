@@ -80,6 +80,7 @@ class AuthService(
             authResponse == null -> onFailedLogin("Authentication Result is Missing", "300")
             else -> startTokenRequest(
                         authResponse,
+                        fcmToken,
                         onSuccessfulLogin,
                         onFailedLogin
                     )
@@ -119,8 +120,16 @@ class AuthService(
     */
 
     private fun createAuthorizationRequest(config: AuthorizationServiceConfiguration, provider: OAuthConfig, codePair: Pair<String, String>): AuthorizationRequest {
+
+        val scopes = when (provider.name) {
+            "google" -> "profile email"
+            "microsoft" -> "openId profile email"
+            "github" -> "user"
+            else -> ""
+        }
+
         return AuthorizationRequest.Builder(config, provider.clientId, ResponseTypeValues.CODE, provider.redirectUri)
-            .setScopes("profile email")
+            .setScopes(scopes)
             .setCodeVerifier(codePair.first, codePair.second, "S256")
             .build()
     }
@@ -145,6 +154,7 @@ class AuthService(
     */
     private fun startTokenRequest(
         authResponse: AuthorizationResponse,
+        fcmToken : String,
         onSuccessfulLogin: () -> Unit,
         onFailedLogin: (errorMsg: String?, errorCode: String?) -> Unit
     ) {
@@ -155,6 +165,7 @@ class AuthService(
                         CoroutineScope(Dispatchers.IO).launch {
                             authenticateWithWebServer(
                                 resp,
+                                fcmToken,
                                 onSuccessfulLogin,
                                 onFailedLogin
                             )
@@ -171,12 +182,16 @@ class AuthService(
 
     private suspend fun authenticateWithWebServer(
         resp: TokenResponse,
+        fcmToken : String,
         onSuccessfulLogin: () -> Unit,
         onFailedLogin: (errorMsg: String?, errorCode: String?) -> Unit
     ) {
         val authResult: AuthResult = accountRepo.Authenticate(
             provider = curProvider.toString(),
-            authRequest = AuthRequest(resp.idToken.toString())
+            authRequest = AuthRequest(
+                resp.idToken.toString(),
+                fcmToken
+            )
         )
 
         withContext(Dispatchers.Main) {
@@ -199,7 +214,6 @@ class AuthService(
 
         if (authResult.isSuccessful) {
             storeTokens(authResult)
-            User.create(authResult.accessToken.toString())
             onSuccessfulLogin()
         } else {
             onFailedLogin(authResult.error, "400")

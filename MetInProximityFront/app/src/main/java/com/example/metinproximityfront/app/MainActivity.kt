@@ -1,6 +1,7 @@
 package com.example.metinproximityfront.app
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -31,13 +32,13 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.StartActivityForResult()){
             result ->
         run {
-
+            Log.e("Micosoft", "got here")
             //val fcmToken = task.result
             // This should return errors if any and update UI in Login page, custom toast that lasts long and is large??
             this.authVm.startLoadingView()
             this.authVm.authService.FinishLogin(
                 result.data!!,
-                "",
+                "token",
                 this.authVm.onSuccLogin,
                 this.authVm.onFailLogin
             )

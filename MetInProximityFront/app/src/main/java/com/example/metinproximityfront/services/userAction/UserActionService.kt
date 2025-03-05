@@ -31,7 +31,6 @@ class UserActionService(
 
             val result : String? = userActionRepo.changeVisibilityRepo()
 
-
             result?.let { accessToken ->
                 changeVisibilityState(accessToken)
             } // ? : Show error

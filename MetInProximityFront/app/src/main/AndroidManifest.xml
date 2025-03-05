@@ -13,9 +13,6 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
 
-
-
-
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -50,11 +47,23 @@
             tools:node="replace" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
                 <data android:scheme="com.example.metinproximityfront"/>
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="com.example.metinproximityfront" android:host="github" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="msauth" android:host="com.example.metinproximityfront"/>
             </intent-filter>
         </activity>
 
@@ -71,7 +80,5 @@
             android:name=".services.location.LocationService"
             android:foregroundServiceType="location"
             />
-
     </application>
-
 </manifest>
