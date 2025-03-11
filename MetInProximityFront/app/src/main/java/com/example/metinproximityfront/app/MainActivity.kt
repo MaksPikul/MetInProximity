@@ -1,5 +1,8 @@
 package com.example.metinproximityfront.app
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -18,6 +21,7 @@ import com.example.metinproximityfront.ui.theme.MetInProximityFrontTheme
 import com.example.metinproximityfront.views.Home.HomeView
 import com.example.metinproximityfront.views.loading.LoadingView
 import com.example.metinproximityfront.views.Login.LoginView
+import com.google.firebase.messaging.FirebaseMessaging
 
 
 class MainActivity : ComponentActivity() {
@@ -35,15 +39,7 @@ class MainActivity : ComponentActivity() {
             Log.e("Micosoft", "got here")
             //val fcmToken = task.result
             // This should return errors if any and update UI in Login page, custom toast that lasts long and is large??
-            this.authVm.startLoadingView()
-            this.authVm.authService.FinishLogin(
-                result.data!!,
-                "token",
-                this.authVm.onSuccLogin,
-                this.authVm.onFailLogin
-            )
 
-        /*
             FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
                     Log.w("FCM", "Fetching FCM token failed :(", task.exception)
@@ -51,6 +47,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 val fcmToken = task.result
+                Log.i("FcmToken" , fcmToken)
                 this.authVm.startLoadingView()
                 this.authVm.authService.FinishLogin(
                     result.data!!,
@@ -59,7 +56,7 @@ class MainActivity : ComponentActivity() {
                     this.authVm.onFailLogin
                 )
             }
-        */
+
         }
     }
 
@@ -82,6 +79,8 @@ class MainActivity : ComponentActivity() {
 
         this.authVm.permissionManager.checkPermissions(this, permissionListener)
         this.authVm.permissionManager.logPermissionsStatus(this)
+
+        this.createNotificationChannel()
 
         this.createViews()
 
@@ -138,18 +137,34 @@ class MainActivity : ComponentActivity() {
 
     override fun onPause() {
         super.onPause()
+        Log.i("MainActivity", "pauses")
         this.mainVm.stopServices()
     }
     override fun onResume() {
         super.onResume()
+        Log.i("MainActivity", "resumes")
         if (this.authVm.authService.IsLoggedIn() /* TODO HOMEVM && Check if initialized */) {
             this.mainVm.startServices()
-
         }
     }
     override fun onDestroy() {
         this.mainVm.stopServices()
         super.onDestroy()
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelId = "firebase_channel"
+            val channelName = "Default Notifications"
+            val description = "Firebase default notification channel"
+            val importance = NotificationManager.IMPORTANCE_HIGH
+
+            val channel = NotificationChannel(channelId, channelName, importance)
+            channel.description = description
+
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(channel)
+        }
     }
 }
 

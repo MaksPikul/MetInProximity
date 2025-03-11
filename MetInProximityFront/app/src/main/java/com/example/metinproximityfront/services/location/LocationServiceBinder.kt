@@ -18,11 +18,14 @@ class LocationServiceBinder (private val context: Context) {
     private var locationService: LocationService? = null
     private var isBound = false
 
+    private var onBoundCallback: (() -> Unit)? = null
+
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as LocationService.LocationServiceBinder
             locationService = binder.getService()
             isBound = true
+            onBoundCallback?.invoke()
             Log.i("MsgLocBinder", "did the binding")
         }
 
@@ -32,15 +35,17 @@ class LocationServiceBinder (private val context: Context) {
         }
     }
 
-    fun bindLocationService() {
+    fun bindLocationService(onBound: () -> Unit) {
         val intent = Intent(context, LocationService::class.java)
         context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+        this.onBoundCallback = onBound
     }
 
     fun unbindLocationService() {
         if (isBound) {
             context.unbindService(serviceConnection)
             isBound = false
+            this.onBoundCallback = null
         }
     }
 

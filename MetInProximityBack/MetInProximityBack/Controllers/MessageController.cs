@@ -31,6 +31,7 @@ namespace MetInProximityBack.Controllers
             [FromBody] MessageRequest msgReq
         ) {
             try {
+
                 List<NearbyUser> nearbyUsers = await _msgService.GetNearbyUsersAsync(msgReq.lon, msgReq.lat, User.GetId());
 
                 List<NearbyUserWithConnId> nearUserswConnId = await _msgService.GetConnectionIdsAsync(nearbyUsers);

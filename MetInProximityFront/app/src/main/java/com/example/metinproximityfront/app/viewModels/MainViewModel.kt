@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import com.example.metinproximityfront.services.location.LocationServiceBinder
 import com.example.metinproximityfront.config.Constants
 import com.example.metinproximityfront.data.remote.ApiTokenWrapper
+import com.example.metinproximityfront.data.repositories.MapRepository
 import com.example.metinproximityfront.data.repositories.MessageRepository
 import com.example.metinproximityfront.data.repositories.UserRepo
 import com.example.metinproximityfront.services.location.LocationService
@@ -58,13 +59,15 @@ class MainViewModel(
         locBinder,
     )
 
-    val mapService : MapService = MapService()
+    val mapRepo = MapRepository(
+        ApiTokenWrapper(encryptedStoreService)
+    )
+    val mapService : MapService = MapService(
+        mapRepo,
+        locBinder
+    )
 
     init {
-        this.locBinder.bindLocationService()
-
-        this.locBinder.registerObserver(mapService)
-
         navController.addOnDestinationChangedListener { _, destination, _ ->
             if (destination.route == "Login") {
                 stopServices()
@@ -73,19 +76,21 @@ class MainViewModel(
     }
 
     fun startServices() {
-        Log.e("Starting Services", "starting")
-
         // Location Service
         Intent(app.applicationContext, LocationService::class.java).apply {
             action = Constants.START_LOC_SERVICE
             app.startService(this)
         }
 
+        // Binds and calls callback once locationService Bound
+        this.locBinder.bindLocationService {
+            // registers observer
+            locBinder.registerObserver(mapService)
+            // Initial Map load
+            //mapService.getMap()
+        }
         // SignalR
         this.signalRMsgReceiver.startConnection()
-
-        // Firebase
-
     }
 
     fun stopServices() {
@@ -94,11 +99,8 @@ class MainViewModel(
             action = Constants.STOP_LOC_SERVICE
             app.startService(this)
         }
-
         // SignalR
         this.signalRMsgReceiver.stopConnection()
-
-        // Firebase
-
     }
+
 }

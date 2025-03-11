@@ -49,12 +49,5 @@ fun BottomNavBar(
             selected = homeVm.uiState.value.currentScreen == ScreenState.PRIVATE,
             //unselectedIcon = Icons.Outlined.Home,
         )
-        NavigationBarItem(
-            onClick = {},
-            label = { Text("Events") },
-            icon = { Icon(Icons.Default.Place , contentDescription = "Home Page") },
-            selected = false,
-            //unselectedIcon = Icons.Outlined.Home,
-        )
     }
 }

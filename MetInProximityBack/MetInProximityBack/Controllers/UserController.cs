@@ -13,12 +13,12 @@ namespace MetInProximityBack.Controllers
     [Route("api/user")]
     [ApiController]
     public class UserController(
-        MessageService locService,
+        MessageService msgService,
         AuthTokenService authTokenService,
         AppDbContext appDbContext
     ) : Controller
     {
-        private readonly MessageService _msgService = locService;
+        private readonly MessageService _msgService = msgService;
         private readonly AuthTokenService _authTokenService = authTokenService;
         private readonly AppDbContext _appDbContext = appDbContext;
 
@@ -62,19 +62,18 @@ namespace MetInProximityBack.Controllers
 
         [HttpPatch("update")]
         [Authorize]
-        // CAN CHANGE THIS LATER TO A FULL USER UPDATE METHOD
         public async Task<IActionResult> UpdateUserFcmToken(
             [FromQuery(Name = "token")] string token
         )
         {
-            /*
+            Console.WriteLine("before");
             await _appDbContext
                 .Users
                 .Where(u => u.Id == User.GetId())
                 .ExecuteUpdateAsync(s =>
-                    s.SetProperty(u => u/.FcmToken, token)
+                    s.SetProperty(u => u.FcmToken, token)
                 );
-            */
+            
             return Ok();
         }
 

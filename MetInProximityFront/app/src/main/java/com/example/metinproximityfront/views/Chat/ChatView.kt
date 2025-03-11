@@ -63,11 +63,17 @@ fun ChatView(
     var errorState by remember { mutableStateOf(false) }
 
     val listState = rememberLazyListState()
+
+    LaunchedEffect(messages.size) {
+        // Scroll to the last item (bottom) in the list
+        listState.animateScrollToItem(messages.size - 1)
+    }
+
     var text by remember { mutableStateOf("") }
 
     val onMsgSend: suspend () -> Unit = {
         val error: String? = homeVm.msgService.sendMessage(text, chatUser)
-
+        text = ""
         error?.let { str ->
             errorState = true
             delay(1000)
@@ -79,8 +85,9 @@ fun ChatView(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Green, RoundedCornerShape(8.dp))
+            .background(Color.Green, shape = RoundedCornerShape(8.dp))
     ) {
+
         ChatHeader(chatUser)
 
         LazyColumn(
@@ -96,7 +103,7 @@ fun ChatView(
         }
 
         InputBar(
-            onMsgSend ,
+            onMsgSend,
             text,
             onTextChange = {
                 text = it
@@ -105,7 +112,6 @@ fun ChatView(
             errorState
         )
         CustomErrorToast(errorState)
-
     }
 }
 

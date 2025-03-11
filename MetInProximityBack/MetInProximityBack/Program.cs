@@ -19,7 +19,10 @@ using MetInProximityBack.Interfaces.IServices;
 using MetInProximityBack.Services.Notifications;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
-using MetInProximityBack.Types;
+using MetInProximityBack.Constants;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -125,7 +128,21 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 }).AddEntityFrameworkStores<AppDbContext>();
 
 builder.Services.AddSignalR();
-builder.Services.Configure<FirebaseConfig>(builder.Configuration.GetSection("FirebaseCM"));
+
+var fbConfigSection = builder.Configuration.GetSection("FirebaseConfig");
+
+var fbConfigJson = JsonSerializer.Serialize(fbConfigSection.Get<Dictionary<string, string>>());
+
+var credential = GoogleCredential
+    .FromJson(fbConfigJson)
+    .CreateScoped("https://www.googleapis.com/auth/firebase.messaging");
+
+FirebaseApp.Create(
+    new AppOptions
+    {
+        Credential = credential
+    }
+);
 
 
 builder.Services.AddCors(options =>

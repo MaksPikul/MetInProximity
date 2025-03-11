@@ -75,6 +75,9 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="firebase_channel" />
 
         <service
             android:name=".services.location.LocationService"

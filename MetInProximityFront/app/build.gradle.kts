@@ -67,6 +67,7 @@ dependencies {
 
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
     implementation("com.google.firebase:firebase-messaging")
+    implementation("com.google.firebase:firebase-analytics")
 
     implementation("com.microsoft.signalr:signalr:9.0.1")
     implementation("com.auth0:java-jwt:4.4.0")
@@ -78,6 +79,7 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
     implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
 
+    implementation("androidx.compose.material:material-icons-extended:1.3.0")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

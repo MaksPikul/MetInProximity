@@ -1,12 +1,15 @@
 package com.example.metinproximityfront.services.message
 
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.example.metinproximityfront.config.Constants
 import com.example.metinproximityfront.data.entities.message.MsgResObject
 import com.example.metinproximityfront.data.remote.ApiTokenWrapper
@@ -25,17 +28,26 @@ import java.util.Date
 
 class FirebaseMsgReceiver : FirebaseMessagingService() {
 
+    private lateinit var publicStore : SharedStoreService
 
-    private val publicStore = SharedStoreService(
-        this,
-        Constants.MsgSharedStoreServiceFileName
-    )
-    private val privateStore = EncryptedStoreService(
-        this
-    )
-    private val fcmRepo = FcmRepository(
-        ApiTokenWrapper(privateStore)
-    )
+    private lateinit var privateStore : EncryptedStoreService
+
+    private lateinit var fcmRepo : FcmRepository
+
+    override fun onCreate() {
+        super.onCreate()
+
+        publicStore = SharedStoreService(
+            this.applicationContext,
+            Constants.MsgSharedStoreServiceFileName
+        )
+        privateStore = EncryptedStoreService(
+            this.applicationContext
+        )
+        fcmRepo = FcmRepository(
+            ApiTokenWrapper(privateStore)
+        )
+    }
 
     override fun onNewToken(fcmToken: String) {
         super.onNewToken(fcmToken)
@@ -47,15 +59,16 @@ class FirebaseMsgReceiver : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
+        Log.i("s", "s")
+        message.data.forEach{Log.i("E", it.toString())}
+
         val msgObj : MsgResObject = mapRemoteToMsgRes(message)
 
         val key : String = this.storeMessage(msgObj)
 
-        // TODO: Use Key to create route for intent based on public or private
         val intent = Intent(this, /* TODO THIS HAS TO CHANGE */LocationService::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
         this.createAndRunNotification()
     }
@@ -113,42 +126,20 @@ class FirebaseMsgReceiver : FirebaseMessagingService() {
     /*
         https://developer.android.com/develop/ui/views/notifications/build-notification
      */
+    @SuppressLint("MissingPermission")
     private fun createAndRunNotification(
-
     ){
-        var channelId = "10"
+        var channelId = "firebase_channel"
 
-        // Channel
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "MetInProximity"
-            val descriptionText = "Push Notifications"
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(channelId, name, importance).apply {
-                description = descriptionText
-            }
-            // Register the channel with the system.
-            val notificationManager: NotificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
+        val notification = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle("Message Received")
+            .setContentText("Check who sent you a message!")
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .build()
 
-        // tap action
-        val intent = Intent(this, /* TODO THIS HAS TO CHANGE */LocationService::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-
-        // notification
-        var builder = NotificationCompat.Builder(this, channelId)
-            //.setSmallIcon(R.drawable.notification_icon)
-            .setContentTitle("New message")
-            //.setContentText(newMsg)
-            .setContentIntent(pendingIntent)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-
-        // Notification
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(0, builder.build())
+        NotificationManagerCompat.from(this).notify(1, notification)
     }
 }
 

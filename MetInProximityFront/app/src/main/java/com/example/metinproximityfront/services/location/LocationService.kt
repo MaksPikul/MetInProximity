@@ -39,7 +39,7 @@ class LocationService: Service() {
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    // theres gonna be like one in this list
+    // theres gonna be like one observer in this list
     private val locObsMan = LocObserverManager()
 
     override fun onCreate() {
@@ -72,25 +72,19 @@ class LocationService: Service() {
     }
 
     private fun start() {
-
-        locationClient
-            .getLocationUpdates()
+        locationClient.getLocationUpdates()
             .catch { e -> e.printStackTrace() }
             .onEach{ location ->
                 // logic to check if i need to fetch more map data or not
                 val result : LocResObj? = locationRepo.UpdateUserLocationRepo(location)
 
+                Log.i("Location Client", result?.lon.toString())
+
                 result?.mapImage?.let { mapImage ->
-                    val mapImageBase64: String? = mapImage
-                    val decodedString: ByteArray = Base64.decode(mapImageBase64, Base64.DEFAULT)
-                    val mapBitmap : Bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
 
-                    Log.i("Bitmap", mapBitmap.toString())
-
-                    locObsMan.notifyObservers(mapBitmap)
+                    locObsMan.notifyObservers(mapImage)
                 }
-            }
-            .launchIn(serviceScope)
+            }.launchIn(serviceScope)
 
         val notification = this.CreateNotification() // Create Notification Service?
 
@@ -105,10 +99,6 @@ class LocationService: Service() {
         locObsMan.registerObserver(observer)
     }
 
-    fun unregisterObserver(observer: LocObserver) {
-        locObsMan.unregisterObserver(observer)
-    }
-
     suspend fun GetCurrentLocation() : LocationObject {
         return locationClient.GetCurrentLocation()
     }
@@ -116,8 +106,6 @@ class LocationService: Service() {
     inner class LocationServiceBinder(private val service: LocationService) : Binder() {
         fun getService(): LocationService = service
     }
-
-
 
     private fun CreateNotification(): Notification {
         //https://stackoverflow.com/questions/20857120/what-is-the-proper-way-to-stop-a-service-running-as-foreground

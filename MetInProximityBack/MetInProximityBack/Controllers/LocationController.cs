@@ -19,14 +19,12 @@ namespace MetInProximityBack.Controllers
     [Route("api/location")]
     [ApiController]
     public class LocationController(
-        UserManager<AppUser> userManager,
         CosmoLocationRepo cosmosDb,
         MapService mapService
 
     ) : Controller
     {
 
-        private readonly UserManager<AppUser> _userManager = userManager;
         private readonly CosmoLocationRepo _cosmosDb = cosmosDb;
         private readonly MapService _mapService = mapService;
 
@@ -44,7 +42,7 @@ namespace MetInProximityBack.Controllers
 
                 string mapImageBase64 = await _mapService.GetMapTiles( llObj.lon, llObj.lat );
 
-                var response = new LocResObj{
+                var response = new LocResObj {
                     lon = llObj.lon,
                     lat = llObj.lat,
                     mapImage = mapImageBase64
@@ -59,6 +57,22 @@ namespace MetInProximityBack.Controllers
             }
         }
 
+        [HttpGet("map")]
+        [Authorize]
+        public async Task<IActionResult> GetLocationMap(
+            [FromQuery] double lon,
+            [FromQuery] double lat
+        ){
+            try
+            {
+                string mapImageBase64 = await _mapService.GetMapTiles(lon, lat);
 
+                return Ok(mapImageBase64);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Failed to fetch Mapl: " + ex.Message);
+            }
+        }
     }
 }

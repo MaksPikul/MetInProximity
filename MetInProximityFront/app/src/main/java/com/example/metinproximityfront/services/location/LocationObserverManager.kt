@@ -1,6 +1,7 @@
 package com.example.metinproximityfront.services.location
 
 import android.graphics.Bitmap
+import android.util.Log
 import com.example.metinproximityfront.interfaces.LocObserver
 
 
@@ -16,8 +17,9 @@ class LocObserverManager {
         observers.remove(observer)
     }
 
-    fun notifyObservers(mapBitmap: Bitmap) {
+    fun notifyObservers(mapBitmap: String) {
         observers.forEach {
+            Log.e("Observer", "Logs")
             it.updateLocation(mapBitmap)
         }
     }

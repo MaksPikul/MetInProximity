@@ -18,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.util.Date
 
 class MessageService(
     private val sharedStore: IStoreService,
@@ -85,6 +86,16 @@ class MessageService(
                     locObj.lat,
                 )
 
+                val dummyMessage = MsgResObject(
+                    body = "Hello, this is a test message!",
+                    userId = "User123",
+                    isPublic = true,
+                    recipientId = null,
+                    timestamp = Date()
+                )
+                storeMessage(dummyMessage)
+                retrieveMessages(dummyMessage)
+                /*
                 val result: MsgResObject?
                 if (chatUser == null) {
                     result = msgRepo?.SendPublicMessageRepo(msgObj)
@@ -99,6 +110,7 @@ class MessageService(
 
                     retrieveMessages(msg)
                 }
+                 */
             }
             null
         } catch (ex: Throwable) {

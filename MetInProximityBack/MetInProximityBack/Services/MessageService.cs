@@ -24,9 +24,6 @@ namespace MetInProximityBack.Services
 
         private readonly CosmoLocationRepo _cosmosDb = cosmosDb;
         private readonly RedisCacheRepo _cacheRepo = cacheRepo;
-
-
-
         public async Task<List<NearbyUser>> GetNearbyUsersAsync(double longitude, double latitude, string RequestingUserId)
         {
             // UserId : ConnectionString (SignalR)

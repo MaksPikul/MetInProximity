@@ -46,7 +46,7 @@ class SignalRMsgReceiver(
         if (::hubConnection.isInitialized && hubConnection.connectionState == HubConnectionState.CONNECTED) {
             hubConnection.stop().subscribe(
                 {
-                    Log.d("SignalR", "Connection Successful!")
+                    Log.d("SignalR", "Disconnection Successful!")
                 },
                 { error ->
                     Log.e("SignalR", "Disconnection Failed: ${error.message} + ${error.localizedMessage}")
@@ -75,7 +75,7 @@ class SignalRMsgReceiver(
                     Log.e("SignalR", "Unauthorized: Token might be invalid")
                 }
 
-                reconnect()
+                //reconnect()
             } else {
                 Log.e("SignalR", "Disconnected normally")
             }

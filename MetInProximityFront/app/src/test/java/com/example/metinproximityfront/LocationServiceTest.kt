@@ -4,7 +4,6 @@ import android.content.Context
 import com.example.metinproximityfront.services.preference.EncryptedStoreService
 import org.junit.Test
 
-import org.junit.Assert.*
 import org.mockito.Mockito
 
 /**
@@ -12,9 +11,11 @@ import org.mockito.Mockito
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
-class EncryptedStoreTest {
+class LocationServiceTest {
 
-
+    // Start and Stop
+    // Binding
+    // Observers
 
 
 

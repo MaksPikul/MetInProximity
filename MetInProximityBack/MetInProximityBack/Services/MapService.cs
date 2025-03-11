@@ -21,12 +21,12 @@ namespace MetInProximityBack.Services
         public async Task<string> GetMapTiles(
             double lon,
             double lat,
-            int zoom = 14
+            int zoom = 20
         ) {
             var bbox = CalculateBoundingBox(lat, lon, 500);
 
             //.comic, 2x.png
-            string mapboxUrl = $"https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v12/static/{bbox}/600x600?access_token={_config["MapBox:ApiKey"]}";
+            string mapboxUrl = $"https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v12/static/{bbox}/600x1200?access_token={_config["MapBox:ApiKey"]}";
 
             HttpClient httpClient = _httpClientFactory.CreateClient();
             byte[] mapImageData = await httpClient.GetByteArrayAsync(mapboxUrl);

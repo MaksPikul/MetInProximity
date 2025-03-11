@@ -15,9 +15,6 @@ class UserActionService(
     private val userActionRepo: UserRepo,
     private val msgLocBinder : LocationServiceBinder
 ) {
-    private var _visibility = MutableStateFlow(false)
-    val visibility : StateFlow<Boolean> = _visibility
-
     val testUser = ChatUser(
         "1234",
         "tester"
@@ -32,7 +29,7 @@ class UserActionService(
             val result : String? = userActionRepo.changeVisibilityRepo()
 
             result?.let { accessToken ->
-                changeVisibilityState(accessToken)
+                User.update(accessToken.toString())
             } // ? : Show error
         }
     }
@@ -48,11 +45,6 @@ class UserActionService(
                 updateChatUsers(chatUsers)
             } // ? : Show that 0 Users showed up
         }
-    }
-
-    private fun changeVisibilityState(accessToken : String?){
-        // For now
-        _visibility.value = User.update(accessToken.toString())
     }
 
     private fun updateChatUsers( newChatUsers : List<ChatUser>) {

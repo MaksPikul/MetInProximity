@@ -14,6 +14,7 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationTokenSource
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -43,22 +44,25 @@ class LocationClient(
                     ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
                 }
             ) {
+                Log.e("Location Client","Missing Permissions")
                 throw Exception("Missing Permissions") // TODO Clean exceptions, Should i Make Custom Exceptions for each exception?
             }
 
+            Log.i("Location Client", "In callback")
             val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
             val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
             val isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
 
             if(!isGpsEnabled && !isNetworkEnabled) {
+                Log.e("Location Client", "GPS is disabled")
                 throw Exception("GPS is disabled")
             }
 
             val locationRequest = LocationRequest
-                .Builder(0)
+                .Builder(60000 ) //.Builder(600000 ) // 60000 = 1 min
                 .setWaitForAccurateLocation(false)
-                .setPriority(Priority.PRIORITY_LOW_POWER)
-                .setMinUpdateDistanceMeters(100f)
+                .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
+                //.setMinUpdateDistanceMeters(100f) // move every 100 feet ?
                 .build()
 
             val locationCallback = object : LocationCallback() {
@@ -79,7 +83,7 @@ class LocationClient(
             )
 
             awaitClose {
-                fusedClient.removeLocationUpdates(locationCallback)
+                //fusedClient.removeLocationUpdates(locationCallback)
             }
         }
     }
@@ -102,7 +106,10 @@ class LocationClient(
                 continuation.resumeWithException(Exception("GPS is disabled"))
             }
 
-            fusedClient.lastLocation.addOnSuccessListener { location ->
+            fusedClient.getCurrentLocation(
+                Priority.PRIORITY_HIGH_ACCURACY,
+                CancellationTokenSource().token
+            ).addOnSuccessListener { location ->
                 if (location != null) {
                     continuation.resume(
                         LocationObject(location.longitude, location.latitude)

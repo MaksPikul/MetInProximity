@@ -21,9 +21,10 @@ namespace MetInProximityBack.Services
 
             foreach (var user in users)
             {
+                Console.WriteLine(user.UserId);
                 tasks.Add(Task.Run(async () =>
                 {
-                    await this.CreatePublicTask(user.connId, msgRes, user.openToMessages);
+                    await this.CreatePublicTask(user, msgRes);
 
                 }));
             }
@@ -41,32 +42,31 @@ namespace MetInProximityBack.Services
                 }
                 else
                 {
-                    await _fbService.SendPushNotification(msgRes);
+                    await _fbService.SendPushNotification(msgRes.UserId, msgRes);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Failure to send message, Error :", ex);
+                Console.WriteLine("Failure to send message, Error :", ex.Message);
             }
         }
 
-        private async Task CreatePublicTask(string userConnectionId, MessageResponse msgRes, bool openToMessages)
+        private async Task CreatePublicTask(NearbyUserWithConnId user, MessageResponse msgRes)
         {
             try
-            {
-                Console.WriteLine("sumting wong" + userConnectionId + openToMessages);
-                if (userConnectionId != null && openToMessages)
+            { 
+                if (user.connId != null && user.openToMessages)
                 {
-                    await _srService.SendNotification(userConnectionId, msgRes);
+                    await _srService.SendNotification(user.connId, msgRes);
                 }
-                else if (openToMessages)
+                else if (user.openToMessages)
                 {
-                    await _fbService.SendPushNotification(msgRes);
+                    await _fbService.SendPushNotification(user.UserId, msgRes);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Failure to send message, Error :", ex);
+                Console.WriteLine("Failure to send message, Error :", ex.Message);
             }
         }
     }

@@ -8,118 +8,73 @@ using MetInProximityBack.Types.Message;
 using MetInProximityBack.Models;
 using Microsoft.AspNetCore.Identity;
 using MetInProximityBack.Interfaces.IServices;
-using Google.Apis.FirebaseCloudMessaging.v1;
-using Google.Apis.FirebaseCloudMessaging.v1.Data;
+//using Google.Apis.FirebaseCloudMessaging.v1;
+//using Google.Apis.FirebaseCloudMessaging.v1.Data;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
-using MetInProximityBack.Types;
 using Microsoft.Extensions.Options;
+using MetInProximityBack.Constants;
+using System.Text.Json;
+using Google.Apis;
+using Microsoft.Azure.Cosmos;
+using MetInProximityBack.Data;
+using Microsoft.EntityFrameworkCore;
+using FirebaseAdmin.Messaging;
+using FirebaseAdmin;
+using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
 
 namespace MetInProximityBack.Services.Notifications
 {
-    public class FirebaseService {
-        private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IConfiguration _config;
-        private readonly UserManager<AppUser> _userManager;
+    public class FirebaseService(
+            AppDbContext context
+    ) {
+        private readonly AppDbContext _context = context;
 
-        private readonly FirebaseCloudMessagingService _fcmService;
-
-        public FirebaseService(
-            IHttpClientFactory httpClientFactory,
-            IConfiguration configuration,
-            UserManager<AppUser> userManager,
-            IOptions<FirebaseConfig> firebaseOptions
-        )
+        // https://firebase.google.com/docs/cloud-messaging/send-message
+        public async Task SendPushNotification(string recipientId, MessageResponse msgRes)
         {
-            var firebaseConfig = firebaseOptions.Value;
-
-            var credential = GoogleCredential
-                .FromJson(firebaseConfig.Credentials)
-                .CreateScoped("https://www.googleapis.com/auth/firebase.messaging");
-
-            _fcmService = new FirebaseCloudMessagingService(new BaseClientService.Initializer
-            {
-                HttpClientInitializer = credential
-            });
-
-            _httpClientFactory = httpClientFactory;
-            _config = configuration;
-            _userManager = userManager;
-        }
-
-
-
-        /*
-         *  https://stackoverflow.com/questions/38184432/fcm-firebase-cloud-messaging-push-notification-with-asp-net
-         */
-        public async Task SendPushNotification(MessageResponse msgRes)
-        {
-            string fcmToken = await GetUserFcmToken(msgRes.RecipientId);
+            string fcmToken = await GetUserFcmToken(recipientId);
+            Console.WriteLine(fcmToken);
+            if (fcmToken == null) {
+                return;
+            }
 
             var message = new Message
             {
                 Token = fcmToken,
+                /*
                 Notification = new Notification
                 {
                     Title = "Metin Message",
-                    Body = msgRes.Body
-                }
+                    Body = "Check who sent you a Message !"
+                },
+                */
+                Data = CreateFcmPayload(msgRes)
             };
 
-            var request = new SendMessageRequest { Message = message };
-            var response = await _fcmService.Projects.Messages.Send(request, $"projects/{_config["FirebaseCM:ProjectId"]}").ExecuteAsync();
+            var response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+                
+            Console.WriteLine("went : " + response);
         }
-
-        public async Task SendPushNotification(string recipientId, MessageResponse msgRes)
+        private Dictionary<string, string> CreateFcmPayload(MessageResponse msgRes)
         {
-            string fcmSecretKey = _config["Firebase:SecretKey"];
-            string fcmUrl = _config["Firebase:Url"];
-            string fcmToken = await GetUserFcmToken(recipientId);
-
-            // correct usage of Http Client
-            HttpClient _httpClient = _httpClientFactory.CreateClient();
-
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"key={fcmSecretKey}");
-
-            /*
-             * https://firebase.google.com/docs/cloud-messaging/send-message#send_using_the_fcm_v1_http_api
-             */
-            var payload = CreateFcmPayload(fcmToken, msgRes);
-
-            var jsonPayload = Newtonsoft.Json.JsonConvert.SerializeObject(payload);
-
-            var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
-
-            var response = await _httpClient.PostAsync(fcmUrl, content);
-
-            if (response.IsSuccessStatusCode)
+            return new Dictionary<string, string>
             {
-                return;
-            }
-            else
-            {
-                throw new Exception("HttpClient failed to post message to firebase, StatusCode: " + response.StatusCode);
-            }
+                { "UserId", msgRes.UserId },
+                { "isPublic", msgRes.isPublic.ToString() },
+                { "Body",  msgRes.Body },
+                { "RecipientId", msgRes.RecipientId},
+                { "Timestamp", msgRes.Timestamp.ToString() },
+            };
         }
 
-        private FcmPayload CreateFcmPayload(string fcmToken, MessageResponse msgRes)
+        // Need to handle nulls
+        private async Task<string?> GetUserFcmToken(string userId)
         {
-            var payload = new FcmPayload(fcmToken, msgRes);
-
-            return payload;
+            return await _context.Users
+                .Where(u => u.Id == userId)
+                .Select(u => u.FcmToken)
+                .FirstOrDefaultAsync();
         }
-
-        private async Task<string> GetUserFcmToken(string userId)
-        {
-
-            AppUser user = await _userManager.FindByIdAsync(userId);
-
-            return "s";//user.FcmToken;
-        }
-
-
-
     }
-
 }
-

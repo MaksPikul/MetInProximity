@@ -1,4 +1,4 @@
-package com.example.metinproximityfront
+package com.example.metinproximityfront.Constants
 
 object TestConstants {
 
