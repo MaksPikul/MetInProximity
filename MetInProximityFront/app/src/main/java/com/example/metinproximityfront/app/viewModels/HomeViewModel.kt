@@ -1,6 +1,7 @@
 package com.example.metinproximityfront.app.viewModels
 
 import android.app.Application
+import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -22,7 +23,7 @@ data class HomeVmState (
     val botSheetVisible: Boolean = false,
     val loadingState: LoadingState = LoadingState.READY,
     val currentChatUser: ChatUser? = null,
-    val drawerState: DrawerState = DrawerState(DrawerValue.Closed),
+    var drawerState: DrawerState = DrawerState(DrawerValue.Closed),
 )
 
 class HomeViewModel(
@@ -38,7 +39,7 @@ class HomeViewModel(
     fun toggleBottomSheet() {
         if (!_uiState.value.botSheetVisible) {
             _uiState.value = _uiState.value.copy(loadingState = LoadingState.LOADING)
-            //userActionService.getPrivateUsers()
+            userActionService.getPrivateUsers()
             _uiState.value = _uiState.value.copy(loadingState = LoadingState.READY)
         }
 
@@ -62,4 +63,28 @@ class HomeViewModel(
         navController.navigate(newScreen.toString())
     }
 
+    fun changeDrawerState() {
+        _uiState.value.drawerState = DrawerState(DrawerValue.Open)
+    }
+
+    fun handleMessageNotifIntent(
+        intent: Intent?,
+    ){
+        val destinationKey = intent?.getStringExtra("destination")
+
+        if (!destinationKey.isNullOrBlank()) {
+
+            if (destinationKey == Constants.PUBLIC_CHAT_KEY){
+                changeScreen(ScreenState.PUBLIC)
+            }
+            else {
+                val userId = destinationKey.split("-")[1]
+                val newChatUser = ChatUser(
+                    userId,
+                    "Private User"
+                )
+                changeScreen(ScreenState.PRIVATE, newChatUser)
+            }
+        }
+    }
 }

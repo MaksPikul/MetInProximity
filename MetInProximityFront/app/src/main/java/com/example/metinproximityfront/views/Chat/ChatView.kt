@@ -2,6 +2,7 @@ package com.example.metinproximityfront.views.Chat
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +27,7 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -66,7 +68,9 @@ fun ChatView(
 
     LaunchedEffect(messages.size) {
         // Scroll to the last item (bottom) in the list
-        listState.animateScrollToItem(messages.size - 1)
+        if (messages.isNotEmpty()) {
+            listState.animateScrollToItem(messages.size - 1)
+        }
     }
 
     var text by remember { mutableStateOf("") }
@@ -85,7 +89,7 @@ fun ChatView(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Green, shape = RoundedCornerShape(8.dp))
+            .background(Color.White, shape = RoundedCornerShape(8.dp))
     ) {
 
         ChatHeader(chatUser)
@@ -116,13 +120,16 @@ fun ChatView(
 }
 
 @Composable
-fun MessageBubble(msgObj: MsgResObject, isUser: Boolean) {
+fun MessageBubble(
+    msgObj: MsgResObject,
+    isUser: Boolean
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .background(
-                if (isUser) Color(0xFFDCF8C6) else Color(0xFFEFEFEF),
+                if (isUser) Color(0xFFD1C4E9) else Color(0xFFEFEFEF),
                 RoundedCornerShape(12.dp)
             )
             .padding(8.dp),

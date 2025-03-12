@@ -2,26 +2,40 @@ version: '3.4'
 
 services:
   metinproximityback:
+    ports:
+        - "5000:5000"  # HTTP
+        - "5001:5001"  # HTTPS
+    environment:
+    - EnableSwagger=true
+    - ASPNETCORE_URLS=http://+:5000
     build:
       context: .
       dockerfile: MetInProximityBack/Dockerfile
+    entrypoint: ["sh", "-c", "dotnet ef database update && dotnet MetInProximityBack.dll"]
     depends_on:
-    - cosmos
-    - redis
-    - sqlEdge
+      sqlEdge:
+        condition: service_healthy
+      cosmos:
+        condition: service_healthy
 
   cosmos:
     image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator
     container_name: azure_cosmos_db 
     ports:
       - "8081:8081"  # API endpoint
+    network_mode: host 
     environment:
       - AZURE_COSMOS_EMULATOR_PARTITION_COUNT=3
       - AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE=true
       - AZURE_COSMOS_EMULATOR_IP_ADDRESS_OVERRIDE=127.0.0.1
     restart: always
     volumes:
-    - cosmosdb_data:/cosmosdb
+      - cosmosdb_data:/cosmosdb
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/_explorer/index.html"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   redis:
     image: redis:latest
@@ -41,6 +55,11 @@ services:
     environment:
         MSSQL_SA_PASSWORD: "MaxwellState1!"
         ACCEPT_EULA: "Y"
+    healthcheck:
+      test: ["CMD", "sqlcmd", "-S", "localhost", "-U", "sa", "-P", "MaxwellState1!", "-Q", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
 volumes:
     azure-sql-edge-data:

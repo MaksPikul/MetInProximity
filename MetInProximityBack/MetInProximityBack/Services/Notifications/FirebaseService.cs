@@ -26,7 +26,7 @@ using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
 namespace MetInProximityBack.Services.Notifications
 {
     public class FirebaseService(
-            AppDbContext context
+        AppDbContext context
     ) {
         private readonly AppDbContext _context = context;
 
@@ -34,7 +34,7 @@ namespace MetInProximityBack.Services.Notifications
         public async Task SendPushNotification(string recipientId, MessageResponse msgRes)
         {
             string fcmToken = await GetUserFcmToken(recipientId);
-            Console.WriteLine(fcmToken);
+
             if (fcmToken == null) {
                 return;
             }
@@ -42,19 +42,10 @@ namespace MetInProximityBack.Services.Notifications
             var message = new Message
             {
                 Token = fcmToken,
-                /*
-                Notification = new Notification
-                {
-                    Title = "Metin Message",
-                    Body = "Check who sent you a Message !"
-                },
-                */
                 Data = CreateFcmPayload(msgRes)
             };
 
             var response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
-                
-            Console.WriteLine("went : " + response);
         }
         private Dictionary<string, string> CreateFcmPayload(MessageResponse msgRes)
         {

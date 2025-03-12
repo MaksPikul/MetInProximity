@@ -21,10 +21,8 @@ namespace MetInProximityBack.Controllers
     public class LocationController(
         CosmoLocationRepo cosmosDb,
         MapService mapService
-
     ) : Controller
     {
-
         private readonly CosmoLocationRepo _cosmosDb = cosmosDb;
         private readonly MapService _mapService = mapService;
 
@@ -42,11 +40,8 @@ namespace MetInProximityBack.Controllers
 
                 string mapImageBase64 = await _mapService.GetMapTiles( llObj.lon, llObj.lat );
 
-                var response = new LocResObj {
-                    lon = llObj.lon,
-                    lat = llObj.lat,
-                    mapImage = mapImageBase64
-                };
+                var response = LocationFactory
+                    .CreateLocResObj( llObj.lon, llObj.lat, mapImageBase64 );
 
                 return Ok(response);
             }

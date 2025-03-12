@@ -27,6 +27,20 @@ namespace MetInProximityBack.Types.Location
             return location;
         }
 
+        public static LocResObj CreateLocResObj(
+            double lon ,
+            double lat ,
+            string mapImage
+        )
+        {
+            return new LocResObj
+            {
+                lon = lon,
+                lat = lat,
+                mapImage = mapImage
+            };
+        }
+
         public static Point CreatePoint(
             double longitude,
             double latitude

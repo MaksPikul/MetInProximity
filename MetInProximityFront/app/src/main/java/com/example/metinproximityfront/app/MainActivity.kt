@@ -2,6 +2,7 @@ package com.example.metinproximityfront.app
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +11,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -56,7 +61,6 @@ class MainActivity : ComponentActivity() {
                     this.authVm.onFailLogin
                 )
             }
-
         }
     }
 
@@ -82,9 +86,34 @@ class MainActivity : ComponentActivity() {
 
         this.createNotificationChannel()
 
+
         this.createViews()
 
+            /*
+            LaunchedEffect(intentState.value) {
+                Log.i("Main", "launchedEffect")
+                if (authVm.authService.IsLoggedIn()){
+                    homeVm.handleMessageNotifIntent(
+                        intentState.value
+                    )
+                }
+                else {
+                    mainVm.navController.navigate("Login")
+                }
+            }
+             */
+
+
         enableEdgeToEdge()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        Log.i("Main", "Handles intent")
+        setIntent(intent)
+        homeVm.handleMessageNotifIntent(
+            intent
+        )
     }
 
     private fun createViews(){
@@ -99,23 +128,32 @@ class MainActivity : ComponentActivity() {
                     startDestination = "Loading"
                 ) {
                     composable("Login") {
-                    LoginView(
-                        // This looks hella complicated, but its very nice
-                        // pass 1 parameter here, pass a second parameter in login view
-                        StartLogin = { provider ->
-                            this@MainActivity.authVm.authService.StartLogin(provider) { intent ->
-                                loginLauncher.launch(intent)
-                        }}
-                    ) }
+                        LoginView(
+                            // This looks hella complicated, but its very nice
+                            // pass 1 parameter here, pass a second parameter in login view
+                            StartLogin = { provider ->
+                                this@MainActivity.authVm.authService.StartLogin(provider) { intent ->
+                                    loginLauncher.launch(intent)
+                                }
+                            }
+                        )
+                    }
 
                     composable("Home") {
-                    HomeView(
-                        homeVm,
-                        { this@MainActivity.authVm.authService.Logout({ this@MainActivity.mainVm.navController.navigate("Login")})}
-                    ) }
+                        HomeView(
+                            homeVm,
+                            {
+                                this@MainActivity.authVm.authService.Logout({
+                                    this@MainActivity.mainVm.navController.navigate(
+                                        "Login"
+                                    )
+                                })
+                            }
+                        )
+                    }
 
-                    composable("Loading"){
-                    LoadingView()
+                    composable("Loading") {
+                        LoadingView()
                     }
                 }
 

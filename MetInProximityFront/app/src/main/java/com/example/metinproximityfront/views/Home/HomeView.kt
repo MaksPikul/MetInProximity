@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
@@ -45,6 +46,11 @@ fun HomeView(
         homeVm
     )
 
+    val onLogOut = {
+        homeVm.changeDrawerState()
+        logout()
+    }
+
     ModalNavigationDrawer(
         drawerState = homeVm.uiState.value.drawerState,
         content = {
@@ -65,7 +71,7 @@ fun HomeView(
                                     bottom = padding.calculateBottomPadding()
                                 )
                             )
-                            .background(color = Color.Red, shape = RoundedCornerShape(16.dp)),
+                            .background(color = Color.White , shape = RoundedCornerShape(16.dp)),
                     ) {
 
                         NavHost(navController = nc, startDestination = ScreenState.MAP.toString()) {
@@ -86,7 +92,7 @@ fun HomeView(
                 }
             )
         },
-        drawerContent = { ProfileDrawerContent(logout) }
+        drawerContent = { ProfileDrawerContent(onLogOut) }
     )
 
 }

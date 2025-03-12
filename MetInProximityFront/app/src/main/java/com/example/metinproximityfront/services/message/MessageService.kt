@@ -86,16 +86,6 @@ class MessageService(
                     locObj.lat,
                 )
 
-                val dummyMessage = MsgResObject(
-                    body = "Hello, this is a test message!",
-                    userId = "User123",
-                    isPublic = true,
-                    recipientId = null,
-                    timestamp = Date()
-                )
-                storeMessage(dummyMessage)
-                retrieveMessages(dummyMessage)
-                /*
                 val result: MsgResObject?
                 if (chatUser == null) {
                     result = msgRepo?.SendPublicMessageRepo(msgObj)
@@ -110,7 +100,6 @@ class MessageService(
 
                     retrieveMessages(msg)
                 }
-                 */
             }
             null
         } catch (ex: Throwable) {

@@ -65,7 +65,7 @@ class MainViewModel(
         locBinder,
     )
 
-    val mapService : MapService = MapService(
+    var mapService : MapService = MapService(
         locBinder,
         navController,
         ApiTokenWrapper(encryptedStoreService, refreshTokenApi)
@@ -74,6 +74,7 @@ class MainViewModel(
     init {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             if (destination.route == "Login") {
+                Log.i("Logout", "Services stopped")
                 stopServices()
             }
         }
@@ -91,7 +92,7 @@ class MainViewModel(
             // registers observer
             locBinder.registerObserver(mapService)
             // Initial Map load
-            //mapService.getMap()
+            mapService.getMap()
         }
         // SignalR
         this.signalRMsgReceiver.startConnection()

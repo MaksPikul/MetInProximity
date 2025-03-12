@@ -23,6 +23,7 @@ using MetInProximityBack.Constants;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using System.Text.Json;
+using Google;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -90,14 +91,6 @@ builder.Services.AddSingleton<CosmoLocationRepo>(sp =>
     )
 );
 
-/* Dont need this high lvl abstraction if using IDatabase
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    options.Configuration = builder.Configuration.GetConnectionString("RedisConnectionString");
-    options.InstanceName = "MetinInstance";
-});
-*/
-
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
     var configuration = builder.Configuration.GetConnectionString("RedisConnectionString");
@@ -114,9 +107,6 @@ builder.Services.AddScoped<IDatabase>(sp =>
     
 });
 
-builder.Logging.AddDebug();
-builder.Logging.AddConsole();
-
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
     options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+/ ";
@@ -127,7 +117,10 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
     options.Lockout.MaxFailedAccessAttempts = 3;
 }).AddEntityFrameworkStores<AppDbContext>();
 
+// Websockets Init
 builder.Services.AddSignalR();
+
+// Firebase Init (For Notifications)
 
 var fbConfigSection = builder.Configuration.GetSection("FirebaseConfig");
 
@@ -150,10 +143,11 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAndroidApp",
         policy =>
         {
-            policy.AllowAnyMethod()
-                  .WithOrigins("http://localhost", "https://MetinProximity.com")
-                  .AllowAnyHeader()
-                  .AllowCredentials();
+            policy
+                .AllowAnyMethod()
+                .WithOrigins("http://localhost", "https://MetinProximity.com")
+                .AllowAnyHeader()
+                .AllowCredentials();
         });
 });
 
@@ -234,11 +228,29 @@ builder.Services.AddHttpClient<IOAuthService, OAuthService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+var enableSwagger = builder.Configuration.GetValue<bool>("EnableSwagger", false);
+if (enableSwagger || builder.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+
+// Migrates SqlEdge to contain Identity Tables on start up
+// "person checking my app wont need to run anything to start testing"
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();  
+}
+
+// Does above but for Cosmos Db (NoSql)
+using (var scope = app.Services.CreateScope())
+{
+    var cosmosClient = scope.ServiceProvider.GetRequiredService<CosmosClient>();
+    var databaseResponse = await cosmosClient.CreateDatabaseIfNotExistsAsync(AppConstants.COSMO_LOC_DB);
+    var containerResponse = await databaseResponse.Database.CreateContainerIfNotExistsAsync(
+        AppConstants.COSMO_LOC_CON, AppConstants.COSMO_PART_KEY, 400
+    );
 }
 
 app.UseHttpsRedirection();

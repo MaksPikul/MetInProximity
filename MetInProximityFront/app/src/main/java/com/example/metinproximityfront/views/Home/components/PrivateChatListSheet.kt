@@ -46,8 +46,11 @@ import com.example.metinproximityfront.data.entities.users.ChatUser
 import com.example.metinproximityfront.data.enums.ScreenState
 import com.example.metinproximityfront.app.viewModels.HomeViewModel
 import com.example.metinproximityfront.data.entities.account.User
+import com.example.metinproximityfront.data.enums.LoadingState
 import com.example.metinproximityfront.views.Chat.InputBar
 import kotlin.reflect.jvm.internal.impl.descriptors.deserialization.PlatformDependentDeclarationFilter.All
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,14 +78,10 @@ fun PrivateChatListSheet (
             Column (
 
             ) {
+                when (homeVm.uiState.value.loadingState) {
+                LoadingState.LOADING -> null
 
-
-                // TODO : create screen manager, too much nesting, looks ugly
-                //when (homeVm.uiState.value.loadingState) {
-                    //LoadingState.LOADING -> null
-
-                    //LoadingState.READY ->
-                LazyColumn(
+                LoadingState.READY -> LazyColumn(
                         //state = listState,
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier
@@ -97,8 +96,8 @@ fun PrivateChatListSheet (
                             )
                         }
                     }
-                //}
-                // TODO -------------------------------------------------------
+                }
+
             }
         }
     }
@@ -106,7 +105,6 @@ fun PrivateChatListSheet (
 
 @Composable
 fun PrivateChatHeader (
-    ///homeVm: HomeViewModel,
     visible : Boolean
 ){
     Row (

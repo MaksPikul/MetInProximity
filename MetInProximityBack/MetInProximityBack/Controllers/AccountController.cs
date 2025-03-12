@@ -30,15 +30,13 @@ namespace MetInProximityBack.Controllers
             SignInManager<AppUser> signInManager,
             UserManager<AppUser> userManager,
             OAuthProviderFactory providerFactory,
-            AuthTokenService authTokenService,
-            IOAuthService OAuthService
+            AuthTokenService authTokenService
 
         ) { 
             _signInManager = signInManager;
             _userManager = userManager;
             _providerFactory = providerFactory;
             _authTokenService = authTokenService;
-            _OAuthService = OAuthService;
         }
 
         [HttpPost("oauth/{provider}")]
@@ -46,27 +44,12 @@ namespace MetInProximityBack.Controllers
             [FromBody] AuthRequest authRequest,
             [FromRoute] string provider
         ) {
-
             try
             {
-                // Factory which returns a OAuthProvider class, 
-                // this class contains methods and variables required to complete oauth 
+
                 IOAuthProvider OAuthProvider = _providerFactory.GetProvider(provider);
 
-                //var authCode = authRequest.AuthCode;
-                //var codeVerifier = authRequest.CodeVerifier;
-
-                //authCode = HttpUtility.UrlDecode(authCode);
-                // OAuth service using access code is now able to pass authentication when making requests to provider resource server (resource being user information)
-                // OAuthTokenResponse tokens = await _OAuthService.GetOAuthTokens(OAuthProvider.TokenUrl, OAuthProvider.GetReqValues(authCode, codeVerifier));
-
-                // Provider resource server returns a json of values, the Id token holding information about the user that we can use to authenticate them to our application
-                // the id_token is a JWT which can be simply decoded into a enumerable object of claims
-                // Claims are statements about a user, used by ASP.Net for authentication
                 IEnumerable<Claim> claims = _authTokenService.DecodeToken(authRequest.IdToken);
-
-                // Different providers id_tokens hold a differnt set of values, example, google has email key {email:"mail"} and microsoft as {mail : "mail"}
-                // using the Adapter Design pattern, we can unify the many interfaces to a common one that can be used by the server
 
                 OAuthUserDto user = await OAuthProvider.MapResponseToUser(claims);
 
@@ -76,9 +59,6 @@ namespace MetInProximityBack.Controllers
                     return BadRequest("Email not verified.");
                 }
 
-                // This part simply checks if user has logged in with such credentials before, if not a new account is made,
-                // A user who logs in with google can also log in with same emailed microsoft account, 
-                // If a client would not like this feature,we can change code for accounts to hold a value in database to note what oauth provider was used for this account, and check if they match
                 AppUser appUser = await _userManager.FindByEmailAsync(user.UserEmail); 
 
                 if (appUser == null) {
@@ -86,8 +66,11 @@ namespace MetInProximityBack.Controllers
                 }
                 else
                 {
-                    appUser.FcmToken = authRequest.FcmToken;
-                    await _userManager.UpdateAsync(appUser);
+                    if (appUser.FcmToken != authRequest.FcmToken)
+                    {
+                        appUser.FcmToken = authRequest.FcmToken;
+                        await _userManager.UpdateAsync(appUser);
+                    }
                 }
 
                 await _signInManager.SignInAsync(appUser, isPersistent: true);
@@ -97,7 +80,7 @@ namespace MetInProximityBack.Controllers
                 // Token for refreshing access token 1 month duration
                 string refreshToken = _authTokenService.CreateRefreshToken(User);
 
-                // OPTIONAL, PROBABLY WILL INCLUDE, STORE refreshToken into DB to REVOKE access by admin
+                // OPTIONAL, STORE refreshToken into DB to REVOKE access by admin
 
                 return Ok(new {accessToken, refreshToken});
             }
@@ -141,8 +124,7 @@ namespace MetInProximityBack.Controllers
             }
         }
 
-
-        //CLASS METHOD FOR NOW, WILL MOVE LATER, IF NECESSARY
+        // I think this is the only place that this method will be used, hence a private controller class
         private async Task<AppUser> CreateAppUser(string UserName, string Email, string fcmToken)
         {
             AppUser appUser = new AppUser {UserName = UserName, Email = Email, FcmToken = fcmToken};
@@ -150,9 +132,5 @@ namespace MetInProximityBack.Controllers
             //await _userManager.AddToRoleAsync(appUser, "User");
             return appUser;
         }
-
-
-        // I think this is the only place that this method will be used, hence a private controller class
-        
     }
 }

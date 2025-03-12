@@ -10,6 +10,7 @@ import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.example.metinproximityfront.app.MainActivity
 import com.example.metinproximityfront.config.Constants
 import com.example.metinproximityfront.data.api.RefreshTokenApi
 import com.example.metinproximityfront.data.entities.message.MsgResObject
@@ -28,6 +29,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Date
+import kotlin.random.Random
 
 class FirebaseMsgReceiver : FirebaseMessagingService() {
 
@@ -73,11 +75,9 @@ class FirebaseMsgReceiver : FirebaseMessagingService() {
 
         val key : String = this.storeMessage(msgObj)
 
-        val intent = Intent(this, /* TODO THIS HAS TO CHANGE */LocationService::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
+        val notifIntent = CreateIntent(key)
 
-        this.createAndRunNotification()
+        this.createAndRunNotification(notifIntent)
     }
 
     // Hate that i have to repeat code,
@@ -133,8 +133,22 @@ class FirebaseMsgReceiver : FirebaseMessagingService() {
     /*
         https://developer.android.com/develop/ui/views/notifications/build-notification
      */
+
+    private fun CreateIntent(key: String) : PendingIntent {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            action = Random.nextInt().toString()
+            putExtra("destination", key) // Pass route name to MainActivity
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+
+        val pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+
+        return pendingIntent
+    }
+
     @SuppressLint("MissingPermission")
     private fun createAndRunNotification(
+        notifIntent : PendingIntent
     ){
         var channelId = "firebase_channel"
 
@@ -143,6 +157,7 @@ class FirebaseMsgReceiver : FirebaseMessagingService() {
             .setContentTitle("Message Received")
             .setContentText("Check who sent you a message!")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .addAction(0, "Go To", notifIntent)
             .setAutoCancel(true)
             .build()
 

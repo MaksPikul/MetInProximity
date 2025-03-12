@@ -32,13 +32,13 @@ namespace MetInProximityBack.Controllers
         ) {
             try {
 
-                List<NearbyUser> nearbyUsers = await _msgService.GetNearbyUsersAsync(msgReq.lon, msgReq.lat, User.GetId());
+                List<NearbyUser> nearbyUsers = await _msgService.GetNearbyUsersAsync( msgReq.lon, msgReq.lat, User.GetId() );
 
-                List<NearbyUserWithConnId> nearUserswConnId = await _msgService.GetConnectionIdsAsync(nearbyUsers);
+                List<NearbyUserWithConnId> nearUserswConnId = await _msgService.GetConnectionIdsAsync( nearbyUsers );
 
-                MessageResponse msgRes = MessageFactory.CreateMessageResponse(msgReq, User.GetId(), true);
+                MessageResponse msgRes = MessageFactory.CreateMessageResponse( msgReq, User.GetId(), true );
 
-                await _notifService.RunPublicTasksAsync(msgRes, nearUserswConnId);
+                await _notifService.RunPublicTasksAsync( msgRes, nearUserswConnId );
 
                 return Ok(msgRes);
             }
@@ -57,7 +57,7 @@ namespace MetInProximityBack.Controllers
             {
                 string recipientConnId = await _msgService.GetConnectionIdAsync( msgReq.MsgRecipientId );
 
-                MessageResponse msgRes = MessageFactory.CreateMessageResponse(msgReq, User.GetId(), false, msgReq.MsgRecipientId);
+                MessageResponse msgRes = MessageFactory.CreateMessageResponse( msgReq, User.GetId(), false, msgReq.MsgRecipientId );
 
                 await _notifService.CreatePrivateTaskAsync(recipientConnId, msgRes);
 

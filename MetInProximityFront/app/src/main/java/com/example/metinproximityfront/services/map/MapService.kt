@@ -37,7 +37,7 @@ class MapService(
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val locObj: LocationObject = msgLocBinder.getCurrentLocation()
-
+                Log.i("MapService", "getMap Runs")
                 val result: String? = apiTokenWrapper.callApiWithToken { accessToken: String ->
                     mapApi.getMapApi(
                         locObj.lon,
@@ -47,6 +47,7 @@ class MapService(
                 }
 
                 result?.let { mapImage ->
+                    Log.i("MapService", "Map Object : " + mapImage)
                     updateLocation(mapImage)
                 }
             }
