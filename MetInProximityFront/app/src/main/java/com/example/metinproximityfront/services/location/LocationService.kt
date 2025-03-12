@@ -16,9 +16,12 @@ import android.util.Base64
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.metinproximityfront.config.Constants
+import com.example.metinproximityfront.data.api.RefreshTokenApi
 import com.example.metinproximityfront.data.entities.location.LocResObj
 import com.example.metinproximityfront.data.entities.location.LocationObject
+import com.example.metinproximityfront.data.remote.ApiServiceFactory
 import com.example.metinproximityfront.data.remote.ApiTokenWrapper
+import com.example.metinproximityfront.data.remote.PublicHttpClient.publicRetrofit
 import com.example.metinproximityfront.data.repositories.LocationRepo
 import com.example.metinproximityfront.interfaces.LocObserver
 import com.example.metinproximityfront.services.preference.EncryptedStoreService
@@ -39,6 +42,9 @@ class LocationService: Service() {
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
+    private val refreshTokenApi: RefreshTokenApi by lazy {
+        ApiServiceFactory(publicRetrofit)
+    }
     // theres gonna be like one observer in this list
     private val locObsMan = LocObserverManager()
 
@@ -47,7 +53,8 @@ class LocationService: Service() {
 
         locationRepo = LocationRepo(
             ApiTokenWrapper(
-                EncryptedStoreService(applicationContext)
+                EncryptedStoreService(applicationContext),
+                refreshTokenApi
             )
         )
 

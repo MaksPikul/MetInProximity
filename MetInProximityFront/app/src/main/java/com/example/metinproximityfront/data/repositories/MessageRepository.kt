@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.navigation.NavController
 import com.example.metinproximityfront.data.remote.ApiTokenWrapper
 import com.example.metinproximityfront.data.api.MessageApi
+import com.example.metinproximityfront.data.entities.error.AuthException
 import com.example.metinproximityfront.data.entities.message.MsgReqObject
 import com.example.metinproximityfront.data.entities.message.MsgResObject
 import com.example.metinproximityfront.data.remote.ApiServiceFactory
@@ -26,7 +27,7 @@ class MessageRepository(
             apiTokenWrapper.callApiWithToken { token: String ->
                 messageApi.SendPublicMessage(msgObj, token) // Extract response body
             }
-        } catch (e : ApiTokenWrapper.AuthException){
+        } catch (e : AuthException){
             Log.e("Auth Error", e.message.toString())
             navController.navigate("Login")
             null
@@ -45,7 +46,7 @@ class MessageRepository(
             apiTokenWrapper.callApiWithToken { token: String ->
                 messageApi.SendPrivateMessage(msgObj, token) // Extract response body
             }
-        } catch (e : ApiTokenWrapper.AuthException){
+        } catch (e : AuthException){
             Log.e("Auth Error", e.message.toString())
             navController.navigate("Login")
             null

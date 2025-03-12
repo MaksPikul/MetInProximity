@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
 import android.util.Log
+import com.example.metinproximityfront.data.entities.error.AuthException
 import com.example.metinproximityfront.data.entities.location.LocationObject
 import com.example.metinproximityfront.data.remote.ApiTokenWrapper
 import com.example.metinproximityfront.data.repositories.MapRepository
@@ -37,7 +38,7 @@ class MapService(
                     updateLocation(mapImage)
                 }
             }
-            catch (ex : ApiTokenWrapper.AuthException){
+            catch (ex : AuthException){
                 Log.e("Auth", ex.message.toString())
             }
             catch (ex : Throwable) {

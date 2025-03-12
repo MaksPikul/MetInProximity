@@ -50,37 +50,37 @@ object VERSION {
 }
 
 dependencies {
-
-    implementation ("net.openid:appauth:${VERSION.APPAUTH}")
-
-    // Chrome Custom tabs for the login window
-    implementation ("androidx.browser:browser:${VERSION.BROWSER}")
-
-    // API requests and JSON
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation ("com.squareup.okhttp3:okhttp:${VERSION.OKHTTP}")
-    implementation ("com.google.code.gson:gson:${VERSION.GSON}")
-
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-
+    // Authentication
+    implementation("net.openid:appauth:${VERSION.APPAUTH}")
+    implementation("androidx.browser:browser:${VERSION.BROWSER}")
     implementation("androidx.security:security-crypto:1.0.0")
 
+    // REST API stuff
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:okhttp:${VERSION.OKHTTP}")
+    implementation("com.google.code.gson:gson:${VERSION.GSON}")
+
+    // Firebase (Cloud Messaging)
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
     implementation("com.google.firebase:firebase-messaging")
     implementation("com.google.firebase:firebase-analytics")
 
+    // SignalR (Web sockets
     implementation("com.microsoft.signalr:signalr:9.0.1")
+
+    // JSON Web Tokens
     implementation("com.auth0:java-jwt:4.4.0")
-
-    implementation("com.google.android.gms:play-services-maps:18.2.0")
-    implementation("com.google.android.gms:play-services-location:20.0.0")
-
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
     implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
     implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
 
-    implementation("androidx.compose.material:material-icons-extended:1.3.0")
+    // Google Play Services
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.android.gms:play-services-location:20.0.0")
 
+    // Jetpack Compose
+    implementation("androidx.compose.material:material-icons-extended:1.3.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -90,20 +90,28 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
+
+    // Other
     implementation(libs.play.services.location)
     implementation(libs.volley)
-    //implementation(libs.androidx.security.crypto.ktx)
-    testImplementation(libs.junit)
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
+
+    // Unit Testing
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("io.mockk:mockk:1.13.8")
+    testImplementation("org.mockito:mockito-core:5.4.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
+    testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.9.3")
+
+    // Android Testing
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
-
-    implementation("org.mockito:mockito-core:5.4.0")
-    implementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
-    testImplementation("org.mockito:mockito-core:5.4.0")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
     androidTestImplementation(libs.androidx.ui.test.junit4)
+
+    // Debugging Tools
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }

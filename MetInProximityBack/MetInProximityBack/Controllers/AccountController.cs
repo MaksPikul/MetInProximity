@@ -119,7 +119,7 @@ namespace MetInProximityBack.Controllers
                 var tokenId = principle.Claims.GetClaimValue("TokenId");
                 var userId = principle.Claims.GetClaimValue("UserId");
 
-                AppUser user = await _userManager.FindByIdAsync(userId);
+                AppUser? user = await _userManager.FindByIdAsync(userId);
 
                 // User doesn't exist or token expired
                 if (user == null)

@@ -11,7 +11,6 @@ import javax.net.ssl.X509TrustManager
 
 object PublicHttpClient {
 
-
     val publicRetrofit: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(Constants.BASE_URL)

@@ -7,7 +7,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.navigation.NavHostController
 import com.example.metinproximityfront.services.location.LocationServiceBinder
 import com.example.metinproximityfront.config.Constants
+import com.example.metinproximityfront.data.api.RefreshTokenApi
+import com.example.metinproximityfront.data.remote.ApiServiceFactory
 import com.example.metinproximityfront.data.remote.ApiTokenWrapper
+import com.example.metinproximityfront.data.remote.PublicHttpClient.publicRetrofit
 import com.example.metinproximityfront.data.repositories.MapRepository
 import com.example.metinproximityfront.data.repositories.MessageRepository
 import com.example.metinproximityfront.data.repositories.UserRepo
@@ -34,8 +37,12 @@ class MainViewModel(
 
     var navController : NavHostController = NavHostController(app.applicationContext)
 
+    private val refreshTokenApi: RefreshTokenApi by lazy {
+        ApiServiceFactory(publicRetrofit)
+    }
+
     private val msgRepo : MessageRepository  = MessageRepository(
-        ApiTokenWrapper(encryptedStoreService),
+        ApiTokenWrapper(encryptedStoreService, refreshTokenApi),
         navController
     )
 
@@ -51,7 +58,7 @@ class MainViewModel(
     )
 
     private val userActionRepo : UserRepo = UserRepo(
-        ApiTokenWrapper(encryptedStoreService),
+        ApiTokenWrapper(encryptedStoreService, refreshTokenApi),
         navController
     )
     val userActionService : UserActionService = UserActionService(
@@ -60,7 +67,7 @@ class MainViewModel(
     )
 
     val mapRepo = MapRepository(
-        ApiTokenWrapper(encryptedStoreService)
+        ApiTokenWrapper(encryptedStoreService, refreshTokenApi)
     )
     val mapService : MapService = MapService(
         mapRepo,

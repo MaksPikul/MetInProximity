@@ -4,13 +4,11 @@ import android.location.Location
 import android.util.Log
 import com.example.metinproximityfront.data.remote.ApiTokenWrapper
 import com.example.metinproximityfront.data.api.LocationApi
+import com.example.metinproximityfront.data.entities.error.AuthException
 import com.example.metinproximityfront.data.entities.location.LocResObj
 import com.example.metinproximityfront.data.entities.location.LocationObject
 import com.example.metinproximityfront.data.remote.ApiServiceFactory
 import com.example.metinproximityfront.data.remote.PublicHttpClient.publicRetrofit
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class LocationRepo (
     private val apiTokenWrapper: ApiTokenWrapper
@@ -31,7 +29,7 @@ class LocationRepo (
                     token
                 )
             }
-        }catch (ex : ApiTokenWrapper.AuthException){
+        }catch (ex : AuthException){
             Log.e("Auth", ex.message.toString())
             null
         }

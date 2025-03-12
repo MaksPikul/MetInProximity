@@ -11,8 +11,11 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.metinproximityfront.config.Constants
+import com.example.metinproximityfront.data.api.RefreshTokenApi
 import com.example.metinproximityfront.data.entities.message.MsgResObject
+import com.example.metinproximityfront.data.remote.ApiServiceFactory
 import com.example.metinproximityfront.data.remote.ApiTokenWrapper
+import com.example.metinproximityfront.data.remote.PublicHttpClient.publicRetrofit
 import com.example.metinproximityfront.data.repositories.FcmRepository
 import com.example.metinproximityfront.services.location.LocationService
 import com.example.metinproximityfront.services.preference.EncryptedStoreService
@@ -34,6 +37,10 @@ class FirebaseMsgReceiver : FirebaseMessagingService() {
 
     private lateinit var fcmRepo : FcmRepository
 
+    private val refreshTokenApi: RefreshTokenApi by lazy {
+        ApiServiceFactory(publicRetrofit)
+    }
+
     override fun onCreate() {
         super.onCreate()
 
@@ -45,7 +52,7 @@ class FirebaseMsgReceiver : FirebaseMessagingService() {
             this.applicationContext
         )
         fcmRepo = FcmRepository(
-            ApiTokenWrapper(privateStore)
+            ApiTokenWrapper(privateStore, refreshTokenApi)
         )
     }
 

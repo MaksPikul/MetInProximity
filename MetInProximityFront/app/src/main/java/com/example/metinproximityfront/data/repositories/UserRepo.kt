@@ -3,6 +3,7 @@ package com.example.metinproximityfront.data.repositories
 import android.util.Log
 import androidx.navigation.NavController
 import com.example.metinproximityfront.data.api.UserApi
+import com.example.metinproximityfront.data.entities.error.AuthException
 import com.example.metinproximityfront.data.entities.location.LocationObject
 import com.example.metinproximityfront.data.entities.users.ChatUser
 import com.example.metinproximityfront.data.remote.ApiServiceFactory
@@ -23,7 +24,7 @@ class UserRepo (
             apiTokenWrapper.callApiWithToken { token: String ->
                 userActionApi.ChangeVisibilityApi(token)// Extract response body
             }
-        } catch (e : ApiTokenWrapper.AuthException){
+        } catch (e : AuthException){
             Log.e("Auth Error", e.message.toString())
             navController.navigate("Login")
             null
@@ -41,7 +42,7 @@ class UserRepo (
             apiTokenWrapper.callApiWithToken { token: String ->
                 userActionApi.GetPrivateUserApi(locObj, token)// Extract response body
             }
-        } catch (e : ApiTokenWrapper.AuthException){
+        } catch (e : AuthException){
             Log.e("Auth Error", e.message.toString())
             navController.navigate("Login")
             null
