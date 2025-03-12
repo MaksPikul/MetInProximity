@@ -41,21 +41,12 @@ class LocationServiceBinder (private val context: Context) {
         this.onBoundCallback = onBound
     }
 
-    fun unbindLocationService() {
-        if (isBound) {
-            context.unbindService(serviceConnection)
-            isBound = false
-            this.onBoundCallback = null
-        }
-    }
-
+    // These two are only used by binder, hence why they're public, less stuff in location service
     suspend fun getCurrentLocation(): LocationObject {
-        return locationService?.GetCurrentLocation()!!
+        return locationService?.locationClient!!.GetCurrentLocation()
     }
 
     fun registerObserver(locObserver: LocObserver) {
-        locationService?.registerObserver(locObserver)
+        locationService?.locObsMan?.registerObserver(locObserver)
     }
-
-
 }

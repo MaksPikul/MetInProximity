@@ -11,7 +11,6 @@ import com.example.metinproximityfront.data.api.RefreshTokenApi
 import com.example.metinproximityfront.data.remote.ApiServiceFactory
 import com.example.metinproximityfront.data.remote.ApiTokenWrapper
 import com.example.metinproximityfront.data.remote.PublicHttpClient.publicRetrofit
-import com.example.metinproximityfront.data.repositories.MapRepository
 import com.example.metinproximityfront.data.repositories.MessageRepository
 import com.example.metinproximityfront.data.repositories.UserRepo
 import com.example.metinproximityfront.services.location.LocationService
@@ -66,12 +65,10 @@ class MainViewModel(
         locBinder,
     )
 
-    val mapRepo = MapRepository(
-        ApiTokenWrapper(encryptedStoreService, refreshTokenApi)
-    )
     val mapService : MapService = MapService(
-        mapRepo,
-        locBinder
+        locBinder,
+        navController,
+        ApiTokenWrapper(encryptedStoreService, refreshTokenApi)
     )
 
     init {

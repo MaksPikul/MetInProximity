@@ -13,10 +13,6 @@ class LocObserverManager {
         observers.add(observer)
     }
 
-    fun unregisterObserver(observer: LocObserver) {
-        observers.remove(observer)
-    }
-
     fun notifyObservers(mapBitmap: String) {
         observers.forEach {
             Log.e("Observer", "Logs")

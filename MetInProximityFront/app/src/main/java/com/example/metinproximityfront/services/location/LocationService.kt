@@ -35,18 +35,14 @@ import kotlinx.coroutines.flow.onEach
 
 class LocationService: Service() {
 
-    private lateinit var locationClient: LocationClient
+    lateinit var locationClient: LocationClient
+    val locObsMan = LocObserverManager() // theres gonna be like one observer in this list
+
     private lateinit var locationRepo : LocationRepo
 
     private val binder = LocationServiceBinder(this)
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-
-    private val refreshTokenApi: RefreshTokenApi by lazy {
-        ApiServiceFactory(publicRetrofit)
-    }
-    // theres gonna be like one observer in this list
-    private val locObsMan = LocObserverManager()
 
     override fun onCreate() {
         super.onCreate()
@@ -54,7 +50,7 @@ class LocationService: Service() {
         locationRepo = LocationRepo(
             ApiTokenWrapper(
                 EncryptedStoreService(applicationContext),
-                refreshTokenApi
+                ApiServiceFactory(publicRetrofit)
             )
         )
 
@@ -93,56 +89,16 @@ class LocationService: Service() {
                 }
             }.launchIn(serviceScope)
 
-        val notification = this.CreateNotification() // Create Notification Service?
+        val notification = CreateNotification(this) // Method in file CreateNotificationFunc
 
         startForeground(4523, notification)
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
+    override fun onBind(intent: Intent?): IBinder {
         return binder
-    }
-
-    fun registerObserver(observer: LocObserver) {
-        locObsMan.registerObserver(observer)
-    }
-
-    suspend fun GetCurrentLocation() : LocationObject {
-        return locationClient.GetCurrentLocation()
     }
 
     inner class LocationServiceBinder(private val service: LocationService) : Binder() {
         fun getService(): LocationService = service
-    }
-
-    private fun CreateNotification(): Notification {
-        //https://stackoverflow.com/questions/20857120/what-is-the-proper-way-to-stop-a-service-running-as-foreground
-
-        val stopIntent : Intent = Intent(this, LocationService::class.java)
-        stopIntent.setAction( "STOP_SERVICE") /*Constants.ACTION.STOPFOREGROUND_ACTION*/
-        startService(stopIntent);
-
-        val pendingStopIntent = PendingIntent.getService(this, 0, stopIntent, PendingIntent.FLAG_IMMUTABLE)
-
-        val channelId = "4523"
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "MetInProximity"
-            var description = "Device open to receive messages for MetInProximity"
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-
-            val channel = NotificationChannel(channelId, name, importance)
-            val notificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
-
-        val notification: Notification = NotificationCompat
-            .Builder(this, channelId)
-            .setContentTitle("MetInProximity")
-            .setContentText("Listening for Messages")
-            .setSmallIcon(android.R.drawable.ic_menu_mylocation)
-            .addAction(0, "Stop", pendingStopIntent)
-            .build()
-
-        return notification
     }
 }

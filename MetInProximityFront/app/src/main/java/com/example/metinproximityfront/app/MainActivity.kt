@@ -143,7 +143,7 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         Log.i("MainActivity", "resumes")
-        if (this.authVm.authService.IsLoggedIn() /* TODO HOMEVM && Check if initialized */) {
+        if (this.authVm.authService.IsLoggedIn()) {
             this.mainVm.startServices()
         }
     }
