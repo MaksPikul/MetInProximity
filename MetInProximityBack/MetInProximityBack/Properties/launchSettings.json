@@ -1,20 +1,32 @@
 {
   "profiles": {
+    "MetInProximityBack": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "applicationUrl": "http://localhost:5000;http://localhost:5001", // http, https
+      "environmentVariables": {
+        "EnableSwagger": "true",
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
     "http": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
+        "EnableSwagger": "true",
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "http://localhost:5177"
+      "applicationUrl": "http://localhost:5000"
     },
     "https": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
+        "EnableSwagger": "true",
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
@@ -25,6 +37,7 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
+        "EnableSwagger": "true",
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
@@ -33,8 +46,9 @@
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
       "environmentVariables": {
-        "ASPNETCORE_HTTPS_PORTS": "8081",
-        "ASPNETCORE_HTTP_PORTS": "8080"
+        "EnableSwagger": "true",
+        "ASPNETCORE_HTTPS_PORTS": "5000",
+        "ASPNETCORE_HTTP_PORTS": "5001"
       },
       "publishAllPorts": true,
       "useSSL": true

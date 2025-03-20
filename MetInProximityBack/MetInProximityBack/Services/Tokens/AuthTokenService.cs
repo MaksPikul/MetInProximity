@@ -48,7 +48,7 @@ namespace MetInProximityBack.Services.Tokens
         {
             List<Claim> refreshTokenClaims = new ClaimsBuilder()
                     .AddClaim("TokenId", Guid.NewGuid().ToString()) // used to store in DB, and Revoke user access
-                    .AddClaim("UserId", User.FindFirstValue(ClaimTypes.NameIdentifier))
+                    .AddClaim(ClaimTypes.NameIdentifier, User.FindFirstValue(ClaimTypes.NameIdentifier))
                 .Build();
 
             var refreshToken = base.CreateToken(refreshTokenClaims, 30); // Month 43200

@@ -10,7 +10,8 @@ namespace MetInProximityBack.Types.Location
             string userId,
             double longitude,
             double latitude,
-            bool openToMessages
+            bool openToMessages,
+            bool openToPrivate = false
         )
         {
             var geohasher = new Geohasher();
@@ -21,7 +22,8 @@ namespace MetInProximityBack.Types.Location
                 UserId = userId,
                 Location = CreatePoint(longitude, latitude),
                 Geohash = geohasher.Encode(latitude, longitude),
-                openToMessages = openToMessages
+                openToMessages = openToMessages,
+                openToPrivate = openToPrivate
             };
 
             return location;

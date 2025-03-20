@@ -7,21 +7,21 @@ namespace MetInProximityBack.Services
 {
     [Obsolete("Class is unneccassry, this functionality is fufilled in the android app")]
     // Put alot of work and thought into this, feel bad deleting 
-    public class OAuthService : IOAuthService
+    public class OAuthService //: IOAuthService
     {
-        private readonly HttpClient _httpClient;
+        //private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
 
         //dependency injection from program.cs
         public OAuthService(
-            HttpClient httpClient,
+            //HttpClient httpClient,
             IConfiguration configuration
         )
         {
-            _httpClient = httpClient;
+            //_httpClient = httpClient;
             _configuration = configuration;
         }
-
+        /*
         public async Task<OAuthTokenResponse> GetOAuthTokens(string url, Dictionary<string,string> req)
         {
             var content = new FormUrlEncodedContent(req);
@@ -58,5 +58,6 @@ namespace MetInProximityBack.Services
 
             return response;
         }
+        */
     }
 }

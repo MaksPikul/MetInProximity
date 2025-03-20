@@ -1,5 +1,6 @@
 ﻿using MetInProximityBack.Data;
 using MetInProximityBack.Extensions;
+using MetInProximityBack.Interfaces.IServices;
 using MetInProximityBack.Services;
 using MetInProximityBack.Services.Tokens;
 using MetInProximityBack.Types.Location;
@@ -13,16 +14,16 @@ namespace MetInProximityBack.Controllers
     [Route("api/user")]
     [ApiController]
     public class UserController(
-        MessageService msgService,
+        IMessageService msgService,
         AuthTokenService authTokenService,
         AppDbContext appDbContext
     ) : Controller
     {
-        private readonly MessageService _msgService = msgService;
+        private readonly IMessageService _msgService = msgService;
         private readonly AuthTokenService _authTokenService = authTokenService;
         private readonly AppDbContext _appDbContext = appDbContext;
 
-        [HttpGet]
+        [HttpGet("private_users")]
         [Authorize]
         public async Task<IActionResult> GetAvailableForPrivateUserMsg(
             [FromBody] LonLatObject locObj

@@ -100,7 +100,7 @@ namespace MetInProximityBack.Controllers
                 ClaimsPrincipal principle = _authTokenService.ValidateToken(refreshToken);
 
                 var tokenId = principle.Claims.GetClaimValue("TokenId");
-                var userId = principle.Claims.GetClaimValue("UserId");
+                var userId = principle.Claims.GetClaimValue(ClaimTypes.NameIdentifier);
 
                 AppUser? user = await _userManager.FindByIdAsync(userId);
 

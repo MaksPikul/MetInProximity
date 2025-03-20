@@ -14,7 +14,6 @@ using MetInProximityBack.Hubs;
 using MetInProximityBack.Services.Tokens;
 using Microsoft.OpenApi.Models;
 using MetInProximityBack.Repositories;
-using MetInProximityBack.Interfaces.IRepos;
 using MetInProximityBack.Interfaces.IServices;
 using MetInProximityBack.Services.Notifications;
 using Microsoft.AspNetCore.RateLimiting;
@@ -23,16 +22,20 @@ using MetInProximityBack.Constants;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using System.Text.Json;
-using Google;
+using MetInProximityBack.Types.Location;
+using Microsoft.Azure.Cosmos.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
+builder.Services.AddHttpClient();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
 
 // This is for testing APIs :)
 builder.Services.AddSwaggerGen(option =>
@@ -63,7 +66,6 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
-/* REMOVE THIS IN PRODUCTION */
 CosmosClientOptions options = new()
 {
     HttpClientFactory = () => new HttpClient(new HttpClientHandler()
@@ -193,17 +195,8 @@ builder.Services.AddRateLimiter(options =>
 
 });
 
-
-/* Configure this
-builder.Services.AddHealthChecks()
-    .AddRedis(config.GetConnectionString("Redis"))
-    .AddAzureCosmosDb(config.GetConnectionString("CosmosDb"));
-
-app.MapHealthChecks("/health");
-*/
-
 /* dependency injections*/
-builder.Services.AddScoped<IOAuthService, OAuthService>();
+//builder.Services.AddScoped<IOAuthService, OAuthService>();
 builder.Services.AddScoped<AuthTokenService>();
 
 builder.Services.AddScoped<IMessageService, MessageService>();
@@ -220,27 +213,19 @@ builder.Services.AddTransient<OAuthProviderFactory>();
 builder.Services.AddTransient<IOAuthProvider, GoogleOAuthProvider>();
 builder.Services.AddTransient<IOAuthProvider, MicrosoftOAuthProvider>();
 
-/*
- following
-https://learn.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests
- */
-builder.Services.AddHttpClient<IOAuthService, OAuthService>();
-
 var app = builder.Build();
 
-var enableSwagger = builder.Configuration.GetValue<bool>("EnableSwagger", false);
-if (enableSwagger || builder.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 // Migrates SqlEdge to contain Identity Tables on start up
 // "person checking my app wont need to run anything to start testing"
+// No need for dummy users, tester should log in with provided google account, and use provided jwts to log into swagger and act as a second phone 
+// (send api calls to web server directly instead of from client to server)
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();  
+    await db.Database.MigrateAsync();  
 }
 
 // Does above but for Cosmos Db (NoSql)
@@ -251,6 +236,35 @@ using (var scope = app.Services.CreateScope())
     var containerResponse = await databaseResponse.Database.CreateContainerIfNotExistsAsync(
         AppConstants.COSMO_LOC_CON, AppConstants.COSMO_PART_KEY, 400
     );
+
+    // assumption is that if i created the container before, then i have ran this code before
+    if (containerResponse.StatusCode == System.Net.HttpStatusCode.Created)
+    {
+        Container container = containerResponse.Container;
+
+        var tasks = new List<Task>();
+
+        foreach (LocationObject dummyUser in AppConstants.CosmoDbDummyData)
+        {
+            tasks.Add(Task.Run(async () =>
+            {
+                await container.CreateItemAsync(dummyUser, new PartitionKey(dummyUser.UserId));
+
+            }));
+        }
+
+        await Task.WhenAll(tasks);
+
+        Console.WriteLine("CosmoDb (NoSql) has been populated with new dummy data");
+    }
+    else if (containerResponse.StatusCode == System.Net.HttpStatusCode.OK)
+    {
+        Console.WriteLine("CosmoDb (NoSql) already populated with dummy data");
+    }
+    else
+    {
+        Console.WriteLine("There has been an error creating container, and hence, populating database");
+    }
 }
 
 app.UseHttpsRedirection();
