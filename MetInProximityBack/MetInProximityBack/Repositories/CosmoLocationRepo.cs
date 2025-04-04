@@ -3,15 +3,12 @@ using MetInProximityBack.Constants;
 using Microsoft.Azure.Cosmos.Spatial;
 using MetInProximityBack.Types.Location;
 using Microsoft.Azure.Cosmos.Linq;
-using Microsoft.EntityFrameworkCore;
-using System.ClientModel.Primitives;
-using System.Threading;
-using NetTopologySuite.Index.HPRtree;
-
+using MetInProximityBack.Types.NearbyUser;
+using MetInProximityBack.Interfaces.IRepos;
 
 namespace MetInProximityBack.Repositories
 {
-    public class CosmoLocationRepo 
+    public class CosmoLocationRepo : IDocumentRepo
     {
 
         private Container _container;
@@ -80,9 +77,6 @@ namespace MetInProximityBack.Repositories
             return NearbyLocations.ToList();
         }
 
-        // This shoudl get latest
-        // Didnt give any lint errors
-        // FOR ASYNC OPS, use this setup (while loop)
         public async Task<LocationObject?> GetLocationByUserId(string userId)
         {
             var query = _container.GetItemLinqQueryable<LocationObject>()
@@ -90,33 +84,8 @@ namespace MetInProximityBack.Repositories
                 .OrderByDescending(locObj => locObj.Timestamp)
                 .ToFeedIterator();
 
-            while (query.HasMoreResults)
-            {
-                var response = await query.ReadNextAsync();
-                return response.FirstOrDefault(); // Get the first item from the response
-            }
-
-            return null;
+            var response = await query.ReadNextAsync();
+            return response.FirstOrDefault();
         }
     }
 }
-
-// find or create database and container
-
-/*
-    Container container = cosmosClient.GetContainer(databaseName, containerName);
-    if (container != null)
-    { 
-        return container;
-    }
-           
-    DatabaseResponse dbRes = await cosmosClient.CreateDatabaseIfNotExistsAsync(
-        id: databaseName,
-        throughput: 400
-    );
-
-    ContainerResponse conRes = await dbRes.Database.CreateContainerIfNotExistsAsync(
-    id: containerName,
-    partitionKeyPath: "/UserId"
-    );
-*/

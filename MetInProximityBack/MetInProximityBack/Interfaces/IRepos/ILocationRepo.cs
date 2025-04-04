@@ -1,4 +1,5 @@
 ﻿using MetInProximityBack.Types.Location;
+using MetInProximityBack.Types.NearbyUser;
 using Microsoft.Azure.Cosmos.Spatial;
 
 namespace MetInProximityBack.Interfaces.IRepos

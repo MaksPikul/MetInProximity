@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace MetInProximityBack.Types.Location
+namespace MetInProximityBack.Types.NearbyUser
 {
     public class NearbyUser
     {

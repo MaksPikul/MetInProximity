@@ -1,4 +1,5 @@
 ﻿using MetInProximityBack.Types.Location;
+using MetInProximityBack.Types.NearbyUser;
 
 namespace MetInProximityBack.Interfaces.IServices
 {

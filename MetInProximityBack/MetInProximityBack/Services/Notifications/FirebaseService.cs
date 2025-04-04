@@ -1,15 +1,14 @@
 ﻿using MetInProximityBack.Types.Message;
-//using Google.Apis.FirebaseCloudMessaging.v1;
-//using Google.Apis.FirebaseCloudMessaging.v1.Data;
 using MetInProximityBack.Data;
 using Microsoft.EntityFrameworkCore;
 using FirebaseAdmin.Messaging;
+using MetInProximityBack.Interfaces.IRepos;
 
 namespace MetInProximityBack.Services.Notifications
 {
     public class FirebaseService(
         AppDbContext context
-    ) {
+    ) : IPushNotifService {
         private readonly AppDbContext _context = context;
 
         // https://firebase.google.com/docs/cloud-messaging/send-message

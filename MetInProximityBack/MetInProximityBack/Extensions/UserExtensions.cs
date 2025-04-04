@@ -16,10 +16,16 @@ namespace MetInProximityBack.Extensions
             return idClaim?.Value;
         }
 
+        public static string GetName(this ClaimsPrincipal user)
+        {
+            var nameClaim = user.Claims.SingleOrDefault(x => x.Type == ClaimTypes.Name);
+            return nameClaim?.Value;
+        }
+
         public static string GetOpenToPrivate(this ClaimsPrincipal user)
         {
-            var idClaim = user.Claims.SingleOrDefault(x => x.Type == "OpenToPrivate");
-            return idClaim?.Value;
+            var otpClaim = user.Claims.SingleOrDefault(x => x.Type == "OpenToPrivate");
+            return otpClaim?.Value;
         }
     }
 }

@@ -23,7 +23,7 @@ using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using System.Text.Json;
 using MetInProximityBack.Types.Location;
-using Microsoft.Azure.Cosmos.Linq;
+using MetInProximityBack.Interfaces.IRepos;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -186,30 +186,23 @@ builder.Services.AddRateLimiter(options =>
         limiterOptions.AutoReplenishment = true;
     });
 
-    options.AddConcurrencyLimiter("signalr", limiterOptions =>
-    {
-        limiterOptions.PermitLimit = 25; 
-        limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        limiterOptions.QueueLimit = 5; 
-    });
-
 });
 
 /* dependency injections*/
 //builder.Services.AddScoped<IOAuthService, OAuthService>();
-builder.Services.AddScoped<AuthTokenService>();
+builder.Services.AddSingleton<AuthTokenService>();
 
 builder.Services.AddScoped<IMessageService, MessageService>();
-builder.Services.AddScoped<RedisCacheRepo>();
-builder.Services.AddScoped<CosmoLocationRepo>();
+builder.Services.AddScoped<ICacheRepo, RedisCacheRepo>();
+builder.Services.AddScoped<IDocumentRepo, CosmoLocationRepo>();
 
 builder.Services.AddScoped<INotificationService, NotificationService>();
-builder.Services.AddScoped<FirebaseService>();
-builder.Services.AddScoped<SignalRService>();
+builder.Services.AddScoped<IPushNotifService, FirebaseService>();
+builder.Services.AddScoped<IWebSocketService, SignalRService>();
 
 builder.Services.AddScoped<MapService>();
 
-builder.Services.AddTransient<OAuthProviderFactory>();
+builder.Services.AddSingleton<OAuthProviderFactory>();
 builder.Services.AddTransient<IOAuthProvider, GoogleOAuthProvider>();
 builder.Services.AddTransient<IOAuthProvider, MicrosoftOAuthProvider>();
 
@@ -273,7 +266,7 @@ app.UseAuthorization();
 
 app.UseCors("AllowAndroidApp");
 
-app.MapHub<ChatHub>("/chathub").RequireRateLimiting("signalr");
+app.MapHub<ChatHub>("/chathub");
 
 app.MapControllers();
 

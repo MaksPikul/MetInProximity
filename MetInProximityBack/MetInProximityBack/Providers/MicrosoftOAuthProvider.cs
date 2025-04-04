@@ -41,7 +41,7 @@ namespace MetInProximityBack.Providers
             return req;
         }
 
-        public async Task<OAuthUserDto> MapResponseToUser(IEnumerable<Claim> res)
+        public OAuthUserDto MapResponseToUser(IEnumerable<Claim> res)
         {
             var userEmail = res.GetClaimValue("email");
             var userName = res.GetClaimValue("name");

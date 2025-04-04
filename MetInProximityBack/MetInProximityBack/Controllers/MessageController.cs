@@ -1,6 +1,5 @@
 ﻿using MetInProximityBack.Enums;
 using MetInProximityBack.Models;
-using MetInProximityBack.Types.Location;
 using MetInProximityBack.Types.Message;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +8,7 @@ using MetInProximityBack.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using MetInProximityBack.Interfaces.IServices;
 using Microsoft.AspNetCore.RateLimiting;
+using MetInProximityBack.Types.NearbyUser;
 
 namespace MetInProximityBack.Controllers
 {

@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -55,17 +56,13 @@ import kotlin.reflect.jvm.internal.impl.descriptors.deserialization.PlatformDepe
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrivateChatListSheet (
-    sheetState : SheetState,
     homeVm: HomeViewModel
 ) {
-    // function to make publicly available
     val chatUsers by homeVm.userActionService.chatUsers.collectAsState()
-    val visibility by remember { mutableStateOf(User.userData?.openToPrivate) }
 
-    val onVisibilityChange = {
-        homeVm.userActionService.changeVisibility()
-    }
-
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = false,
+    )
 
     if (homeVm.uiState.value.botSheetVisible) {
         ModalBottomSheet(
@@ -75,13 +72,14 @@ fun PrivateChatListSheet (
             sheetState = sheetState,
             onDismissRequest = { homeVm.toggleBottomSheet() }
         ) {
-            Column (
+            Column {
 
-            ) {
+                PrivateChatHeader(homeVm)
+
                 when (homeVm.uiState.value.loadingState) {
-                LoadingState.LOADING -> null
+                    LoadingState.LOADING -> null
 
-                LoadingState.READY -> LazyColumn(
+                    LoadingState.READY -> LazyColumn(
                         //state = listState,
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier
@@ -105,8 +103,10 @@ fun PrivateChatListSheet (
 
 @Composable
 fun PrivateChatHeader (
-    visible : Boolean
+    homeVm: HomeViewModel,
 ){
+    val visibility by remember { mutableStateOf(User.userData?.openToPrivate) }
+
     Row (
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -120,10 +120,10 @@ fun PrivateChatHeader (
         Button (
             modifier = Modifier,
             onClick = {
-
+                homeVm.changeVisibility()
             }
         ) {
-            when (visible) {
+            when (visibility!!) {
                 true -> Icon(
                     imageVector = Icons.Default.Visibility,
                     contentDescription = "Toggle Password Visibility"
@@ -150,7 +150,7 @@ fun ChatUserBubble (
     ){
 
         Text(
-            text = chatUser.UserName,
+            text = "chatUser.UserName",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )
@@ -177,12 +177,6 @@ fun ChatViewPreview() {
         "1234",
         "tester"
     )
-
-    PrivateChatHeader (
-        ///homeVm: HomeViewModel,
-        false
-    )
-
 }
 
 @Composable

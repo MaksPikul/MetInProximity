@@ -1,19 +1,18 @@
 ﻿using MetInProximityBack.Interfaces.IServices;
 using MetInProximityBack.Services.Notifications;
-using MetInProximityBack.Types.Location;
 using MetInProximityBack.Types.Message;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.Azure.Cosmos;
+using MetInProximityBack.Types.NearbyUser;
+using MetInProximityBack.Interfaces.IRepos;
 
 namespace MetInProximityBack.Services
 {
     public class NotificationService(
-        SignalRService signalRService,
-        FirebaseService firebaseService
+        IWebSocketService wsService,
+        IPushNotifService pnService
     ) : INotificationService
     {
-        private readonly SignalRService _srService = signalRService;
-        private readonly FirebaseService _fbService = firebaseService;
+        private readonly IWebSocketService _srService = wsService;
+        private readonly IPushNotifService _fbService = pnService;
 
         public async Task RunPublicTasksAsync(MessageResponse msgRes, List<NearbyUserWithConnId> users)
         {

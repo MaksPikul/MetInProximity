@@ -1,4 +1,5 @@
 ﻿using MetInProximityBack.Builders;
+using MetInProximityBack.Extensions;
 using MetInProximityBack.Interfaces;
 using MetInProximityBack.Models;
 using Microsoft.Azure.Cosmos;
@@ -18,13 +19,13 @@ namespace MetInProximityBack.Services.Tokens
         {
             List<Claim> accessTokenClaims = new ClaimsBuilder()
                     .AddClaim("TokenId", Guid.NewGuid().ToString())
-                    .AddClaim(ClaimTypes.NameIdentifier, User.FindFirstValue(ClaimTypes.NameIdentifier))
-                    .AddClaim(ClaimTypes.Name, User.FindFirstValue(ClaimTypes.Name))
+                    .AddClaim(ClaimTypes.NameIdentifier, User.GetId())
+                    .AddClaim(ClaimTypes.Name, User.GetName())
                     .AddClaim("OpenToPrivate", openToPrivate.ToString())
-                    .AddClaim(ClaimTypes.Email, User.FindFirstValue(ClaimTypes.Email))
+                    .AddClaim(ClaimTypes.Email, User.GetEmail())
                 .Build();
 
-            string accessToken = base.CreateToken(accessTokenClaims, 30); // 30 mins
+            string accessToken = base.CreateToken(accessTokenClaims, 60 * 24 * 30); // 30 mins
 
             return accessToken;
         }
@@ -39,19 +40,19 @@ namespace MetInProximityBack.Services.Tokens
                     .AddClaim(ClaimTypes.Email, User.Email)
                 .Build();
 
-            string accessToken = base.CreateToken(accessTokenClaims, 30); // 30 mins
+            string accessToken = base.CreateToken(accessTokenClaims, 60 * 24 * 30); // 30 mins / days
 
             return accessToken;
         }
 
-        public string CreateRefreshToken(ClaimsPrincipal User)
+        public string CreateRefreshToken(AppUser User)
         {
             List<Claim> refreshTokenClaims = new ClaimsBuilder()
                     .AddClaim("TokenId", Guid.NewGuid().ToString()) // used to store in DB, and Revoke user access
-                    .AddClaim(ClaimTypes.NameIdentifier, User.FindFirstValue(ClaimTypes.NameIdentifier))
+                    .AddClaim(ClaimTypes.NameIdentifier, User.Id)
                 .Build();
 
-            var refreshToken = base.CreateToken(refreshTokenClaims, 30); // Month 43200
+            var refreshToken = base.CreateToken(refreshTokenClaims, 60 * 24 * 30); // Month 43200
 
             return refreshToken;
         }

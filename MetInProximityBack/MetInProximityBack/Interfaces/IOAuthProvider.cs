@@ -7,6 +7,6 @@ namespace MetInProximityBack.Interfaces
     public interface IOAuthProvider
     {
         string ProviderName { get; }
-        Task<OAuthUserDto> MapResponseToUser(IEnumerable<Claim> res);
+        OAuthUserDto MapResponseToUser(IEnumerable<Claim> res);
     }
 }

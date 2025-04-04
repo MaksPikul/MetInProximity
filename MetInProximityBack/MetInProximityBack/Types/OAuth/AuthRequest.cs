@@ -2,7 +2,7 @@
 {
     public class AuthRequest
     {
-        public string IdToken { get; set; } = String.Empty;
-        public string FcmToken { get; set; } = String.Empty;
+        public string IdToken { get; set; } = string.Empty;
+        public string FcmToken { get; set; } = string.Empty;
     }
 }

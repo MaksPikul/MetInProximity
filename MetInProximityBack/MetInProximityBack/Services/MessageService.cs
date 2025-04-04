@@ -1,13 +1,8 @@
 ﻿using MetInProximityBack.Constants;
-using MetInProximityBack.Hubs;
 using MetInProximityBack.Interfaces.IRepos;
 using MetInProximityBack.Interfaces.IServices;
-using MetInProximityBack.Repositories;
 using MetInProximityBack.Types.Location;
-using MetInProximityBack.Types.Message;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using MetInProximityBack.Types.NearbyUser;
 using System.Reflection;
 
 namespace MetInProximityBack.Services
@@ -17,13 +12,13 @@ namespace MetInProximityBack.Services
     // Notification Service actually sends out the messages,
     // LocationAndConnectionIdService would not be a good name
     public class MessageService (
-        CosmoLocationRepo cosmosDb,
-        RedisCacheRepo cacheRepo
+        IDocumentRepo cosmosDb,
+        ICacheRepo cacheRepo
     ) : IMessageService
     {
 
-        private readonly CosmoLocationRepo _cosmosDb = cosmosDb;
-        private readonly RedisCacheRepo _cacheRepo = cacheRepo;
+        private readonly IDocumentRepo _cosmosDb = cosmosDb;
+        private readonly ICacheRepo _cacheRepo = cacheRepo;
         public async Task<List<NearbyUser>> GetNearbyUsersAsync(double longitude, double latitude, string RequestingUserId)
         {
             // UserId : ConnectionString (SignalR)
@@ -85,10 +80,11 @@ namespace MetInProximityBack.Services
             return result;
         }
 
-        // Trying something out
         public async Task<LocationObject> UpdateLocation(LocationObject locationObject, string propertyName, object newVal)
         {
             PropertyInfo? property = typeof(LocationObject).GetProperty(propertyName);
+
+            Console.WriteLine($"Property: {property?.Name}, CanWrite: {property?.CanWrite}, PropertyType: {property?.PropertyType}, newVal Type: {newVal.GetType()}");
 
             if ((property != null && property.CanWrite) && property.PropertyType == newVal.GetType())
             {

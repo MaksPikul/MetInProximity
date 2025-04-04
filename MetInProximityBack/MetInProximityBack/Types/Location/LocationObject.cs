@@ -23,7 +23,7 @@ namespace MetInProximityBack.Types.Location
         [JsonProperty("open_to_messages")]
         public bool openToMessages { get; set; } = false;
 
-        [JsonProperty("open_to_Private")]
+        [JsonProperty("openToPrivate")]
         public bool openToPrivate { get; set; } = false;
 
 

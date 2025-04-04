@@ -1,6 +1,7 @@
 ﻿using MetInProximityBack.Enums;
 using MetInProximityBack.Extensions;
 using MetInProximityBack.Interfaces;
+using MetInProximityBack.Interfaces.IRepos;
 using MetInProximityBack.Models;
 using MetInProximityBack.Repositories;
 using MetInProximityBack.Services;
@@ -19,11 +20,11 @@ namespace MetInProximityBack.Controllers
     [Route("api/location")]
     [ApiController]
     public class LocationController(
-        CosmoLocationRepo cosmosDb,
+        IDocumentRepo cosmosDb,
         MapService mapService
     ) : Controller
     {
-        private readonly CosmoLocationRepo _cosmosDb = cosmosDb;
+        private readonly IDocumentRepo _cosmosDb = cosmosDb;
         private readonly MapService _mapService = mapService;
 
         [HttpPut]

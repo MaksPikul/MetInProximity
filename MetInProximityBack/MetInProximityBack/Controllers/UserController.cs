@@ -1,13 +1,16 @@
 ﻿using MetInProximityBack.Data;
+using MetInProximityBack.Enums;
 using MetInProximityBack.Extensions;
 using MetInProximityBack.Interfaces.IServices;
 using MetInProximityBack.Services;
 using MetInProximityBack.Services.Tokens;
 using MetInProximityBack.Types.Location;
+using MetInProximityBack.Types.NearbyUser;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MetInProximityBack.Controllers
 {
@@ -23,42 +26,65 @@ namespace MetInProximityBack.Controllers
         private readonly AuthTokenService _authTokenService = authTokenService;
         private readonly AppDbContext _appDbContext = appDbContext;
 
-        [HttpGet("private_users")]
         [Authorize]
-        public async Task<IActionResult> GetAvailableForPrivateUserMsg(
-            [FromBody] LonLatObject locObj
+        [HttpGet("private")]
+        public async Task<IActionResult> GetNearbyPrivateUsers(
+            [FromQuery] double lon,
+            [FromQuery] double lat
         ) {
-            List<NearbyUser> nearbyUsers = await _msgService.GetNearbyUsersAsync( locObj.lon, locObj.lat, User.GetId() );
+            try
+            {
+                    
+                List<NearbyUser> nearbyUsers = await _msgService.GetNearbyUsersAsync(lon, lat, User.GetId());
 
-            IEnumerable<NearbyUser> usersOpenToPrivate = nearbyUsers.Where(x => x.openToPrivate == true);
+                var usersOpenToPrivate = nearbyUsers.Where(x => x.openToPrivate == true).Select(nu => new { Id = nu.UserId }).ToList();
 
-            return Ok(usersOpenToPrivate);
+                return Ok(usersOpenToPrivate);
+                   
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
         }
 
         [HttpPatch("visibility")]
         [Authorize]
-        public async Task<IActionResult> UpdateUserAvailableForPrivateMsg()
+        public async Task<IActionResult> UpdateUserVisibility()
         {
-            string openToPrivate = User.GetOpenToPrivate();
-
-            if (openToPrivate != "true" || openToPrivate != "false")
+            try
             {
-                return BadRequest("FIELD ERROR");
-            }
+                string openToPrivate = User.GetOpenToPrivate();
 
-            bool openToPrivateBool = true;
-            if (openToPrivate == "true")
+                if (openToPrivate != "True" && openToPrivate != "False")
+                {
+                    return BadRequest("FIELD ERROR, openToPrivate does not correspond to 'TRUE' or 'FALSE'");
+                }
+
+                bool openToPrivateBool = true;
+                if (openToPrivate == "True")
+                {
+                    openToPrivateBool = false;
+                }
+
+                LocationObject? locObj = await _msgService.GetLatestLocationAsync( User.GetId() );
+
+                if (locObj != null)
+                {
+                    await _msgService.UpdateLocation(locObj, "openToPrivate", openToPrivateBool);
+                    Console.WriteLine("updates location");
+                }
+
+                string newAccessToken = _authTokenService.CreateAccessToken(User, openToPrivateBool);
+                Console.WriteLine("Creates Access Token");
+
+                return Ok(new { message = newAccessToken });
+            }
+            catch (Exception ex)
             {
-                openToPrivateBool = false;
+                return BadRequest(ex.Message);
             }
-
-            LocationObject? locObj = await _msgService.GetLatestLocationAsync( User.GetId() );
-
-            await _msgService.UpdateLocation(locObj, "openToPrivate", openToPrivate);
-
-            string newAccessToken = _authTokenService.CreateAccessToken(User, openToPrivateBool); 
-
-            return Ok(newAccessToken);
         }
 
         [HttpPatch("update")]
@@ -67,7 +93,6 @@ namespace MetInProximityBack.Controllers
             [FromQuery(Name = "token")] string token
         )
         {
-            Console.WriteLine("before");
             await _appDbContext
                 .Users
                 .Where(u => u.Id == User.GetId())
