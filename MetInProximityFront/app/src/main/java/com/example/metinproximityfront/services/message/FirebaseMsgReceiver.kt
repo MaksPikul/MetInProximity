@@ -13,6 +13,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.example.metinproximityfront.app.MainActivity
 import com.example.metinproximityfront.config.Constants
 import com.example.metinproximityfront.data.api.RefreshTokenApi
+import com.example.metinproximityfront.data.entities.account.User
 import com.example.metinproximityfront.data.entities.message.MsgResObject
 import com.example.metinproximityfront.data.remote.ApiServiceFactory
 import com.example.metinproximityfront.data.remote.ApiTokenWrapper
@@ -68,8 +69,10 @@ class FirebaseMsgReceiver : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
-        Log.i("s", "s")
-        message.data.forEach{Log.i("E", it.toString())}
+        Log.i("Push Notif data", "")
+        message.data.forEach{
+            Log.i( it.key.toString() , it.value.toString() )
+        }
 
         val msgObj : MsgResObject = mapRemoteToMsgRes(message)
 
@@ -85,7 +88,7 @@ class FirebaseMsgReceiver : FirebaseMessagingService() {
     // This would be simpler
     private fun storeMessage(msg: MsgResObject): String {
 
-        var key = Constants.PUBLIC_CHAT_KEY/*-${msg.UserId}"*/
+        var key = Constants.PUBLIC_CHAT_KEY(User.userData.value.userId)/*-${msg.UserId}"*/
         if (!msg.isPublic) {
             key = Constants.PRIVATE_CHAT_KEY(msg.userId, msg.recipientId)
         }
@@ -105,10 +108,14 @@ class FirebaseMsgReceiver : FirebaseMessagingService() {
         val key = if (msg.isPublic != true && msg.recipientId != null) {
             Constants.PRIVATE_CHAT_KEY(msg.userId, msg.recipientId)
         } else {
-            Constants.PUBLIC_CHAT_KEY
+            Constants.PUBLIC_CHAT_KEY(User.userData.value.userId)
         }
 
-        val json = publicStore.getFromPref(key)
+        val json = key?.let { publicStore.getFromPref(it) }
+        if (json.isNullOrEmpty()) {
+            // Handle the case where json is null or empty
+            return emptyList()
+        }
 
         val type = object : TypeToken<List<MsgResObject>>() {}.type
         val messagesList: List<MsgResObject> = Gson().fromJson(json, type)

@@ -15,7 +15,7 @@ import io.reactivex.rxjava3.core.Single
     https://proandroiddev.com/signalr-android-tutorial-fe2302b8bbca
  */
 class SignalRMsgReceiver(
-    private val msgService : MessageService,
+    private val msgService : MessageService?,
     private val encryptedStoreService : IStoreService,
 ) {
 
@@ -59,10 +59,10 @@ class SignalRMsgReceiver(
 
     private fun defineHubMethods() {
         hubConnection.on("ReceiveMessage", { msg: MsgResObject  ->
-            Log.i("SIGNALR_MSG", "GETS OBJECT")
-            val key : String = msgService.storeMessage( msg )
+            Log.i("SIGNALR_MSG_RECEIVED", "MESSAGE BODY: " + msg.body)
+            val key : String = msgService?.storeMessage( msg ).toString()
 
-            msgService.retrieveMessages( msg )
+            msgService?.retrieveMessages( msg , key )
 
         }, MsgResObject::class.java)
 

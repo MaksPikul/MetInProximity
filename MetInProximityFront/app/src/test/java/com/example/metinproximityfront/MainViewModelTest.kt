@@ -26,7 +26,7 @@ class MainViewModelTest {
         Dispatchers.setMain(StandardTestDispatcher())
 
         viewModel = MainViewModel(mockApplication).apply {
-            navController = mockNavController
+            mainNavController = mockNavController
             //locBinder = mockLocBinder
             mapService = mockMapService
             //signalRMsgReceiver = mockSignalR

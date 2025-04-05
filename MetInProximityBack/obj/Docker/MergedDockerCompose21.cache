@@ -1,0 +1,154 @@
+name: dockercompose11972178259193786532
+services:
+  cosmos:
+    container_name: azure_cosmos_db
+    deploy:
+      resources:
+        limits:
+          cpus: 2
+          memory: "1073741824"
+    environment:
+      AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE: "true"
+      AZURE_COSMOS_EMULATOR_PARTITION_COUNT: "3"
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -fk
+        - https://localhost:8081/_explorer/emulator.pem
+      timeout: 5s
+      interval: 21s
+      retries: 50
+    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator
+    networks:
+      metinproximity-network: null
+    ports:
+      - mode: ingress
+        target: 8081
+        published: "8081"
+        protocol: tcp
+    restart: always
+    volumes:
+      - type: volume
+        source: cosmosdb_data
+        target: /cosmosdb
+        volume: {}
+  metinproximityback:
+    build:
+      context: C:\Users\mmaks\Coding Projects\MetInProximity\MetInProximityBack
+      dockerfile: MetInProximityBack/Dockerfile
+    depends_on:
+      cosmos:
+        condition: service_healthy
+        required: true
+      sqlEdge:
+        condition: service_healthy
+        required: true
+    deploy:
+      resources:
+        limits:
+          cpus: 2
+          memory: "1073741824"
+    entrypoint:
+      - dotnet
+      - MetInProximityBack.dll
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ASPNETCORE_HTTPS_PORTS: "8081"
+      ASPNETCORE_URLS: http://+:5000
+      EnableSwagger: "true"
+    networks:
+      metinproximity-network: null
+    ports:
+      - mode: ingress
+        target: 5000
+        published: "5000"
+        protocol: tcp
+      - mode: ingress
+        target: 5001
+        published: "5001"
+        protocol: tcp
+      - mode: ingress
+        target: 8080
+        protocol: tcp
+      - mode: ingress
+        target: 8081
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: C:\Users\mmaks\AppData\Roaming/Microsoft/UserSecrets
+        target: /home/app/.microsoft/usersecrets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\mmaks\AppData\Roaming/ASP.NET/Https
+        target: /home/app/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+  redis:
+    container_name: azure_redis
+    deploy:
+      resources:
+        limits:
+          cpus: 1
+          memory: "536870912"
+    image: redis:latest
+    networks:
+      metinproximity-network: null
+    ports:
+      - mode: ingress
+        target: 6379
+        published: "6379"
+        protocol: tcp
+    restart: always
+  sqlEdge:
+    container_name: azure_sql_edge
+    deploy:
+      resources:
+        limits:
+          cpus: 2
+          memory: "1073741824"
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: MaxwellState1!
+    healthcheck:
+      test:
+        - CMD
+        - /opt/mssql-tools/bin/sqlcmd
+        - -S
+        - localhost
+        - -U
+        - sa
+        - -P
+        - MaxwellState1!
+        - -Q
+        - SELECT 1
+      timeout: 5s
+      interval: 10s
+      retries: 3
+    image: mcr.microsoft.com/azure-sql-edge
+    networks:
+      metinproximity-network: null
+    ports:
+      - mode: ingress
+        target: 1433
+        published: "1433"
+        protocol: tcp
+    restart: always
+    volumes:
+      - type: volume
+        source: azure-sql-edge-data
+        target: /var/opt/mssql
+        volume: {}
+networks:
+  metinproximity-network:
+    name: dockercompose11972178259193786532_metinproximity-network
+    driver: bridge
+volumes:
+  azure-sql-edge-data:
+    name: dockercompose11972178259193786532_azure-sql-edge-data
+  cosmosdb_data:
+    name: dockercompose11972178259193786532_cosmosdb_data

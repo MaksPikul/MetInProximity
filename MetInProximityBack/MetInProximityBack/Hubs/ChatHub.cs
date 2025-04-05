@@ -7,11 +7,10 @@ using Microsoft.AspNetCore.SignalR;
 namespace MetInProximityBack.Hubs
 {
     public class ChatHub(
-        RedisCacheRepo cache
+        ICacheRepo cache
     ) : Hub
     {
-        private readonly RedisCacheRepo _cacheService = cache;
-
+        private readonly ICacheRepo _cacheService = cache;
 
         public override async Task OnConnectedAsync()
         {
@@ -25,8 +24,7 @@ namespace MetInProximityBack.Hubs
                     return;
                 }
 
-                Console.WriteLine(userId);
-                Console.WriteLine(Context.ConnectionId.ToString());
+                Console.WriteLine("Connected UserId: " + userId);  
 
                 if (string.IsNullOrEmpty(userId))
                 {
@@ -36,7 +34,9 @@ namespace MetInProximityBack.Hubs
                 }
 
                 string connectionKey = AppConstants.ConnIdCacheKey(userId);
-                
+                Console.WriteLine("User ConnectionId: " + Context.ConnectionId);
+
+
                 await _cacheService.AddToCacheAsync(connectionKey, Context.ConnectionId);
 
                 await base.OnConnectedAsync();
@@ -52,7 +52,10 @@ namespace MetInProximityBack.Hubs
 
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
+            Console.WriteLine($"User Disconnected: {exception}");
+
             var userId = Context.User.GetId();
+            Console.WriteLine("Disconnecting UserId: " + userId );
 
             if (userId == null)
             {

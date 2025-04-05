@@ -41,12 +41,13 @@ namespace MetInProximityBack.Services
                 }
                 else
                 {
-                    await _fbService.SendPushNotification(msgRes.UserId, msgRes);
+                    await _fbService.SendPushNotification(recipientConnId, msgRes);
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Failure to send message, Error :", ex.Message);
+                throw ex;
             }
         }
 
@@ -66,6 +67,7 @@ namespace MetInProximityBack.Services
             catch (Exception ex)
             {
                 Console.WriteLine("Failure to send message, Error :", ex.Message);
+                throw ex;
             }
         }
     }

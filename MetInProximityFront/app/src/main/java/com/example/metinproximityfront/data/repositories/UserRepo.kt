@@ -1,8 +1,9 @@
 package com.example.metinproximityfront.data.repositories
 
 import android.util.Log
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.metinproximityfront.data.api.UserApi
+import com.example.metinproximityfront.data.entities.account.StringRes
 import com.example.metinproximityfront.data.entities.error.AuthException
 import com.example.metinproximityfront.data.entities.location.LocationObject
 import com.example.metinproximityfront.data.entities.users.ChatUser
@@ -12,21 +13,25 @@ import com.example.metinproximityfront.data.remote.PublicHttpClient.publicRetrof
 
 class UserRepo (
     private val apiTokenWrapper: ApiTokenWrapper,
-    private val navController: NavController
+    private val mainNavController: NavHostController
 ) {
 
     private val userActionApi: UserApi by lazy {
         ApiServiceFactory(publicRetrofit)
     }
 
-    suspend fun changeVisibilityRepo() : String? {
+    suspend fun changeVisibilityRepo(
+    ) : StringRes? {
         return try {
             apiTokenWrapper.callApiWithToken { token: String ->
-                userActionApi.ChangeVisibilityApi(token)// Extract response body
+                userActionApi.ChangeVisibilityApi(
+                    token
+                )
             }
+
         } catch (e : AuthException){
             Log.e("Auth Error", e.message.toString())
-            navController.navigate("Login")
+            mainNavController.navigate("Login")
             null
         }
         catch (e: Exception) {
@@ -36,15 +41,19 @@ class UserRepo (
     }
 
     suspend fun getPrivateUsersRepo(
-        locObj : LocationObject
+        locObj : LocationObject,
     ) : List<ChatUser>? {
         return try {
             apiTokenWrapper.callApiWithToken { token: String ->
-                userActionApi.GetPrivateUserApi(locObj, token)// Extract response body
+                userActionApi.GetPrivateUserApi(
+                    locObj.lon,
+                    locObj.lat,
+                    token
+                )
             }
         } catch (e : AuthException){
             Log.e("Auth Error", e.message.toString())
-            navController.navigate("Login")
+            mainNavController.navigate("Login")
             null
         }
         catch (e: Exception) {

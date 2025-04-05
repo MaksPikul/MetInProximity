@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.util.Base64
 import android.util.Log
-import android.widget.Toast
 import com.example.metinproximityfront.config.Constants
 import com.example.metinproximityfront.config.oauth.OAuthConfig
 import com.example.metinproximityfront.data.entities.account.AuthRequest
@@ -58,8 +57,6 @@ class AuthService(
 
         val request = createAuthorizationRequest(config, provider, codePair)
 
-        Log.d("verifier", codePair.first)
-
         val authIntent = authService.getAuthorizationRequestIntent(request)
         this.curProvider = provider.name
 
@@ -70,7 +67,7 @@ class AuthService(
         responseIntent: Intent,
         fcmToken: String,
         onSuccessfulLogin: () -> Unit,
-        onFailedLogin: (errorMsg: String?, errorCode: String?) -> Unit
+        onFailedLogin: (errorMsg : String?, errorCode : String?) -> Unit
     ) {
         val authResponse: AuthorizationResponse? = AuthorizationResponse.fromIntent(responseIntent)
         val error = AuthorizationException.fromIntent(responseIntent)
@@ -109,16 +106,13 @@ class AuthService(
 
     override fun IsLoggedIn() : Boolean {
         val accessTokenKey = Constants.ACCESS_TOKEN_KEY
-
         val isEmpty = this.prefStore.getFromPref(accessTokenKey) != ""
-        //val isExpired = this
         return isEmpty
     }
 
     /*
         Start Login Helper Functions
     */
-
     private fun createAuthorizationRequest(config: AuthorizationServiceConfiguration, provider: OAuthConfig, codePair: Pair<String, String>): AuthorizationRequest {
 
         val scopes = when (provider.name) {
@@ -186,6 +180,7 @@ class AuthService(
         onSuccessfulLogin: () -> Unit,
         onFailedLogin: (errorMsg: String?, errorCode: String?) -> Unit
     ) {
+
         val authResult: AuthResult = accountRepo.Authenticate(
             provider = curProvider.toString(),
             authRequest = AuthRequest(
@@ -209,14 +204,14 @@ class AuthService(
         onFailedLogin: (errorMsg: String?, errorCode: String?) -> Unit
     ) {
 
-        Log.i("Access", authResult.accessToken.toString())
-        Log.i("Refresh", authResult.refreshToken.toString())
+        Log.i("Access Token", authResult.accessToken.toString())
+        Log.i("Refresh Token", authResult.refreshToken.toString())
 
         if (authResult.isSuccessful) {
             storeTokens(authResult)
             onSuccessfulLogin()
         } else {
-            onFailedLogin(authResult.error, "400")
+            onFailedLogin(authResult.message, "400")
         }
     }
 

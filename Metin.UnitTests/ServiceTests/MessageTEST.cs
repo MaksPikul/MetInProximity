@@ -14,6 +14,7 @@ using MetInProximityBack.Constants;
 using Microsoft.Azure.Cosmos;
 using StackExchange.Redis;
 using Xunit.Abstractions;
+using MetInProximityBack.Types.NearbyUser;
 
 namespace Metin.UnitTests.ServiceTests
 {
@@ -23,7 +24,7 @@ namespace Metin.UnitTests.ServiceTests
     // These two have some sort of logic which other than send/get data
 
 
-   
+
 
 
 

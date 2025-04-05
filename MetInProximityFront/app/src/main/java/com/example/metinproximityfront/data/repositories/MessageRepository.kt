@@ -2,6 +2,7 @@ package com.example.metinproximityfront.data.repositories
 
 import android.util.Log
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.metinproximityfront.data.remote.ApiTokenWrapper
 import com.example.metinproximityfront.data.api.MessageApi
 import com.example.metinproximityfront.data.entities.error.AuthException
@@ -12,7 +13,7 @@ import com.example.metinproximityfront.data.remote.PublicHttpClient.publicRetrof
 
 class MessageRepository(
     private val apiTokenWrapper: ApiTokenWrapper,
-    private val navController: NavController
+    private val mainNavController: NavHostController
 ) {
 
     private val messageApi: MessageApi by lazy {
@@ -21,7 +22,6 @@ class MessageRepository(
 
     suspend fun SendPublicMessageRepo(
         msgObj : MsgReqObject
-        // onSuccess : ()-> Unit
     ) : MsgResObject? {
         return try {
             apiTokenWrapper.callApiWithToken { token: String ->
@@ -29,7 +29,7 @@ class MessageRepository(
             }
         } catch (e : AuthException){
             Log.e("Auth Error", e.message.toString())
-            navController.navigate("Login")
+            mainNavController.navigate("Login")
             null
         }
         catch (e: Exception) {
@@ -40,7 +40,6 @@ class MessageRepository(
 
     suspend fun SendPrivateMessageRepo(
         msgObj : MsgReqObject
-        // onSuccess : ()-> Unit
     ) : MsgResObject? {
         return try {
             apiTokenWrapper.callApiWithToken { token: String ->
@@ -48,7 +47,7 @@ class MessageRepository(
             }
         } catch (e : AuthException){
             Log.e("Auth Error", e.message.toString())
-            navController.navigate("Login")
+            mainNavController.navigate("Login")
             null
         }
         catch (e: Exception) {

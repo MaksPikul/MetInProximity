@@ -1,6 +1,6 @@
 package com.example.metinproximityfront.data.enums
 
-enum class PrivUserListSheet {
+enum class UserLoadState {
     LOADING,
     READY
 }

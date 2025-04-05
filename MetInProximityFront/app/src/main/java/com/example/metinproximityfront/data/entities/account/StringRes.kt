@@ -1,5 +1,5 @@
 package com.example.metinproximityfront.data.entities.account
 
-data class AccessTokenRes(
+data class StringRes(
     val message : String
 )

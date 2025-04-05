@@ -2,7 +2,6 @@ package com.example.metinproximityfront.app.viewModels
 
 import android.app.Application
 import android.content.Intent
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.navigation.NavHostController
 import com.example.metinproximityfront.services.location.LocationServiceBinder
@@ -40,45 +39,38 @@ class MainViewModel(
         ApiServiceFactory(publicRetrofit)
     }
 
-    private val msgRepo : MessageRepository  = MessageRepository(
+    private var msgRepo = MessageRepository(
         ApiTokenWrapper(encryptedStoreService, refreshTokenApi),
         navController
     )
 
-    val msgService : MessageService = MessageService(
+    val msgService = MessageService(
         this.storeService,
         this.msgRepo,
         locBinder,
     )
 
-    private val signalRMsgReceiver : SignalRMsgReceiver = SignalRMsgReceiver(
-        this.msgService,
-        encryptedStoreService
+    val signalRMsgReceiver = SignalRMsgReceiver(
+    this.msgService,
+    encryptedStoreService
     )
 
-    private val userActionRepo : UserRepo = UserRepo(
+    val userActionRepo = UserRepo(
         ApiTokenWrapper(encryptedStoreService, refreshTokenApi),
         navController
     )
-    val userActionService : UserActionService = UserActionService(
+
+    val userActionService = UserActionService(
         this.userActionRepo,
         locBinder,
+        encryptedStoreService
     )
 
-    var mapService : MapService = MapService(
+    val mapService = MapService(
         locBinder,
         navController,
         ApiTokenWrapper(encryptedStoreService, refreshTokenApi)
     )
-
-    init {
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.route == "Login") {
-                Log.i("Logout", "Services stopped")
-                stopServices()
-            }
-        }
-    }
 
     fun startServices() {
         // Location Service
@@ -86,7 +78,6 @@ class MainViewModel(
             action = Constants.START_LOC_SERVICE
             app.startService(this)
         }
-
         // Binds and calls callback once locationService Bound
         this.locBinder.bindLocationService {
             // registers observer

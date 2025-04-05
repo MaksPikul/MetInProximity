@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.metinproximityfront.data.api.MapApi
+import com.example.metinproximityfront.data.entities.account.StringRes
 import com.example.metinproximityfront.data.entities.error.AuthException
 import com.example.metinproximityfront.data.entities.location.LocationObject
 import com.example.metinproximityfront.data.remote.ApiServiceFactory
@@ -19,10 +20,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import okhttp3.ResponseBody
+import retrofit2.Response
 
 class MapService(
     private val msgLocBinder : LocationServiceBinder,
-    private val navController: NavHostController,
+    private val mainNavController: NavHostController,
     private val apiTokenWrapper: ApiTokenWrapper
 ): LocObserver
 {
@@ -33,12 +36,12 @@ class MapService(
         ApiServiceFactory(publicRetrofit)
     }
 
-    fun getMap(){
+    fun getMap( ){
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val locObj: LocationObject = msgLocBinder.getCurrentLocation()
                 Log.i("MapService", "getMap Runs")
-                val result: String? = apiTokenWrapper.callApiWithToken { accessToken: String ->
+                val mapBody: StringRes = apiTokenWrapper.callApiWithToken { accessToken: String ->
                     mapApi.getMapApi(
                         locObj.lon,
                         locObj.lat,
@@ -46,14 +49,11 @@ class MapService(
                     )
                 }
 
-                result?.let { mapImage ->
-                    Log.i("MapService", "Map Object : " + mapImage)
-                    updateLocation(mapImage)
-                }
+                updateLocation(mapBody.message)
             }
             catch (ex : AuthException){
                 Log.e("Auth", ex.message.toString())
-                navController.navigate("Login")
+                mainNavController.navigate("Login")
             }
             catch (ex : Exception) {
                 // Show UI error

@@ -10,9 +10,6 @@ import com.example.metinproximityfront.data.repositories.AccountRepository
 import com.example.metinproximityfront.services.permissions.PermissionManager
 import com.example.metinproximityfront.services.auth.AuthService
 import com.example.metinproximityfront.services.auth.IAuthService
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 class AuthViewModel(
     private val app: Application,
@@ -26,10 +23,6 @@ class AuthViewModel(
     val accountRepo: AccountRepository
     val authService : IAuthService
 
-    // https://developer.android.com/kotlin/flow/stateflow-and-sharedflow
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow() // adding this just in case i need to use it as a state
-
     // These necessary for login page,
     // Once user logs in, other necessary objects are initialised
     init{
@@ -42,19 +35,6 @@ class AuthViewModel(
             mainVm.encryptedStoreService,
             this.accountRepo
         )
-
-    }
-
-    fun startLoadingView(){
-
-        _isLoading.value = true
-        mainVm.navController.navigate("Loading")
-    }
-
-    fun stopLoadingView(nextScreen : String){
-
-        _isLoading.value = false
-        mainVm.navController.navigate(nextScreen)
     }
 
     fun CheckLoginStatus() {
@@ -62,7 +42,7 @@ class AuthViewModel(
             onSuccLogin()
         }
         else {
-            stopLoadingView("Login")
+            onFailLogin("Session Ended", "401")
         }
     }
 
@@ -81,4 +61,11 @@ class AuthViewModel(
         Unit
     }
 
+    fun startLoadingView(){
+        mainVm.navController.navigate("Loading")
+    }
+
+    fun stopLoadingView(nextScreen : String){
+        mainVm.navController.navigate(nextScreen)
+    }
 }

@@ -39,8 +39,10 @@ namespace MetInProximityBack.Controllers
 
                 var usersOpenToPrivate = nearbyUsers.Where(x => x.openToPrivate == true).Select(nu => new { Id = nu.UserId }).ToList();
 
+                Console.WriteLine("These users in list: " + usersOpenToPrivate);    
+
                 return Ok(usersOpenToPrivate);
-                   
+                 
             }
             catch (Exception ex)
             {
@@ -73,11 +75,11 @@ namespace MetInProximityBack.Controllers
                 if (locObj != null)
                 {
                     await _msgService.UpdateLocation(locObj, "openToPrivate", openToPrivateBool);
-                    Console.WriteLine("updates location");
                 }
 
                 string newAccessToken = _authTokenService.CreateAccessToken(User, openToPrivateBool);
-                Console.WriteLine("Creates Access Token");
+
+                Console.WriteLine("New Visibility: " + openToPrivateBool.ToString());
 
                 return Ok(new { message = newAccessToken });
             }

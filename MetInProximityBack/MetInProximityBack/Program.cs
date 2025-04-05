@@ -147,7 +147,7 @@ builder.Services.AddCors(options =>
         {
             policy
                 .AllowAnyMethod()
-                .WithOrigins("http://localhost", "https://MetinProximity.com")
+                .WithOrigins("http://10.0.2.2", "https://MetinProximity.com")
                 .AllowAnyHeader()
                 .AllowCredentials();
         });
@@ -176,18 +176,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddRateLimiter(options =>
-{
-    options.AddTokenBucketLimiter("chat", limiterOptions =>
-    {
-        limiterOptions.TokenLimit = 10; 
-        limiterOptions.TokensPerPeriod = 5; 
-        limiterOptions.ReplenishmentPeriod = TimeSpan.FromMinutes(1);
-        limiterOptions.AutoReplenishment = true;
-    });
-
-});
-
 /* dependency injections*/
 //builder.Services.AddScoped<IOAuthService, OAuthService>();
 builder.Services.AddSingleton<AuthTokenService>();
@@ -210,6 +198,7 @@ var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
+
 
 // Migrates SqlEdge to contain Identity Tables on start up
 // "person checking my app wont need to run anything to start testing"
@@ -269,8 +258,6 @@ app.UseCors("AllowAndroidApp");
 app.MapHub<ChatHub>("/chathub");
 
 app.MapControllers();
-
-app.UseRateLimiter();
 
 app.Run();
 

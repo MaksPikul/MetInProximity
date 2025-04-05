@@ -11,9 +11,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -35,7 +32,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var authVm : AuthViewModel
     private lateinit var homeVm : HomeViewModel
 
-    val permissionListener = PermissionListener(this) // Really dont like the fact this is here, dont want to have a large nesting of parameters tho
+    private val permissionListener = PermissionListener(this) // Really dont like the fact this is here, dont want to have a large nesting of parameters tho
 
     private val loginLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()){
@@ -86,45 +83,25 @@ class MainActivity : ComponentActivity() {
 
         this.createNotificationChannel()
 
-
         this.createViews()
 
-            /*
-            LaunchedEffect(intentState.value) {
-                Log.i("Main", "launchedEffect")
-                if (authVm.authService.IsLoggedIn()){
-                    homeVm.handleMessageNotifIntent(
-                        intentState.value
-                    )
-                }
-                else {
-                    mainVm.navController.navigate("Login")
-                }
-            }
-             */
-
-
         enableEdgeToEdge()
-    }
-
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        Log.i("Main", "Handles intent")
-        setIntent(intent)
-        homeVm.handleMessageNotifIntent(
-            intent
-        )
     }
 
     private fun createViews(){
         setContent {
             MetInProximityFrontTheme {
                 val nc = rememberNavController()
+                nc.addOnDestinationChangedListener { _, destination, _ ->
+                    if (destination.route == "Login") {
+                        Log.i("Logout", "Services stopped")
+                        mainVm.stopServices()
+                    }
+                }
                 mainVm.navController = nc
 
                 NavHost(
                     navController = nc,
-                    // instead of this, check for tokens, if present, run InitAndMoveToHome
                     startDestination = "Loading"
                 ) {
                     composable("Login") {
@@ -132,9 +109,7 @@ class MainActivity : ComponentActivity() {
                             // This looks hella complicated, but its very nice
                             // pass 1 parameter here, pass a second parameter in login view
                             StartLogin = { provider ->
-                                this@MainActivity.authVm.authService.StartLogin(provider) { intent ->
-                                    loginLauncher.launch(intent)
-                                }
+                                authVm.authService.StartLogin(provider) { intent -> loginLauncher.launch(intent) }
                             }
                         )
                     }
@@ -142,13 +117,9 @@ class MainActivity : ComponentActivity() {
                     composable("Home") {
                         HomeView(
                             homeVm,
-                            {
-                                this@MainActivity.authVm.authService.Logout({
-                                    this@MainActivity.mainVm.navController.navigate(
-                                        "Login"
-                                    )
-                                })
-                            }
+                            { authVm.authService.Logout( {
+                                    mainVm.navController.navigate("Login")
+                            } ) }
                         )
                     }
 
@@ -156,9 +127,8 @@ class MainActivity : ComponentActivity() {
                         LoadingView()
                     }
                 }
-
-                this.authVm.CheckLoginStatus()
             }
+            this.authVm.CheckLoginStatus()
         }
     }
 
@@ -172,39 +142,34 @@ class MainActivity : ComponentActivity() {
         this.authVm.permissionManager.handlePermissionsResult(this, requestCode, grantResults, permissionListener)
     }
 
-
     override fun onPause() {
         super.onPause()
-        Log.i("MainActivity", "pauses")
         this.mainVm.stopServices()
     }
     override fun onResume() {
         super.onResume()
-        Log.i("MainActivity", "resumes")
         if (this.authVm.authService.IsLoggedIn()) {
             this.mainVm.startServices()
         }
     }
+
     override fun onDestroy() {
         this.mainVm.stopServices()
         super.onDestroy()
     }
 
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channelId = "firebase_channel"
-            val channelName = "Default Notifications"
-            val description = "Firebase default notification channel"
-            val importance = NotificationManager.IMPORTANCE_HIGH
+        val channelId = "firebase_channel"
+        val channelName = "Default Notifications"
+        val description = "Firebase default notification channel"
+        val importance = NotificationManager.IMPORTANCE_HIGH
 
-            val channel = NotificationChannel(channelId, channelName, importance)
-            channel.description = description
+        val channel = NotificationChannel(channelId, channelName, importance)
+        channel.description = description
 
-            val notificationManager = getSystemService(NotificationManager::class.java)
-            notificationManager.createNotificationChannel(channel)
-        }
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        notificationManager.createNotificationChannel(channel)
     }
 }
-
 
 

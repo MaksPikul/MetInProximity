@@ -46,7 +46,7 @@ class LocationServiceBinder (private val context: Context) {
         return locationService?.locationClient!!.GetCurrentLocation()
     }
 
-    fun registerObserver(locObserver: LocObserver) {
+    fun registerObserver(locObserver: LocObserver?) {
         locationService?.locObsMan?.registerObserver(locObserver)
     }
 }

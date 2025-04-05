@@ -15,12 +15,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.metinproximityfront.data.enums.ScreenState
 import com.example.metinproximityfront.app.viewModels.HomeViewModel
 
 @Composable
 fun BottomNavBar(
-    homeVm: HomeViewModel
+    homeVm: HomeViewModel,
 ) {
 
     NavigationBar(
@@ -31,7 +32,6 @@ fun BottomNavBar(
             label = { Text("Home") },
             icon = { Icon(Icons.Default.Home , contentDescription = "Home Page") },
             selected = homeVm.uiState.value.currentScreen == ScreenState.MAP,
-            //unselectedIcon = Icons.Outlined.Home,
         )
         NavigationBarItem(
             onClick = {
@@ -40,14 +40,12 @@ fun BottomNavBar(
             label = { Text("Public") },
             icon = { Icon(Icons.Default.Menu , contentDescription = "Public Chat Page") },
             selected = homeVm.uiState.value.currentScreen == ScreenState.PUBLIC,
-            //unselectedIcon = Icons.Outlined.Home,
         )
         NavigationBarItem(
             onClick =  { homeVm.toggleBottomSheet() } ,
             label = { Text("Private") },
             icon = { Icon(Icons.Default.Menu , contentDescription = "Private Chat Page") },
             selected = homeVm.uiState.value.currentScreen == ScreenState.PRIVATE,
-            //unselectedIcon = Icons.Outlined.Home,
         )
     }
 }

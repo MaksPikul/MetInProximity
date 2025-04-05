@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using MetInProximityBack.Factories;
 using Microsoft.Azure.Cosmos;
 using MetInProximityBack.Types.Message;
-using MetInProximityBack.Types.Location;
 using Microsoft.Azure.Cosmos.Serialization.HybridRow;
 using MetInProximityBack.Hubs;
 using Microsoft.AspNetCore.SignalR;
@@ -26,6 +25,7 @@ using Microsoft.AspNetCore.Identity;
 using MetInProximityBack.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MetInProximityBack.Types.NearbyUser;
 
 namespace Metin.UnitTests.ServiceTests
 {

@@ -1,5 +1,7 @@
 package com.example.metinproximityfront.data.api
 
+import com.example.metinproximityfront.data.entities.account.StringRes
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -12,5 +14,5 @@ interface MapApi {
         @Query("lon") lon : Double,
         @Query("lat") lat : Double,
         @Header("Authorization") accessToken: String
-    ): Response<String>
+    ): Response<StringRes>
 }

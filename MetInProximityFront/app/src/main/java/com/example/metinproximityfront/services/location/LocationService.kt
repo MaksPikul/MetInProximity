@@ -78,10 +78,9 @@ class LocationService: Service() {
         locationClient.getLocationUpdates()
             .catch { e -> e.printStackTrace() }
             .onEach{ location ->
-                // logic to check if i need to fetch more map data or not
+
                 val result : LocResObj? = locationRepo.UpdateUserLocationRepo(location)
 
-                Log.i("Location Client", result?.lon.toString())
 
                 result?.mapImage?.let { mapImage ->
 

@@ -16,6 +16,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -32,17 +33,16 @@ fun ProfileDrawerContent (
     ModalDrawerSheet (
     modifier =  Modifier.width((LocalConfiguration.current.screenWidthDp * 0.7).dp)
     ){
-        var checked = false;
         Column (
             modifier = Modifier
-                .fillMaxSize() // Allow scrolling for long text
-                .padding(16.dp), // Add padding to avoid edge clipping
-            //verticalArrangement = Arrangement.Center,
+                .fillMaxSize()
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ){
+            val user = User.userData.collectAsState()
 
-            Text(User.userData?.username.toString(), fontSize = 22.sp)
-            Text(User.userData?.email.toString(), fontSize = 14.sp)
+            Text(user.value?.username.toString(), fontSize = 22.sp)
+            Text(user.value?.email.toString(), fontSize = 14.sp)
 
             HorizontalDivider(modifier = Modifier.padding(0.dp, 10.dp))
             NavigationDrawerItem(
@@ -53,41 +53,6 @@ fun ProfileDrawerContent (
 
             NavigationDrawerItem(
                 label = { Text(text = "Settings") },
-                selected = false,
-                onClick = { /*TODO*/ }
-            )
-
-            NavigationDrawerItem(
-                label = { Text(text = "Notifications") },
-                badge = {  Switch(
-                    modifier = Modifier.scale(0.7f),
-                    checked = checked,
-                    onCheckedChange = {
-                        false
-                    },thumbContent = if (checked) {
-                        {
-                            Icon(
-                                imageVector = Icons.Filled.Check,
-                                contentDescription = null,
-                                modifier = Modifier.size(SwitchDefaults.IconSize),
-                            )
-                        }
-                    } else {
-                        {
-                            Icon(
-                                imageVector = Icons.Filled.Close,
-                                contentDescription = null,
-                                modifier = Modifier.size(SwitchDefaults.IconSize),
-                            )
-                        }
-                    },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color.White,
-                        checkedTrackColor = Color.Green,
-                        uncheckedThumbColor = Color.White,
-                        uncheckedTrackColor = Color.Red,
-                    )
-                ) },
                 selected = false,
                 onClick = { /*TODO*/ }
             )

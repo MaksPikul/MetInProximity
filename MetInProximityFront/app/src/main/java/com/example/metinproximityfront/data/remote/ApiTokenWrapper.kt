@@ -23,33 +23,32 @@ class ApiTokenWrapper(
     ): T {
         var accessToken = encryptedStoreService.getFromPref(Constants.ACCESS_TOKEN_KEY)
 
-        if (accessToken.isNullOrBlank()) {
+        Log.i("Access", accessToken!!)
+
+        if (accessToken.isBlank()) {
             throw AuthException("Access token is missing. Redirect to login.")
         }
 
         return withContext(Dispatchers.IO) {
-            val response = try {
-                apiCall(getAuthHeader(accessToken!!))
 
-            } catch (e: Throwable) {
-                if (e is HttpException && e.code() != 401) {
-                    throw e
-                }
+            var response = apiCall(getAuthHeader(accessToken))
 
+            if (response.isSuccessful) {
+                Log.i("ApiTokenWrapper", "Returns first call")
+                response.body() ?: throw Exception("First API response body is null")
+            } else if (response.code() != 401) {
+                throw HttpException(response)
+            } else {
                 accessToken = try {
+                    Log.e("apitoken", "tries to refresh")
                     refreshAccessToken()
-                }
-                catch (e: Exception) {
+                } catch (e: Throwable) {
                     throw AuthException("Error : ${e.message}")
                 }
 
-                apiCall(getAuthHeader(accessToken!!))
-            }
-
-            if (response.isSuccessful) {
-                response.body() ?: throw Exception("API response body is null")
-            } else {
-                throw HttpException(response)
+                Log.i("ApiTokenWrapper", "Returns second call")
+                response = apiCall(getAuthHeader(accessToken))
+                response.body() ?: throw Exception("SecondAPI response body is null")
             }
         }
     }
@@ -63,6 +62,7 @@ class ApiTokenWrapper(
         val refreshToken = encryptedStoreService.getFromPref(Constants.REFRESH_TOKEN_KEY)
 
         if (refreshToken == null) {
+            Log.e("ApiTokenWrapper", "Missing Refresh Token")
             throw AuthException("Missing Refresh Token")
         }
         val response : Response<AuthResponse> = refreshTokenApi.RefreshAccessToken(refreshToken)
@@ -82,11 +82,12 @@ class ApiTokenWrapper(
 
             encryptedStoreService.removeFromPref(Constants.ACCESS_TOKEN_KEY)
             encryptedStoreService.removeFromPref(Constants.REFRESH_TOKEN_KEY)
+            Log.e("ApiTokenWrapper","Failed to refresh access token ")
             throw AuthException("Failed to refresh access token")
         }
     }
 
-    private fun getAuthHeader(accessToken: String) : String{
+    private fun getAuthHeader(accessToken: String?) : String{
         return "Bearer $accessToken"
     }
 }

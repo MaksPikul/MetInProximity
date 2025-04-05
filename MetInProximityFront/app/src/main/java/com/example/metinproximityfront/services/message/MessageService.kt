@@ -1,10 +1,9 @@
 package com.example.metinproximityfront.services.message
 
-import android.app.Application
 import android.util.Log
-import android.widget.Toast
 import com.example.metinproximityfront.services.location.LocationServiceBinder
 import com.example.metinproximityfront.config.Constants
+import com.example.metinproximityfront.data.entities.account.User
 import com.example.metinproximityfront.data.entities.location.LocationObject
 import com.example.metinproximityfront.data.entities.message.MsgResObject
 import com.example.metinproximityfront.data.entities.users.ChatUser
@@ -18,22 +17,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.util.Date
 
 class MessageService(
     private val sharedStore: IStoreService,
     private val msgRepo: MessageRepository? = null,
     private val msgLocBinder : LocationServiceBinder,
-)
-{
-    // Ik this class be using the observer method someone
-    // Does it without the list of observers, signalR updater, message service observer
+){
     private val _messages = MutableStateFlow<List<MsgResObject>>(emptyList()) // StateFlow for UI
     val messages: StateFlow<List<MsgResObject>> = _messages // Expose immutable StateFlow
 
     fun storeMessage(msg: MsgResObject): String {
 
-        var key = Constants.PUBLIC_CHAT_KEY/*-${msg.UserId}"*/
+        var key = Constants.PUBLIC_CHAT_KEY(User.userData.value.userId)
         if (!msg.isPublic) {
             key = Constants.PRIVATE_CHAT_KEY(msg.userId, msg.recipientId)
         }
@@ -45,22 +40,21 @@ class MessageService(
 
     fun retrieveMessages(
         latestMsg: MsgResObject? = null,
-        passedkey: String? = null
+        passedKey: String? = null
     ): List<MsgResObject> {
-        var key = passedkey
+        var key = passedKey
 
         if (key == null) {
             key = if (latestMsg?.isPublic != true && latestMsg?.recipientId != null) {
                 Constants.PRIVATE_CHAT_KEY(latestMsg.userId, latestMsg.recipientId)
             } else {
-                Constants.PUBLIC_CHAT_KEY
+                User.userData.value?.let { Constants.PUBLIC_CHAT_KEY(it.userId) }
             }
         }
-        val json = sharedStore.getFromPref(key)
-        Log.i("Retrieve", json.toString())
+        val json = key?.let { sharedStore.getFromPref(it) }
         if (json.isNullOrEmpty()) {
             // Handle the case where json is null or empty
-            _messages.value = emptyList() // You can return empty list as a fallback
+            _messages.value = emptyList()
             return emptyList()
         }
 
@@ -71,7 +65,7 @@ class MessageService(
         return messagesList
     }
 
-    fun sendMessage(
+    fun  sendMessage(
         textToSend: String,
         chatUser: ChatUser? = null
     ) : String? {
@@ -90,12 +84,17 @@ class MessageService(
                 if (chatUser == null) {
                     result = msgRepo?.SendPublicMessageRepo(msgObj)
                 } else {
-                    msgObj.recipientId = chatUser.Id
+                    Log.e("Recipient Id", chatUser.id)
+                    msgObj.msgRecipientId = chatUser.id
                     result = msgRepo?.SendPrivateMessageRepo(msgObj)
                 }
 
                 result?.let { msg ->
-                    Log.i("SendMessage", msg.body)
+                    Log.i(
+                    "MessageSerivce",
+                    "Message sent!" + msg.body
+                    )
+
                     storeMessage(msg)
 
                     retrieveMessages(msg)

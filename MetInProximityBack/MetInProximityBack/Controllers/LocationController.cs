@@ -34,6 +34,9 @@ namespace MetInProximityBack.Controllers
         ) {
             try
             {
+
+                Console.WriteLine("Coords received: lon = " + llObj.lon + ", lat = " + llObj.lat);
+
                 LocationObject locObj = LocationFactory
                     .CreateLocObj( User.GetId(), llObj.lon, llObj.lat,  true);
 
@@ -63,7 +66,7 @@ namespace MetInProximityBack.Controllers
             {
                 string mapImageBase64 = await _mapService.GetMapTiles(lon, lat);
 
-                return Ok(mapImageBase64);
+                return Ok(new {message=mapImageBase64});
             }
             catch (Exception ex)
             {
