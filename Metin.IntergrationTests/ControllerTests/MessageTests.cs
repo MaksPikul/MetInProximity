@@ -18,7 +18,6 @@ namespace MetInProximityBack.Tests.ControllerTests
         public Task InitializeAsync() => Task.CompletedTask;
         public async Task DisposeAsync() => await _factory.ResetDatabaseAsync();
 
-
         private CustomWebAppFactory _factory;
 
         private MessageResponse SignalRMessage = null;

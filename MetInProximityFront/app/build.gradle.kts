@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "com.example.metinproximityfront"
-    compileSdk = 35
+    compileSdk = 33
 
     defaultConfig {
         applicationId = "com.example.metinproximityfront"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
 

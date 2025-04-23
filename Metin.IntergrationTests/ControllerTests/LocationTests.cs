@@ -113,7 +113,6 @@ namespace Metin.IntergrationTests.ControllerTests
             {
                 return $"/api/user/location?long={fake_long}&lat={latitude}&open={open}";
             }
-
         }
     }
 }

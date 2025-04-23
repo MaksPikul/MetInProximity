@@ -23,18 +23,11 @@ namespace Metin.UnitTests.ServiceTests
 
     // These two have some sort of logic which other than send/get data
 
-
-
-
-
-
     public class MessageTEST
     {
         private readonly Mock<CosmoLocationRepo> _mockCosmoRepo;
         private readonly Mock<RedisCacheRepo> _mockRedisRepo;
         private readonly MessageService _msgService;
-
-
 
         public interface IDatabase_Mock
         {
@@ -53,7 +46,6 @@ namespace Metin.UnitTests.ServiceTests
             var _mockRedisRepo = new Mock<RedisCacheRepo>(mockDB.Object);
 
             return _mockRedisRepo;
-
         }
 
         // https://stackoverflow.com/questions/59067239/i-need-xunit-test-case-of-this-microsoft-azure-cosmos-container
@@ -63,7 +55,6 @@ namespace Metin.UnitTests.ServiceTests
             var client = new Mock<CosmosClient>();
 
             client.Setup(x => x.GetContainer(It.IsAny<string>(), It.IsAny<string>())).Returns(container.Object);
-
 
             var mockResponse = new Mock<ItemResponse<LocationObject>>();
             mockResponse.SetupGet(r => r.Resource).Returns(new LocationObject

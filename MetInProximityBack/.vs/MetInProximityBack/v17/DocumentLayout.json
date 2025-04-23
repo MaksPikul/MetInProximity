@@ -3,16 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metinproximityback\\metinproximityback\\controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|solutionrelative:metinproximityback\\controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{0AF5C350-8608-4E4A-8589-DA895CB53587}|..\\Metin.IntergrationTests\\Metin.IntergrationTests.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metin.intergrationtests\\repotests\\cosmolocationtest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metinproximityback\\metinproximityback\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|solutionrelative:metinproximityback\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metinproximityback\\metinproximityback\\controllers\\messagecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|solutionrelative:metinproximityback\\controllers\\messagecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{0AF5C350-8608-4E4A-8589-DA895CB53587}|..\\Metin.IntergrationTests\\Metin.IntergrationTests.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metin.intergrationtests\\controllertests\\locationtests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,7 +16,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Bookmark",
@@ -30,41 +24,28 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "MessageController.cs",
-              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Controllers\\MessageController.cs",
-              "RelativeDocumentMoniker": "MetInProximityBack\\Controllers\\MessageController.cs",
-              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Controllers\\MessageController.cs",
-              "RelativeToolTip": "MetInProximityBack\\Controllers\\MessageController.cs",
-              "ViewState": "AQIAACEAAAAAAAAAAAAAwDcAAAAPAAAA",
+              "DocumentIndex": 0,
+              "Title": "CosmoLocationTEST.cs",
+              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\Metin.IntergrationTests\\RepoTests\\CosmoLocationTEST.cs",
+              "RelativeDocumentMoniker": "..\\Metin.IntergrationTests\\RepoTests\\CosmoLocationTEST.cs",
+              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\Metin.IntergrationTests\\RepoTests\\CosmoLocationTEST.cs",
+              "RelativeToolTip": "..\\Metin.IntergrationTests\\RepoTests\\CosmoLocationTEST.cs",
+              "ViewState": "AQIAAF0AAAAAAAAAAAAAwDsAAAAcAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-05T18:46:31.561Z",
+              "WhenOpened": "2025-04-23T10:15:33.999Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "AccountController.cs",
-              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Controllers\\AccountController.cs",
-              "RelativeDocumentMoniker": "MetInProximityBack\\Controllers\\AccountController.cs",
-              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Controllers\\AccountController.cs",
-              "RelativeToolTip": "MetInProximityBack\\Controllers\\AccountController.cs",
-              "ViewState": "AQIAAF4AAAAAAAAAAAAQwIMAAAAAAAAA",
+              "Title": "LocationTests.cs",
+              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\Metin.IntergrationTests\\ControllerTests\\LocationTests.cs",
+              "RelativeDocumentMoniker": "..\\Metin.IntergrationTests\\ControllerTests\\LocationTests.cs",
+              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\Metin.IntergrationTests\\ControllerTests\\LocationTests.cs",
+              "RelativeToolTip": "..\\Metin.IntergrationTests\\ControllerTests\\LocationTests.cs",
+              "ViewState": "AQIAAD8AAAAAAAAAAAAmwGAAAAA6AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-02T08:57:50.304Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "UserController.cs",
-              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Controllers\\UserController.cs",
-              "RelativeDocumentMoniker": "MetInProximityBack\\Controllers\\UserController.cs",
-              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Controllers\\UserController.cs",
-              "RelativeToolTip": "MetInProximityBack\\Controllers\\UserController.cs",
-              "ViewState": "AQIAABYAAAAAAAAAAAAgwDIAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-02T08:57:43.767Z",
+              "WhenOpened": "2025-04-23T10:13:55.294Z",
               "EditorCaption": ""
             }
           ]

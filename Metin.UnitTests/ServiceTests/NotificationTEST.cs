@@ -1,31 +1,15 @@
 ﻿using MetInProximityBack.Services.Notifications;
 using MetInProximityBack.Services;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MetInProximityBack.Factories;
-using Microsoft.Azure.Cosmos;
 using MetInProximityBack.Types.Message;
-using Microsoft.Azure.Cosmos.Serialization.HybridRow;
 using MetInProximityBack.Hubs;
 using Microsoft.AspNetCore.SignalR;
-using System.Dynamic;
-using Microsoft.Extensions.Caching.StackExchangeRedis;
-using MetInProximityBack.Repositories;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Azure.Cosmos.Linq;
-using System.Net;
-using Moq.Protected;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Identity;
-using MetInProximityBack.Models;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using MetInProximityBack.Types.NearbyUser;
+using MetInProximityBack.Interfaces.IServices;
+using Microsoft.EntityFrameworkCore;
+using MetInProximityBack.Data;
+using MetInProximityBack.Interfaces.IRepos;
 
 namespace Metin.UnitTests.ServiceTests
 {
@@ -34,17 +18,18 @@ namespace Metin.UnitTests.ServiceTests
 
         private readonly Mock<HttpMessageHandler> mockHttpHandler;
 
-        private readonly NotificationService _notifService;
+        private readonly INotificationService _notifService;
         private Mock<IHubClients> mockClients;
-
-
+        private Mock<IPushNotifService> fbMock;
 
         public NotificationTEST()
         {
             // From this i now know that Moq doesnt like extensions
             // https://stackoverflow.com/questions/56254258/mock-signalr-hub-for-testing-dependent-class
             // https://www.codeproject.com/Articles/1266538/Testing-SignalR-Hubs-in-ASP-NET-Core-2-1
+            
             // ----------- SIGNAL R -----------------
+
             var mockClientProxy = new Mock<ISingleClientProxy>();
             this.mockClients = new Mock<IHubClients>();
             var mockHubContext = new Mock<IHubContext<ChatHub>>();
@@ -58,49 +43,17 @@ namespace Metin.UnitTests.ServiceTests
 
             // ---------- FireBase ------------------
 
-            var config = new Mock<IConfiguration>();
-            config.Setup(x => x["Firebase:SecretKey"]).Returns("key");
-            config.Setup(x => x["Firebase:Url"]).Returns("https://test.com/");
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseInMemoryDatabase(databaseName: "TestDb")
+                .Options;
 
-            // https://www.code4it.dev/blog/testing-httpclientfactory-moq/
-            this.mockHttpHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            var context = new AppDbContext(options);
 
-            this.mockHttpHandler
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.IsAny<HttpRequestMessage>(),
-                    ItExpr.IsAny<CancellationToken>()
-                )
-                .ReturnsAsync(new HttpResponseMessage())
-                .Verifiable(); // Track calls for verification
-
-
-            var httpClient = new HttpClient(this.mockHttpHandler.Object)
-            {
-                BaseAddress = new Uri("https://test.com/")
-            };
-
-            var mockHttpClientFactory = new Mock<IHttpClientFactory>();
-
-            mockHttpClientFactory
-                .Setup(x => x.CreateClient(It.IsAny<string>())) 
-                .Returns(httpClient);
-
-            // https://code-maze.com/aspnetcore-identity-testing-usermanager-rolemanager/
-            var mockUserManager = new Mock<UserManager<AppUser>>(
-            new Mock<IUserStore<AppUser>>().Object,
-                null, null, null, null, null, null, null, null
+            fbMock = new Mock<IPushNotifService>(
             );
-            
-            mockUserManager.Setup(_ => _.FindByIdAsync(It.IsAny<string>()))
-                .ReturnsAsync(new AppUser { /* FcmToken = "TEST_TOKEN" */ });
+            fbMock.Setup(x => x.SendPushNotification(It.IsAny<string>(), It.IsAny<MessageResponse>())).Returns(Task.CompletedTask);
 
-            var fbMock = new Mock<FirebaseService>(
-                   mockHttpClientFactory.Object,
-                   config.Object,
-                   mockUserManager.Object
-               );
+            // make fb verify calls
 
             _notifService = new NotificationService(
                new SignalRService(mockHubContext.Object),
@@ -116,13 +69,15 @@ namespace Metin.UnitTests.ServiceTests
            
             var testList = new List<NearbyUserWithConnId>();
 
-            var openNearbyUser = new NearbyUser { openToMessages = true };
-            var closedNearbyUser = new NearbyUser { openToMessages = false };
+            var openNearbyUser = new NearbyUser { UserId = "user1", openToMessages = true };
+            var closedNearbyUser = new NearbyUser { UserId = "user2", openToMessages = false };
 
             // In notificationService ...
+            // Connection Id not found
             testList.Add(new NearbyUserWithConnId(closedNearbyUser, null)); // false, false
             testList.Add(new NearbyUserWithConnId(openNearbyUser, null)); // true, false
 
+            // Connection Id found
             testList.Add(new NearbyUserWithConnId(closedNearbyUser, "1")); // false, true
             testList.Add(new NearbyUserWithConnId(openNearbyUser, "2")); // true, true
 
@@ -130,18 +85,13 @@ namespace Metin.UnitTests.ServiceTests
             await _notifService.RunPublicTasksAsync(testData.MsgRes, testList);
 
             // Assert
-            this.mockHttpHandler
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.IsAny<HttpRequestMessage>(),
-                    ItExpr.IsAny<CancellationToken>()
-                )
-                .ReturnsAsync(new HttpResponseMessage())
-                .Verifiable(); // Track calls for verification
-
+            // SignalR checks
             mockClients.Verify(x => x.Client("1"), Times.Never);
             mockClients.Verify(x => x.Client("2"), Times.Once);
+
+            // Firebase checks
+            fbMock.Verify(x => x.SendPushNotification("user1", testData.MsgRes), Times.Once);
+            fbMock.Verify(x => x.SendPushNotification("user2", testData.MsgRes), Times.Never);
         }
 
         [Fact] // Copies PrivateMessage method in message controller Flow, same below
@@ -154,20 +104,7 @@ namespace Metin.UnitTests.ServiceTests
             await _notifService.CreatePrivateTaskAsync(testData.RecipientConnId, testData.MsgRes);
 
             // Assert
-
-            mockHttpHandler
-                .Protected()
-                .Verify(
-                    "SendAsync",
-                    Times.Once(), // Ensure it's called exactly once
-                    ItExpr.Is<HttpRequestMessage>(req =>
-                        req.Method == HttpMethod.Post &&
-                        req.RequestUri.ToString() == "https://test.com/"
-                    ),
-                    ItExpr.IsAny<CancellationToken>()
-                );
-
-            mockClients.Verify(x => x.Client(null), Times.Never);
+            fbMock.Verify(x => x.SendPushNotification(testData.RecipientConnId, testData.MsgRes), Times.Once);
         }
 
         [Fact]
