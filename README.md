@@ -92,4 +92,53 @@ Some Endpoints require authentication, authorize yourself with an access token, 
   
 </details> 
 
-### Client Setup
+## Client Setup
+
+If you haven't cloned the project repository yet, open a terminal and enter in the line:
+
+git clone https://github.com/MaksPikul/MetInProximity.git metin
+
+### Emulator Setup (Easier / Requries better hardware)
+
+In android studio, navigate
+
+Tools → Device Manager → + Add a new device → Create Virtual Device
+
+Create your device, keeping android api between 26 - 35
+
+I recommend using pixel 7 with API 33 (Android 13.0)
+
+### Phone USB connection ( More performative)
+
+Setup phone into developer mode
+
+Enable dev mode
+
+Settings → About Phone → Tap build number 7 times → Should notify phone in developer mode
+
+Enable USB connection
+
+Settings → Developer Options → turn on USB debugging
+
+If on eduroam
+
+- On phone, enable Mobile Hotspot and Usb Tethering
+
+Settings → Connections → mobile hotspot and tethering
+
+- Connect laptop to hotspot hosted by mobile phone
+
+Get Laptop IP address
+
+One method, in terminal, type:
+- ipconfig (windows)
+- ifconfig (linux / mac)
+
+navigate to metin\MetInProximityFront\app\src\main\java\com\example\metinproximityfront\config\Constants.kt
+
+in Constants.kt file, change ip constant value to your laptop IP
+
+Client is configured, in android studio, your mobile device should be visible, press the “play” button to start your app
+
+
+
