@@ -1,19 +1,9 @@
-﻿using MetInProximityBack.Enums;
+﻿using MetInProximityBack.Interfaces.IServices;
 using MetInProximityBack.Extensions;
-using MetInProximityBack.Interfaces;
 using MetInProximityBack.Interfaces.IRepos;
-using MetInProximityBack.Models;
-using MetInProximityBack.Repositories;
-using MetInProximityBack.Services;
 using MetInProximityBack.Types.Location;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Cosmos;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace MetInProximityBack.Controllers
 {
@@ -21,11 +11,11 @@ namespace MetInProximityBack.Controllers
     [ApiController]
     public class LocationController(
         IDocumentRepo cosmosDb,
-        MapService mapService
+        IMapService mapService
     ) : Controller
     {
         private readonly IDocumentRepo _cosmosDb = cosmosDb;
-        private readonly MapService _mapService = mapService;
+        private readonly IMapService _mapService = mapService;
 
         [HttpPut]
         [Authorize]

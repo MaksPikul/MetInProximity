@@ -27,7 +27,7 @@ namespace MetInProximityBack.Controllers
         [HttpPost("public")]
         [Authorize]
         [EnableRateLimiting("chat")]
-        public async Task<IActionResult> PublicReceiveMessageAndNotify(
+        public async Task<IActionResult> PublicReceiveMsgAndNotify(
             [FromBody] MessageRequest msgReq
         ) {
             try {
@@ -50,7 +50,7 @@ namespace MetInProximityBack.Controllers
         [HttpPost("private")]
         [Authorize]
         [EnableRateLimiting("chat")]
-        public async Task<IActionResult> PrivateReceiveMessageAndNotify(
+        public async Task<IActionResult> PrivateReceiveMsgAndNotify(
             [FromBody] PrivateMessageRequest msgReq
         ) {
             try

@@ -27,18 +27,18 @@ namespace MetInProximityBack.Constants
         public static ArrayList CosmoDbDummyData = new ArrayList
         {
             // Nearby and open to private
-            LocationFactory.CreateLocObj( "1_near&priv", -122.084009, 37.425636, true, true ),
-            LocationFactory.CreateLocObj( "2_near&priv", -122.084695, 37.421751, true, true ),
-            LocationFactory.CreateLocObj( "3_near&priv", -122.081757, 37.422279, true, true ),
+            LocationFactory.CreateLocObj( "1_near&priv", 0.00002889, -0.00060548, true, true ), 
+            LocationFactory.CreateLocObj( "2_near&priv", 0.00216696, 0.00000003, true, true ),
+            LocationFactory.CreateLocObj( "3_near&priv", -0.00138628, 0.00225841, true, true ), 
 
             // Not available to private but nearby
-            LocationFactory.CreateLocObj( "4_near", -122.086282, 37.423335, true, false ),
-            LocationFactory.CreateLocObj( "5_near", -122.081414, 37.423114, true, false ),
+            LocationFactory.CreateLocObj( "4_near", -0.00040432,0.00050540, true, false ), 
+            LocationFactory.CreateLocObj( "5_near", 0.00028890, 0.00060548, true, false ),
 
             // Not nearby
-            LocationFactory.CreateLocObj( "6", -122.088023, 37.423702, true, true ),
-            LocationFactory.CreateLocObj( "7", -122.079617, 37.421929, true, true ),
-            LocationFactory.CreateLocObj( "8", -122.080218, 37.426565, true, true )
+            LocationFactory.CreateLocObj( "6", 0.00121100, -0.00000000, true, true ),
+            LocationFactory.CreateLocObj( "7", -0.00080864, -0.00101080, true, true ),
+            LocationFactory.CreateLocObj( "8", 0.00000000, 0.00121100, true, true )
         };
 
     }

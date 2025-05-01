@@ -90,6 +90,7 @@ namespace Metin.IntergrationTests.SetupFiles
             await _respawner.ResetAsync(_dbConnection);
         }
 
+        
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
 
@@ -117,5 +118,6 @@ namespace Metin.IntergrationTests.SetupFiles
                 });
             });
         }
+        
     }
 }

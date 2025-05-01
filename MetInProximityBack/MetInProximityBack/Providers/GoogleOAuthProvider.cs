@@ -13,9 +13,28 @@ namespace MetInProximityBack.Providers
     public class GoogleOAuthProvider : IOAuthProvider
     {
 
-        private readonly IConfiguration _configuration;
         public string ProviderName => "google";
-        [Obsolete("Function fufilled on client side")]
+
+        public OAuthUserDto MapResponseToUser(IEnumerable<Claim> res)
+        {
+            var userEmail = res.GetClaimValue("email");
+            var userName = res.GetClaimValue("name");
+            var verified = res.GetClaimValue("email_verified");
+
+            return new OAuthUserDto
+            {
+                UserName = userName,
+                UserEmail = userEmail,
+                IsEmailVerified = verified == "False" ? false : true,
+            };
+        }
+    }
+}
+
+
+
+/*
+ [Obsolete("Function fufilled on client side")]
         public string TokenUrl => "https://oauth2.googleapis.com/token";
         [Obsolete("Function fufilled on client side")]
         public string UserUrl => "https://www.googleapis.com/oauthv2/v1/userinfo";
@@ -42,19 +61,4 @@ namespace MetInProximityBack.Providers
 
             return body;
         }
-
-        public OAuthUserDto MapResponseToUser(IEnumerable<Claim> res)
-        {
-            var userEmail = res.GetClaimValue("email");
-            var userName = res.GetClaimValue("name");
-            var verified = res.GetClaimValue("email_verified");
-
-            return new OAuthUserDto
-            {
-                UserName = userName,
-                UserEmail = userEmail,
-                IsEmailVerified = verified == "False" ? false : true,
-            };
-        }
-    }
-}
+*/

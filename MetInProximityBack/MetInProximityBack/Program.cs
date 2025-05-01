@@ -16,8 +16,6 @@ using Microsoft.OpenApi.Models;
 using MetInProximityBack.Repositories;
 using MetInProximityBack.Interfaces.IServices;
 using MetInProximityBack.Services.Notifications;
-using Microsoft.AspNetCore.RateLimiting;
-using System.Threading.RateLimiting;
 using MetInProximityBack.Constants;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
@@ -188,7 +186,7 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IPushNotifService, FirebaseService>();
 builder.Services.AddScoped<IWebSocketService, SignalRService>();
 
-builder.Services.AddScoped<MapService>();
+builder.Services.AddScoped<IMapService, MapService>();
 
 builder.Services.AddSingleton<OAuthProviderFactory>();
 builder.Services.AddTransient<IOAuthProvider, GoogleOAuthProvider>();
@@ -210,42 +208,24 @@ using (var scope = app.Services.CreateScope())
     await db.Database.MigrateAsync();  
 }
 
-// Does above but for Cosmos Db (NoSql)
 using (var scope = app.Services.CreateScope())
 {
+
     var cosmosClient = scope.ServiceProvider.GetRequiredService<CosmosClient>();
+    Console.WriteLine("creating dbs");
     var databaseResponse = await cosmosClient.CreateDatabaseIfNotExistsAsync(AppConstants.COSMO_LOC_DB);
+    Console.WriteLine("creating container");
     var containerResponse = await databaseResponse.Database.CreateContainerIfNotExistsAsync(
         AppConstants.COSMO_LOC_CON, AppConstants.COSMO_PART_KEY, 400
     );
-
-    // assumption is that if i created the container before, then i have ran this code before
-    if (containerResponse.StatusCode == System.Net.HttpStatusCode.Created)
+    
+    if (containerResponse.StatusCode == System.Net.HttpStatusCode.OK)
     {
-        Container container = containerResponse.Container;
-
-        var tasks = new List<Task>();
-
-        foreach (LocationObject dummyUser in AppConstants.CosmoDbDummyData)
-        {
-            tasks.Add(Task.Run(async () =>
-            {
-                await container.CreateItemAsync(dummyUser, new PartitionKey(dummyUser.UserId));
-
-            }));
-        }
-
-        await Task.WhenAll(tasks);
-
-        Console.WriteLine("CosmoDb (NoSql) has been populated with new dummy data");
-    }
-    else if (containerResponse.StatusCode == System.Net.HttpStatusCode.OK)
-    {
-        Console.WriteLine("CosmoDb (NoSql) already populated with dummy data");
+        Console.WriteLine("CosmoDb (NoSql) container created");
     }
     else
     {
-        Console.WriteLine("There has been an error creating container, and hence, populating database");
+        Console.WriteLine("There has been an error creating container.");
     }
 }
 

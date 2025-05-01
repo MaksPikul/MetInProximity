@@ -8,7 +8,6 @@
 
 # secret files
 appsettings.Development.json
-appsettings.json
 MetInProximityBack.http
 
 

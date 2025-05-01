@@ -14,7 +14,6 @@ namespace MetInProximityBack.Services.Tokens
 
         public AuthTokenService(IConfiguration configuration) : base(configuration) { }
 
-
         public string CreateAccessToken(ClaimsPrincipal User, bool openToPrivate = false)
         {
             List<Claim> accessTokenClaims = new ClaimsBuilder()

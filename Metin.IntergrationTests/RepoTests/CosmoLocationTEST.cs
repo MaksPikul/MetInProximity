@@ -21,19 +21,22 @@ namespace MetInProximityBack.Tests.ServiceTests
                 }),
                 ConnectionMode = ConnectionMode.Gateway,
             };
+            Console.WriteLine("Client options");
 
             // below is a secret,
             // which is not a secret, because its whats given on Microsoft docs to use the emulator
             // ^ FYI 
             var client =new CosmosClient(
-                accountEndpoint : "https://localhost:8081",
+                accountEndpoint : "https://azure_cosmos_db:8081",
                 authKeyOrResourceToken : "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==",
                 clientOptions: options
             );
+            Console.WriteLine("Client");
 
             _cosmoRepo = new CosmoLocationRepo(
                 client
             );
+            Console.WriteLine("Repo");
         }
 
 
@@ -42,11 +45,12 @@ namespace MetInProximityBack.Tests.ServiceTests
         {
 
             var locObj_0 = LocationFactory.CreateLocObj("1234", 0.0, 0.0, false);
-
             ItemResponse<LocationObject> response_0 = await _cosmoRepo.AddOrUpdateLocation( locObj_0 );
+            Console.WriteLine("created");
 
             // Item added
             Assert.Equal("Created", response_0.StatusCode.ToString());
+            Console.WriteLine("asserted");
 
             LocationObject? locObj_Response = await _cosmoRepo.GetLocationByUserId(locObj_0.UserId);
 

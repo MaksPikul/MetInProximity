@@ -15,6 +15,7 @@ using RTools_NTS.Util;
 using MetInProximityBack.Interfaces.IServices;
 using MetInProximityBack.Extensions;
 using Google.Apis.Logging;
+using Microsoft.AspNetCore.Authentication.OAuth;
 
 namespace MetInProximityBack.Controllers
 {
@@ -37,6 +38,7 @@ namespace MetInProximityBack.Controllers
             _authTokenService = authTokenService;
         }
 
+
         [HttpPost("oauth/{provider}")]
         public async Task<IActionResult> Authenticate(
             [FromBody] AuthRequest authRequest,
@@ -48,31 +50,17 @@ namespace MetInProximityBack.Controllers
 
                 IEnumerable<Claim> claims = _authTokenService.DecodeToken(authRequest.IdToken);
 
-                OAuthUserDto user = OAuthProvider.MapResponseToUser(claims);
+                OAuthUserDto authUser = OAuthProvider.MapResponseToUser(claims);
 
-                if (user.IsEmailVerified != true)
+                if (authUser.IsEmailVerified != true)
                 {
                     return BadRequest("Email not verified.");
                 }
 
-                AppUser? appUser = await _userManager.FindByEmailAsync(user.UserEmail); 
+                AppUser appUser = await this.CreateAppUser(authUser, authRequest.FcmToken);
 
-                if (appUser == null) {
-                    appUser = await this.CreateAppUser(user.UserName, user.UserEmail, authRequest.FcmToken);
-                }
-                else
-                {
-                    if (appUser.FcmToken != authRequest.FcmToken)
-                    {
-                        appUser.FcmToken = authRequest.FcmToken;
-                        await _userManager.UpdateAsync(appUser);
-                    }
-                }
-                
-                // Token for accessing app resources 30 minutes duration
-                string accessToken = _authTokenService.CreateAccessToken(appUser); 
-                // Token for refreshing access token 1 month duration
-                string refreshToken = _authTokenService.CreateRefreshToken(appUser);
+                string accessToken = _authTokenService.CreateAccessToken(appUser); // 30 mins
+                string refreshToken = _authTokenService.CreateRefreshToken(appUser); // 1 month
 
                 // OPTIONAL, STORE refreshToken into DB to REVOKE access by admin
 
@@ -120,11 +108,26 @@ namespace MetInProximityBack.Controllers
         }
 
         // I think this is the only place that this method will be used, hence a private controller class
-        private async Task<AppUser> CreateAppUser(string UserName, string Email, string fcmToken)
+        private async Task<AppUser> CreateAppUser(OAuthUserDto authUser, string fcmToken)
         {
-            AppUser appUser = new AppUser {UserName = UserName, Email = Email, FcmToken = fcmToken};
-            await _userManager.CreateAsync(appUser);
-            //await _userManager.AddToRoleAsync(appUser, "User");
+
+
+            AppUser? appUser = await _userManager.FindByEmailAsync(authUser.UserEmail);
+
+            if (appUser == null)
+            {
+                appUser = new AppUser { UserName = authUser.UserName, Email = authUser.UserEmail, FcmToken = fcmToken };
+                await _userManager.CreateAsync(appUser);
+            }
+            else
+            {
+                if (appUser.FcmToken != fcmToken)
+                {
+                    appUser.FcmToken = fcmToken;
+                    await _userManager.UpdateAsync(appUser);
+                }
+            }
+
             return appUser;
         }
     }

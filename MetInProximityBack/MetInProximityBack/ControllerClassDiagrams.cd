@@ -1,0 +1,201 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="MetInProximityBack.Controllers.AccountController">
+    <Position X="2.75" Y="2.25" Width="1.75" />
+    <AssociationLine Name="_providerFactory" Type="MetInProximityBack.Factories.OAuthProviderFactory" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="4.5" Y="3.312" />
+        <Point X="7.688" Y="3.312" />
+        <Point X="7.688" Y="4" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAABAAAAAAAAAAAIAAAACAAAAAAAAAAIAAEA=</HashCode>
+      <FileName>Controllers\AccountController.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_userManager" />
+      <Field Name="_providerFactory" />
+      <Field Name="_authTokenService" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="MetInProximityBack.Services.Tokens.TokenService">
+    <Position X="0.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAEAAAAAAAAAAAGAAAAAEAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\Tokens\TokenService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="MetInProximityBack.Providers.GoogleOAuthProvider" Collapsed="true">
+    <Position X="8.25" Y="5.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAA=</HashCode>
+      <FileName>Providers\GoogleOAuthProvider.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="MetInProximityBack.Providers.MicrosoftOAuthProvider" Collapsed="true">
+    <Position X="8.25" Y="6.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAA=</HashCode>
+      <FileName>Providers\MicrosoftOAuthProvider.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="MetInProximityBack.Services.Tokens.AuthTokenService">
+    <Position X="2.75" Y="5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\Tokens\AuthTokenService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MetInProximityBack.Factories.OAuthProviderFactory">
+    <Position X="6.5" Y="4" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAA=</HashCode>
+      <FileName>Factories\OAuthProviderFactory.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="_providers" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Microsoft.AspNetCore.Identity.UserManager&lt;TUser&gt;" Collapsed="true">
+    <Position X="6.75" Y="2" Width="1.75" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="MetInProximityBack.Controllers.LocationController">
+    <Position X="11.25" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAACg=</HashCode>
+      <FileName>Controllers\LocationController.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_cosmosDb" />
+      <Field Name="_mapService" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="MetInProximityBack.Controllers.MessageController">
+    <Position X="10.75" Y="6" Width="2" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAAAAAAAAAAAAAAAAQAAAgAAAAABAAAAAAAAA=</HashCode>
+      <FileName>Controllers\MessageController.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_msgService" />
+      <Field Name="_notifService" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="MetInProximityBack.Services.MessageService">
+    <Position X="16.25" Y="4.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>MAAAAAAAAAAAggAAAAAAAQAAAAgAAACAAAAAAAAAAAg=</HashCode>
+      <FileName>Services\MessageService.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_cacheRepo" />
+      <Field Name="_cosmosDb" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="MetInProximityBack.Services.NotificationService">
+    <Position X="16.25" Y="7.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABACAAAEAAACAAAAAAAAAAAAAAAAIAAAAA=</HashCode>
+      <FileName>Services\NotificationService.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_fbService" />
+      <Field Name="_srService" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="MetInProximityBack.Controllers.UserController">
+    <Position X="2.5" Y="9" Width="1.5" />
+    <AssociationLine Name="_msgService" Type="MetInProximityBack.Interfaces.IServices.IMessageService" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="4" Y="9.809" />
+        <Point X="10.566" Y="9.809" />
+        <Point X="10.566" Y="5.125" />
+        <Point X="14" Y="5.125" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAQAAACAIAAAAAACAAAAAA=</HashCode>
+      <FileName>Controllers\UserController.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_appDbContext" />
+      <Field Name="_authTokenService" />
+      <Field Name="_msgService" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="MetInProximityBack.Data.AppDbContext" Collapsed="true">
+    <Position X="4.25" Y="8.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Data\AppDbContext.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityDbContext&lt;TUser&gt;">
+    <Position X="4" Y="6.75" Width="2.25" />
+    <TypeIdentifier />
+  </Class>
+  <Interface Name="MetInProximityBack.Interfaces.IOAuthProvider">
+    <Position X="6.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAA=</HashCode>
+      <FileName>Interfaces\IOAuthProvider.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="MetInProximityBack.Interfaces.IRepos.IDocumentRepo">
+    <Position X="14" Y="1.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAABAAAACAAAAQAAAAAAAAABAAAA=</HashCode>
+      <FileName>Interfaces\IRepos\IDocumentRepo.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="MetInProximityBack.Interfaces.IServices.IMapService">
+    <Position X="11.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\IServices\IMapService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="MetInProximityBack.Interfaces.IServices.IMessageService">
+    <Position X="14" Y="4.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAAAggAAAAAAAQAAAAAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\IServices\IMessageService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="MetInProximityBack.Interfaces.IServices.INotificationService">
+    <Position X="14" Y="7.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAIAAAAA=</HashCode>
+      <FileName>Interfaces\IServices\INotificationService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="MetInProximityBack.Interfaces.IRepos.ICacheRepo">
+    <Position X="19.5" Y="4.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQAAAAABAIAAAAAAAAAAAAAAAAEAAAAAAA=</HashCode>
+      <FileName>Interfaces\IRepos\ICacheRepo.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="MetInProximityBack.Interfaces.IRepos.IPushNotifService">
+    <Position X="19.5" Y="7" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\IRepos\IPushNotifService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="MetInProximityBack.Interfaces.IRepos.IWebSocketService">
+    <Position X="19.5" Y="8.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\IRepos\IWebSocketService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
