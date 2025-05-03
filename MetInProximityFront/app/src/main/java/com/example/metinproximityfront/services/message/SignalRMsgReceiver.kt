@@ -62,7 +62,7 @@ class SignalRMsgReceiver(
             Log.i("SIGNALR_MSG_RECEIVED", "MESSAGE BODY: " + msg.body)
             val key : String = msgService?.storeMessage( msg, msg.userId ).toString()
 
-            msgService?.retrieveMessages( msg , key )
+            msgService?.retrieveMessages( msg , key)
 
         }, MsgResObject::class.java)
 

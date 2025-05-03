@@ -34,6 +34,7 @@ class MessageService(
         }
         val json = Gson().toJson(_messages.value + msg)
         sharedStore.saveIntoPref(key, json)
+        Log.e("Key store", key)
 
         return key
     }
@@ -51,6 +52,8 @@ class MessageService(
                 User.userData.value?.let { Constants.PUBLIC_CHAT_KEY(it.userId) }
             }
         }
+        Log.e("Key retrieve", key.toString())
+
         val json = key?.let { sharedStore.getFromPref(it) }
         if (json.isNullOrEmpty()) {
             // Handle the case where json is null or empty
@@ -96,13 +99,12 @@ class MessageService(
                     )
 
                     if (msg.recipientId != null) {
-                        var privateKey = storeMessage(msg, msg.recipientId)
-                        retrieveMessages(msg, privateKey)
-
+                        var keyPrivate = storeMessage(msg, msg.recipientId)
+                        retrieveMessages(msg, keyPrivate)
                     }
                     else {
-                        var publicKey = storeMessage(msg)
-                        retrieveMessages(msg, publicKey)
+                        var keyPublic = storeMessage(msg)
+                        retrieveMessages(msg, keyPublic)
                     }
 
                 }

@@ -16,19 +16,11 @@ namespace MetInProximityBack.Services
 
         public async Task RunPublicTasksAsync(MessageResponse msgRes, List<NearbyUserWithConnId> users)
         {
-            var tasks = new List<Task>();
-
             foreach (var user in users)
             {
                 Console.WriteLine(user.UserId);
-                tasks.Add(Task.Run(async () =>
-                {
-                    await this.CreatePublicTask(user, msgRes);
-
-                }));
+                await this.CreatePublicTask(user, msgRes);
             }
-
-            await Task.WhenAll(tasks);
         }
 
         public async Task CreatePrivateTaskAsync(string recipientConnId, MessageResponse msgRes)
@@ -41,7 +33,7 @@ namespace MetInProximityBack.Services
                 }
                 else
                 {
-                    await _fbService.SendPushNotification(recipientConnId, msgRes);
+                    await _fbService.SendPushNotification(msgRes.RecipientId, msgRes);
                 }
             }
             catch (Exception ex)

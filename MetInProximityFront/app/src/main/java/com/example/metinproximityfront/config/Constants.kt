@@ -2,7 +2,7 @@ package com.example.metinproximityfront.config
 
 object Constants {
 
-    private val ip = "192.168.1.134"
+    private const val ip = ""
     val BASE_URL: String = "http://${ip}:5000/api/" // 5177 , 7238
 
     val ACCESS_TOKEN_KEY = "Access_Token"
@@ -25,7 +25,7 @@ object Constants {
         userId : String,
         recipientId: String?
     ) : String {
-        return "private-${recipientId}-${userId}"
+        return "private-${userId}-${recipientId}"
     }
 
 }

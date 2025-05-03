@@ -43,10 +43,12 @@ namespace MetInProximityBack.Services.Notifications
         // Need to handle nulls
         private async Task<string?> GetUserFcmToken(string userId)
         {
-            return await _context.Users
+            var x = await _context.Users
                 .Where(u => u.Id == userId)
-                .Select(u => u.FcmToken)
+                .Select(u => new { token = u.FcmToken })
                 .FirstOrDefaultAsync();
+
+            return x.token;
         }
     }
 }
