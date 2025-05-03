@@ -60,7 +60,7 @@ class SignalRMsgReceiver(
     private fun defineHubMethods() {
         hubConnection.on("ReceiveMessage", { msg: MsgResObject  ->
             Log.i("SIGNALR_MSG_RECEIVED", "MESSAGE BODY: " + msg.body)
-            val key : String = msgService?.storeMessage( msg ).toString()
+            val key : String = msgService?.storeMessage( msg, msg.userId ).toString()
 
             msgService?.retrieveMessages( msg , key )
 

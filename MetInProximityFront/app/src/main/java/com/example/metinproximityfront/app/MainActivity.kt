@@ -67,6 +67,8 @@ class MainActivity : ComponentActivity() {
         val mainModel: MainViewModel by viewModels( )
         this.mainVm = mainModel
 
+        mainVm.storeService.removeFromPref("wsg")
+
         this.authVm = AuthViewModel(
             application,
             mainVm

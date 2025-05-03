@@ -26,7 +26,7 @@ class MainViewModel(
 ) : AndroidViewModel(app) {
 
     val encryptedStoreService : IStoreService = EncryptedStoreService(this.app.applicationContext)
-    private val storeService : IStoreService = SharedStoreService(
+    val storeService : IStoreService = SharedStoreService(
         this.app.applicationContext,
         Constants.MsgSharedStoreServiceFileName
     )

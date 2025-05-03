@@ -1,7 +1,9 @@
 package com.example.metinproximityfront.services.preference
 
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
+
 
 class SharedStoreService(
     appContext: Context,
@@ -23,6 +25,9 @@ class SharedStoreService(
     }
 
     override fun removeFromPref(key: String) {
-        sharedPreferences.edit().remove(key).apply()
+        //sharedPreferences.edit().remove(key).apply()
+        val editor = sharedPreferences.edit()
+        editor.clear() // This clears all the data
+        editor.apply()
     }
 }

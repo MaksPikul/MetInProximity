@@ -26,11 +26,11 @@ class MessageService(
     private val _messages = MutableStateFlow<List<MsgResObject>>(emptyList()) // StateFlow for UI
     val messages: StateFlow<List<MsgResObject>> = _messages // Expose immutable StateFlow
 
-    fun storeMessage(msg: MsgResObject): String {
+    fun storeMessage(msg: MsgResObject, otherId: String? = null): String {
 
         var key = Constants.PUBLIC_CHAT_KEY(User.userData.value.userId)
         if (!msg.isPublic) {
-            key = Constants.PRIVATE_CHAT_KEY(msg.userId, msg.recipientId)
+            key = Constants.PRIVATE_CHAT_KEY(User.userData.value.userId, otherId)
         }
         val json = Gson().toJson(_messages.value + msg)
         sharedStore.saveIntoPref(key, json)
@@ -46,7 +46,7 @@ class MessageService(
 
         if (key == null) {
             key = if (latestMsg?.isPublic != true && latestMsg?.recipientId != null) {
-                Constants.PRIVATE_CHAT_KEY(latestMsg.userId, latestMsg.recipientId)
+                Constants.PRIVATE_CHAT_KEY(latestMsg.recipientId, latestMsg.userId)
             } else {
                 User.userData.value?.let { Constants.PUBLIC_CHAT_KEY(it.userId) }
             }
@@ -95,9 +95,16 @@ class MessageService(
                     "Message sent!" + msg.body
                     )
 
-                    storeMessage(msg)
+                    if (msg.recipientId != null) {
+                        var privateKey = storeMessage(msg, msg.recipientId)
+                        retrieveMessages(msg, privateKey)
 
-                    retrieveMessages(msg)
+                    }
+                    else {
+                        var publicKey = storeMessage(msg)
+                        retrieveMessages(msg, publicKey)
+                    }
+
                 }
             }
             null
