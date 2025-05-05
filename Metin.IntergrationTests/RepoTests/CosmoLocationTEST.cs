@@ -21,13 +21,8 @@ namespace MetInProximityBack.Tests.ServiceTests
                 }),
                 ConnectionMode = ConnectionMode.Gateway,
             };
-            Console.WriteLine("Client options");
-
-            // below is a secret,
-            // which is not a secret, because its whats given on Microsoft docs to use the emulator
-            // ^ FYI 
             var client =new CosmosClient(
-                accountEndpoint : "https://azure_cosmos_db:8081",
+                accountEndpoint : "https://172.18.0.4:8081",
                 authKeyOrResourceToken : "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==",
                 clientOptions: options
             );

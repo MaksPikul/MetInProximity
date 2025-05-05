@@ -8,17 +8,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Respawn;
-using RTools_NTS.Util;
-using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Data.Common;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Testcontainers.CosmosDb;
-using Testcontainers.Redis;
-using Testcontainers.SqlEdge;
 
 
 /*
@@ -33,20 +23,11 @@ namespace Metin.IntergrationTests.SetupFiles
         
 
         private Respawner _respawner = null!;
-
-        private readonly Lazy<RedisContainer> _redisContainer = new(() => new RedisBuilder().Build());
-        private readonly Lazy<CosmosDbContainer> _cosmosContainer = new(() => new CosmosDbBuilder().Build());
-        private readonly Lazy<SqlEdgeContainer> _sqlEdgeContainer = new(() => new SqlEdgeBuilder().Build());
-
         public HttpClient HttpClient { get; private set; } = null!;
         public HubConnection hubConnection { get; private set; } = null!;
 
         public async Task InitializeAsync()
         {
-
-            await _redisContainer.Value.StartAsync();
-            await _cosmosContainer.Value.StartAsync();
-            await _sqlEdgeContainer.Value.StartAsync();
 
             HttpClient = CreateClient();
             string dogUser = "Bearer " + Constants.DOG_TEST_JWT;
@@ -59,20 +40,17 @@ namespace Metin.IntergrationTests.SetupFiles
                 })
                 .WithAutomaticReconnect()
                 .Build();
-          
+            
             HttpClient.DefaultRequestHeaders.Add("Authorization", catUser);
 
-            _dbConnection = new SqlConnection(_sqlEdgeContainer.Value.GetConnectionString());  
-
-            await _dbConnection.OpenAsync();
+            //_dbConnection = new SqlConnection(_sqlEdgeContainer.Value.GetConnectionString());  
+             
+            //await _dbConnection.OpenAsync();
             await InitializeRespawnerAsync();
         }
 
         public new async Task DisposeAsync()
         {
-            await _redisContainer.Value.DisposeAsync();
-            await _cosmosContainer.Value.DisposeAsync();
-            await _sqlEdgeContainer.Value.DisposeAsync();
             await base.DisposeAsync();
         }
 
@@ -94,9 +72,9 @@ namespace Metin.IntergrationTests.SetupFiles
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
 
-            Environment.SetEnvironmentVariable("ConnectionStrings:DefaultConnection", _sqlEdgeContainer.Value.GetConnectionString());
-            Environment.SetEnvironmentVariable("ConnectionStrings:RedisConnectionString", _redisContainer.Value.GetConnectionString());
-            Environment.SetEnvironmentVariable("ConnectionStrings:CosmosAccountEndpoint", _cosmosContainer.Value.GetConnectionString());
+            //Environment.SetEnvironmentVariable("ConnectionStrings:DefaultConnection", _sqlEdgeContainer.Value.GetConnectionString());
+            //Environment.SetEnvironmentVariable("ConnectionStrings:RedisConnectionString", _redisContainer.Value.GetConnectionString());
+            //Environment.SetEnvironmentVariable("ConnectionStrings:CosmosAccountEndpoint", _cosmosContainer.Value.GetConnectionString());
 
             builder.ConfigureServices(services =>
             {
@@ -114,7 +92,7 @@ namespace Metin.IntergrationTests.SetupFiles
 
                 services.AddDbContext<AppDbContext>(options =>
                 {
-                    options.UseSqlServer(_sqlEdgeContainer.Value.GetConnectionString());
+                    //options.UseSqlServer(_sqlEdgeContainer.Value.GetConnectionString());
                 });
             });
         }

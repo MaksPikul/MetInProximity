@@ -3,20 +3,27 @@
   "WorkspaceRootPath": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metinproximityback\\metinproximityback\\services\\notificationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|solutionrelative:metinproximityback\\services\\notificationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metinproximityback\\metinproximityback\\interfaces\\irepos\\ipushnotifservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|solutionrelative:metinproximityback\\interfaces\\irepos\\ipushnotifservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metinproximityback\\metinproximityback\\services\\notifications\\firebaseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|solutionrelative:metinproximityback\\services\\notifications\\firebaseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metinproximityback\\metinproximityback\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|solutionrelative:metinproximityback\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0AF5C350-8608-4E4A-8589-DA895CB53587}|..\\Metin.IntergrationTests\\Metin.IntergrationTests.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metin.intergrationtests\\repotests\\cosmolocationtest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metinproximityback\\metinproximityback\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{05A7F439-9703-4C37-8D0A-146154AC18E3}|MetInProximityBack\\MetInProximityBack.csproj|solutionrelative:metinproximityback\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0AF5C350-8608-4E4A-8589-DA895CB53587}|..\\Metin.IntergrationTests\\Metin.IntergrationTests.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metin.intergrationtests\\setupfiles\\customwebappfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0AF5C350-8608-4E4A-8589-DA895CB53587}|..\\Metin.IntergrationTests\\Metin.IntergrationTests.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metin.intergrationtests\\controllertests\\messagetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0AF5C350-8608-4E4A-8589-DA895CB53587}|..\\Metin.IntergrationTests\\Metin.IntergrationTests.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metin.intergrationtests\\controllertests\\sharedtestcollection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0AF5C350-8608-4E4A-8589-DA895CB53587}|..\\Metin.IntergrationTests\\Metin.IntergrationTests.csproj|c:\\users\\mmaks\\coding projects\\metinproximity\\metin.intergrationtests\\controllertests\\locationtests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,62 +33,96 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 5,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "IPushNotifService.cs",
-              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Interfaces\\IRepos\\IPushNotifService.cs",
-              "RelativeDocumentMoniker": "MetInProximityBack\\Interfaces\\IRepos\\IPushNotifService.cs",
-              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Interfaces\\IRepos\\IPushNotifService.cs",
-              "RelativeToolTip": "MetInProximityBack\\Interfaces\\IRepos\\IPushNotifService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAkAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-01T19:51:59.737Z",
-              "EditorCaption": ""
-            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "NotificationService.cs",
-              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Services\\NotificationService.cs",
-              "RelativeDocumentMoniker": "MetInProximityBack\\Services\\NotificationService.cs",
-              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Services\\NotificationService.cs",
-              "RelativeToolTip": "MetInProximityBack\\Services\\NotificationService.cs",
-              "ViewState": "AgIAAA4AAAAAAAAAAAAwwCIAAAARAAAAAAAAAA==",
+              "DocumentIndex": 4,
+              "Title": "MessageTests.cs",
+              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\Metin.IntergrationTests\\ControllerTests\\MessageTests.cs",
+              "RelativeDocumentMoniker": "..\\Metin.IntergrationTests\\ControllerTests\\MessageTests.cs",
+              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\Metin.IntergrationTests\\ControllerTests\\MessageTests.cs",
+              "RelativeToolTip": "..\\Metin.IntergrationTests\\ControllerTests\\MessageTests.cs",
+              "ViewState": "AgIAABYAAAAAAAAAAAAuwEgAAAA2AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-01T19:51:26.398Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-05T17:47:33.046Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "FirebaseService.cs",
-              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Services\\Notifications\\FirebaseService.cs",
-              "RelativeDocumentMoniker": "MetInProximityBack\\Services\\Notifications\\FirebaseService.cs",
-              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Services\\Notifications\\FirebaseService.cs",
-              "RelativeToolTip": "MetInProximityBack\\Services\\Notifications\\FirebaseService.cs",
-              "ViewState": "AgIAAAgAAAAAAAAAAAA5wBoAAAAOAAAAAAAAAA==",
+              "DocumentIndex": 5,
+              "Title": "SharedTestCollection.cs",
+              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\Metin.IntergrationTests\\ControllerTests\\SharedTestCollection.cs",
+              "RelativeDocumentMoniker": "..\\Metin.IntergrationTests\\ControllerTests\\SharedTestCollection.cs",
+              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\Metin.IntergrationTests\\ControllerTests\\SharedTestCollection.cs",
+              "RelativeToolTip": "..\\Metin.IntergrationTests\\ControllerTests\\SharedTestCollection.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAqAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-01T18:57:22.591Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-05T17:47:15.721Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
+              "Title": "CustomWebAppFactory.cs",
+              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\Metin.IntergrationTests\\SetupFiles\\CustomWebAppFactory.cs",
+              "RelativeDocumentMoniker": "..\\Metin.IntergrationTests\\SetupFiles\\CustomWebAppFactory.cs",
+              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\Metin.IntergrationTests\\SetupFiles\\CustomWebAppFactory.cs",
+              "RelativeToolTip": "..\\Metin.IntergrationTests\\SetupFiles\\CustomWebAppFactory.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAoAAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-05T17:41:12.237Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "LocationTests.cs",
+              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\Metin.IntergrationTests\\ControllerTests\\LocationTests.cs",
+              "RelativeDocumentMoniker": "..\\Metin.IntergrationTests\\ControllerTests\\LocationTests.cs",
+              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\Metin.IntergrationTests\\ControllerTests\\LocationTests.cs",
+              "RelativeToolTip": "..\\Metin.IntergrationTests\\ControllerTests\\LocationTests.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAABMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-05T17:40:04.816Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
               "Title": "appsettings.json",
               "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\appsettings.json",
               "RelativeDocumentMoniker": "MetInProximityBack\\appsettings.json",
               "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\appsettings.json",
               "RelativeToolTip": "MetInProximityBack\\appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACQAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB0AAAAUAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-05-01T16:30:29.938Z",
+              "WhenOpened": "2025-05-05T17:39:19.381Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Program.cs",
+              "RelativeDocumentMoniker": "MetInProximityBack\\Program.cs",
+              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\MetInProximityBack\\MetInProximityBack\\Program.cs",
+              "RelativeToolTip": "MetInProximityBack\\Program.cs",
+              "ViewState": "AgIAAMcAAAAAAAAAAAAowOUAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-05T17:39:12.668Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "CosmoLocationTEST.cs",
+              "DocumentMoniker": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\Metin.IntergrationTests\\RepoTests\\CosmoLocationTEST.cs",
+              "RelativeDocumentMoniker": "..\\Metin.IntergrationTests\\RepoTests\\CosmoLocationTEST.cs",
+              "ToolTip": "C:\\Users\\mmaks\\Coding Projects\\MetInProximity\\Metin.IntergrationTests\\RepoTests\\CosmoLocationTEST.cs",
+              "RelativeToolTip": "..\\Metin.IntergrationTests\\RepoTests\\CosmoLocationTEST.cs",
+              "ViewState": "AgIAAEMAAAAAAAAAAADwvyMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-05T17:36:58.99Z",
               "EditorCaption": ""
             }
           ]

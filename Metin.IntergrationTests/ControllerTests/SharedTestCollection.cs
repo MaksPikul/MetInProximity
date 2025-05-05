@@ -7,6 +7,6 @@ using System.Threading.Tasks;
 
 namespace Metin.IntergrationTests.ControllerTests
 {
-    [CollectionDefinition("MetinTests")]
-    public class SharedMetinTestCollection : IClassFixture<CustomWebAppFactory>;
+    //[CollectionDefinition("MetinTests")]
+    //public class SharedMetinTestCollection : IClassFixture<CustomWebAppFactory>;
 }

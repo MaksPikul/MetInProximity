@@ -44,6 +44,10 @@ class HomeViewModel(
 
     fun changeVisibility() {
         userActionService?.changeVisibility()
+        val afterChange = User.userData.value.openToPrivate
+        if (afterChange){
+            userActionService?.getPrivateUsers()
+        }
     }
 
     fun changeTextValue(newText : String) {
@@ -68,7 +72,6 @@ class HomeViewModel(
     fun toggleBottomSheet() {
         // if was false, hence sheet is now appearing
         if (!_uiState.value.botSheetVisible) {
-            Log.i("toggle", "runs here")
             userActionService?.getPrivateUsers(
             )
         }

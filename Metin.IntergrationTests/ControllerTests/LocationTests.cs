@@ -15,7 +15,7 @@ using MetInProximityBack.Tests.SetupFiles;
 
 namespace Metin.IntergrationTests.ControllerTests
 {
-    [Collection("MetinTests")]
+    //[Collection("MetinTests")]
     public class LocationTests(CustomWebAppFactory factory) : IAsyncLifetime
     {
 

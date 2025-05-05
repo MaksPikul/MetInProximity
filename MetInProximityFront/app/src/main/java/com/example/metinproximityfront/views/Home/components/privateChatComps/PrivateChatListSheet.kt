@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.metinproximityfront.data.entities.users.ChatUser
 import com.example.metinproximityfront.app.viewModels.HomeViewModel
+import com.example.metinproximityfront.data.entities.account.User
 import com.example.metinproximityfront.data.enums.UserLoadState
 
 
@@ -42,10 +43,13 @@ import com.example.metinproximityfront.data.enums.UserLoadState
 fun PrivateChatListSheet (
     homeVm: HomeViewModel,
 ) {
+
     val chatUsers by homeVm.userActionService!!.chatUsers.collectAsState()
     val loadState by homeVm.userActionService!!.loadState.collectAsState()
 
     val userListState = rememberLazyListState()
+
+    val user by User.userData.collectAsState()
 
     if(homeVm.uiState.value.botSheetVisible) {
         ModalBottomSheet(
@@ -57,40 +61,52 @@ fun PrivateChatListSheet (
 
             PrivateChatHeader(homeVm)
 
-            when (loadState) {
-                UserLoadState.LOADING -> Column (
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    CircularProgressIndicator()
-                }
-
-                UserLoadState.READY -> if (chatUsers.isNotEmpty()) {
-                    LazyColumn(
-                        state = userListState,
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
+            if (user.openToPrivate) {
+                when (loadState) {
+                    UserLoadState.LOADING -> Column(
                         modifier = Modifier
-                            .weight(1f)
                             .fillMaxWidth(),
-                        reverseLayout = false
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        items(chatUsers) { chatUser ->
-                            PrivateChatUserBubble(
-                                chatUser,
-                                homeVm
-                            )
+                        CircularProgressIndicator()
+                    }
+
+                    UserLoadState.READY -> if (chatUsers.isNotEmpty()) {
+                        LazyColumn(
+                            state = userListState,
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(),
+                            reverseLayout = false
+                        ) {
+                            items(chatUsers) { chatUser ->
+                                PrivateChatUserBubble(
+                                    chatUser,
+                                    homeVm
+                                )
+                            }
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.TopCenter
+                        ) {
+                            Text(text = "No users nearby")
                         }
                     }
-                } else {
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = "No users nearby")
-                    }
+                }
+            }
+            else {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.TopCenter
+                ) {
+                    Text(text = "Enable private messaging to see other nearby private users")
                 }
             }
         }

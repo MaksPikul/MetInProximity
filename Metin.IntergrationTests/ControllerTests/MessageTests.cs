@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace MetInProximityBack.Tests.ControllerTests
 {
-    [Collection("MetinTests")]
+    //[Collection("MetinTests")]
     public class MessageTests : IAsyncLifetime
     {
         public Task InitializeAsync() => Task.CompletedTask;

@@ -80,7 +80,7 @@ class FirebaseMsgReceiver : FirebaseMessagingService() {
 
         val notifIntent = CreateIntent(key)
 
-        this.createAndRunNotification(notifIntent)
+        this.createAndRunNotification(msgObj)
     }
 
     // Hate that i have to repeat code,
@@ -155,16 +155,21 @@ class FirebaseMsgReceiver : FirebaseMessagingService() {
 
     @SuppressLint("MissingPermission")
     private fun createAndRunNotification(
-        notifIntent : PendingIntent
+        msgObj : MsgResObject
     ){
         var channelId = "firebase_channel"
 
+        var contentTitle = if (msgObj.isPublic) {
+            "You Received a Public Message!"
+        } else {
+            "You Received a Private Message!"
+        }
+
         val notification = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
-            .setContentTitle("Message Received")
-            .setContentText("Check who sent you a message!")
+            .setContentTitle(contentTitle)
+            .setContentText("See what they sent!")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .addAction(0, "Go To", notifIntent)
             .setAutoCancel(true)
             .build()
 

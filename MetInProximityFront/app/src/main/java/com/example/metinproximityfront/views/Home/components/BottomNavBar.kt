@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Icon
@@ -38,13 +40,13 @@ fun BottomNavBar(
                 homeVm.changeScreen(ScreenState.PUBLIC)
             },
             label = { Text("Public") },
-            icon = { Icon(Icons.Default.Menu , contentDescription = "Public Chat Page") },
+            icon = { Icon(Icons.Default.LockOpen , contentDescription = "Public Chat Page") },
             selected = homeVm.uiState.value.currentScreen == ScreenState.PUBLIC,
         )
         NavigationBarItem(
             onClick =  { homeVm.toggleBottomSheet() } ,
             label = { Text("Private") },
-            icon = { Icon(Icons.Default.Menu , contentDescription = "Private Chat Page") },
+            icon = { Icon(Icons.Default.Lock , contentDescription = "Private Chat Page") },
             selected = homeVm.uiState.value.currentScreen == ScreenState.PRIVATE,
         )
     }
