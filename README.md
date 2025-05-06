@@ -134,9 +134,12 @@ One method, in terminal, type:
 - ipconfig (windows)
 - ifconfig (linux / mac)
 
-navigate to metin\MetInProximityFront\app\src\main\java\com\example\metinproximityfront\config\Constants.kt
+for both files, 
 
-in Constants.kt file, change ip constant value to your laptop IP
+metin\MetInProximityFront\app\src\main\java\com\example\metinproximityfront\config\Constants.kt
+metin\MetInProximityFront\app\src\main\res\xml\network_security_config.xml"
+
+in Constants.kt file and network_security_config.xml, change ip constant value or missing fields to your laptop IP
 
 Client is configured, in android studio, your mobile device should be visible, press the “play” button to start your app
 
